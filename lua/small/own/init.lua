@@ -24,10 +24,10 @@ local M={}
 ---@param theme own.themes
 function M.setup(theme)
     if not theme then
-        if vim.fn.filereadable('/tmp/night')==1 then
-            theme='midnight'
-        elseif vim.env.TRANSPARENT then
+        if vim.env.TRANSPARENT then
             theme='transparent'
+        elseif vim.fn.filereadable('/tmp/night')==1 then
+            theme='midnight'
         else
             if vim.o.background=='light' then
                 theme='day'

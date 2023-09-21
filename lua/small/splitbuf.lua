@@ -17,7 +17,7 @@ M.options={
     },
     d={
         desc='dff',
-        action=function () require'dff.file_expl'.open(vim.fn.expand('%:p:h') --[[@as string]]) end,
+        action=function () require'small.dff.file_expl'.open(vim.fn.expand('%:p:h') --[[@as string]]) end,
     },
 }
 function M.open()

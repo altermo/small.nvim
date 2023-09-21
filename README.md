@@ -77,6 +77,13 @@ Highlight the selected text in visual mode.
 ## Labull
 Has one function `labull.run()`, which is newline and auto adds bullets for bullet-list.
 
+## Lbpr
+Code based replace file wide.\
+Has one function `lbpr.run()`, which opens the editor plane.\
+`:w` on script buf to run script.\
+`:w` on preview buf to save changes.\
+Inspired by [pyro](https://github.com/rraks/pyro)
+
 ## Macro
 A simple macro plugin \
 Has the following functions:

@@ -22,9 +22,10 @@ function M.open(_)
     return {buf=M.buf}
 end
 function M.run()
+    if M.proc then M.proc:kill(1) end
     vim.ui.input({prompt='chat> '},function (inp)
         if inp==nil or vim.trim(inp)=='' then return end
-        M.ask(inp,M.open(inp))
+        M.proc=M.ask(inp,M.open(inp))
     end)
 end
 return M
