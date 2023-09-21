@@ -1,4 +1,4 @@
-local M={}
+local M={conf={}}
 function M.parse_date(date)
     local reg='(%d%d%d%d)%-(%d%d)%-(%d%d) (%d%d):(%d%d)'
     local year,month,day,hour,minute=date:match(reg)
@@ -7,7 +7,7 @@ end
 function M.get_times()
     local times={}
     local reg=[[^%s*%- %[ %]%s*([^(]*)%s%(@(%d%d%d%d%-%d%d%-%d%d %d%d:%d%d)%)]]
-    for i in io.lines(M.path) do
+    for i in io.lines(M.conf.path) do
         local doc,date=i:match(reg)
         if doc then table.insert(times,{doc,M.parse_date(date)}) end
     end
@@ -35,7 +35,7 @@ function M.fn()
     vim.defer_fn(function () vim.ui.select(to_dos,{default=''},function() end) end,10000)
 end
 function M.setup()
-    if not M.path then
+    if not M.conf.path then
         error('conf: reminder.path is not set')
     end
     M.done={}

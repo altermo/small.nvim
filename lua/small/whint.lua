@@ -77,15 +77,10 @@ function M.create_return_autocmd(linenr,col)
         vim.api.nvim_del_autocmd(au)
     end})
 end
-function M.run(key)
-    if not M.in_lua() then return key end
+function M.run()
+    if not M.in_lua() then return ':' end
     if M.should_statment() then vim.schedule(M.run_statment)
     elseif M.should_return() then vim.schedule(M.run_return)
-    else return key end
-end
-function M.run_wrapp(key)
-    return function ()
-        return M.run(key)
-    end
+    else return ':' end
 end
 return M

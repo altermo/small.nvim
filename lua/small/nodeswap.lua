@@ -1,15 +1,15 @@
-local M={nodes={
+local M={conf={nodes={
     arguments=true,
     parameters=true,
     argument_list=true,
     table_constructor=true,
     list=true,
     array=true,
-}}
+}}}
 function M.get_node(prev,node)
     if not node then return end
     local parent=node:parent()
-    while parent and (not M.nodes[parent:type()] or not (prev and node:prev_named_sibling() or node:next_named_sibling())) do
+    while parent and (not M.conf.nodes[parent:type()] or not (prev and node:prev_named_sibling() or node:next_named_sibling())) do
         node=parent
         parent=node:parent()
     end
