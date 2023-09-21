@@ -39,7 +39,7 @@ end
 ---@param path string?
 ---@param conf dff.config?
 function M.open(path,conf)
-    conf=conf or require'small.dff.init'.config
+    conf=conf or require'small.dff.init'.conf
     path=vim.fs.normalize(vim.fn.fnamemodify(path or '.',':p'))
     local buf=M.create_buf()
     M.create_win(conf,buf)

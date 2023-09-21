@@ -1,4 +1,4 @@
-local M={conf={
+local M={conf={builders={
     python={normal='python %s',source='pyfile %'},
     mojo={normal='mojo %s'},
     fish={normal='fish %s'},
@@ -10,7 +10,7 @@ local M={conf={
     c={normal='zig cc -O2 %s -o __tmp;./__tmp;rm __tmp',alter='make'},
     vim={source='so %'},
     zig={normal='zig run %s',alter='zig build run'},
-}}
+}}}
 
 function M.eval()
     vim.cmd('silent! update')

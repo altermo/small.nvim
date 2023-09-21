@@ -70,6 +70,7 @@ while len(items)!=1:
     items=filter(lambda x:x[col]==char,items)
 ```
 </details>
+<!-- TODO: write about config-->
 
 ## Foldselect
 Summary: Select from folds using `vim.ui.select`. \

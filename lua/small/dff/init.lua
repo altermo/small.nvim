@@ -11,7 +11,7 @@ local default_conf={
 }
 
 local file_expl=require'small.dff.file_expl'
-local M={default_conf=default_conf,config=default_conf}
+local M={conf=default_conf}
 function M.file_expl(file)
     file_expl.open(file)
 end
