@@ -1,3 +1,4 @@
+--TODO: instead of using inode, use count as nodes may change when doing many M.over()
 local M={conf={nodes={
     arguments=true,
     parameters=true,
@@ -17,15 +18,15 @@ function M.get_node(prev,node)
 end
 function M.swap(prev,inode)
     local node,other=M.get_node(prev,inode or vim.treesitter.get_node())
-    if not node then return end
-    M.save={prev,node}
+    if not node then return false end
+    M.save={prev,node,other}
     require'nvim-treesitter.ts_utils'.swap_nodes(node,other,0)
 end
 function M.over()
     if not M.save then return end
-    local prev,node=M.save[1],M.save[2]
-    M.swap(prev,node)
-    M.swap(prev,node:parent())
+    local prev,node,other=unpack(M.save)
+    require'nvim-treesitter.ts_utils'.swap_nodes(node,other,0)
+    if not M.swap(prev,node:parent()) then M.save=nil end
 end
 function M.swap_prev() M.swap(true) end
 function M.swap_next() M.swap() end
