@@ -1,4 +1,4 @@
-local M={}
+local M={conf={exit_if_single=false}}
 function M.ranger(path)
     local realpath=vim.fn.fnamemodify(path,':p')
     local file='/tmp/chosenfile'
@@ -15,6 +15,8 @@ function M.ranger(path)
             if vim.fn.filereadable(file)==1 then
                 vim.cmd.edit(vim.fn.readfile(file)[1])
                 vim.fn.delete(file)
+            else
+                if M.conf.exit_if_single and #vim.fn.getbufinfo()==1 and vim.api.nvim_get_current_buf()==buf then vim.cmd.quitall() end
             end
             vim.cmd.bdelete{buf,bang=true}
         end

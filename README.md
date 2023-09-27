@@ -130,8 +130,10 @@ Summary: Searches and download and inits plugins using [nvim.sh](https://nvim.sh
 Commands: `plugin_search.run()`
 ## Ranger
 Required: `ranger` \
-Summary: simple `ranger` wrapper
-Commands: `ranger.run(file?)`
+Summary: simple `ranger` wrapper \
+Commands: `ranger.run(file?)` \
+Config:
++ `ranger.conf.exit_if_single`: exit neovim when quitting ranger if it is the only buffer
 ## Reminder
 Summary: Searches the `reminder.conf.path` for any bullet list with `-`, and a date `(@YYYY-MM-DD HH:MM)`, and does a reminder when the time comes. \
 Setup: `reminder.setup()`\
