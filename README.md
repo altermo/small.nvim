@@ -76,6 +76,10 @@ while len(items)!=1:
 Summary: Select from folds using `vim.ui.select`. \
 Commands: `foldselect.run()`
 
+## Foldtext
+Summary: A simple foldtext. \
+Setup: `foldtext.setup()`
+
 ## Highlight_selected
 Summary: Highlight matching selected text in visual mode. \
 Setup: `highlight_selected.setup()`
