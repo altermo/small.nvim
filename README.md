@@ -72,6 +72,24 @@ while len(items)!=1:
 </details>
 <!-- TODO: write about config-->
 
+## Exchange
+Summary: Exchange two selected regions. \
+Commands:
++ `exchange.ex_line()` exchange current line
++ `exchange.ex_oper()` exchange operator
++ `exchange.ex_visual()` exchange visual
++ `exchange.ex_eol()` exchange to end of line
++ `exchange.ex_cancel()` cancel exchange
+
+Keymap (example):
+```lua
+vim.keymap.set('n','cx',exchange.ex_oper)
+vim.keymap.set('n','cX',exchange.ex_eol)
+vim.keymap.set('n','cxx',exchange.ex_line)
+vim.keymap.set('n','cxc',exchange.ex_cancel)
+vim.keymap.set('x','X',exchange.ex_visual)
+```
+
 ## Foldselect
 Summary: Select from folds using `vim.ui.select`. \
 Commands: `foldselect.run()`
