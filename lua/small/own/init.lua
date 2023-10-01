@@ -22,7 +22,8 @@
 
 local M={}
 ---@param theme own.themes
-function M.setup(theme)
+---@param ns_id? number
+function M.setup(theme,ns_id)
     if not theme then
         if vim.env.TRANSPARENT then
             theme='transparent'
@@ -36,18 +37,20 @@ function M.setup(theme)
             end
         end
     end
-    M.load(theme)
+    M.load(theme,ns_id)
 end
 ---@param theme own.themes
-function M.load(theme)
-    M.set_highlights(require('small.own.theme.'..theme))
+---@param ns_id? number
+function M.load(theme,ns_id)
+    M.set_highlights(require('small.own.theme.'..theme),ns_id)
 end
 ---@param color own.color
-function M.set_highlights(color)
+---@param ns_id? number
+function M.set_highlights(color,ns_id)
     local p=color.pallet
     vim.cmd'highlight clear'
     local function set_hl(name,val)
-        vim.api.nvim_set_hl(0,name,val)
+        vim.api.nvim_set_hl(ns_id or 0,name,val)
     end
     local linebg=p.secondbg
     local secondfg=p.nimportant
