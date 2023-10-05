@@ -17,7 +17,7 @@ function M.make_floating(win)
         height=height,
         row=row,
         col=col,
-    })
+    }) --TODO: use `nvim_win_set_config()` instead
 end
 function M.move_floating_window(win)
     win=win or 0

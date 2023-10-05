@@ -12,6 +12,7 @@ function M.utf8_sub(s,i,j)
     local end_=pos[j]
     return s:sub(start,end_+vim.str_utf_end(s,end_))
 end
+M.utf8_len=vim.api.nvim_strwidth
 ---@return string?
 function M.pos_tree_lang()
     local stat,parser=pcall(vim.treesitter.get_parser,0)

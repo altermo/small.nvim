@@ -10,6 +10,7 @@ end
 M.I.get_range=function(reg)
     local r=M.I.to_lsp_range(reg)
     local lines=vim.api.nvim_buf_get_lines(0,r.start.line,r['end'].line+1,false)
+    --TODO: use `nvim_buf_get_text` instead
     if r.start.line==r['end'].line then
         lines[1]=lines[1]:sub(r.start.character+1,r['end'].character)
     else
