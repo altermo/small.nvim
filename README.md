@@ -140,6 +140,18 @@ Commands:
 
 Config:
 + `nodeswap.conf.nodes` which tsnodes should be considered as nodes
+## Nterm
+Summary: Run terminal or use neovim as a terminal.\
+Commands:
++ `nterm.run(cmd?,smart_quit_nvim?)` creates a new termial
+    + `cmd?`: the cmd to run, defaults to `&shell`
+    + `smart_quit_nvim?`: if is the only buffer open, quits neovim
+
+Example:
+Here is an example of how to use neovim-qt as a terminal:
+```bash
+nvim-qt -- -c "lua require'small.nterm'.run(nil,true)"
+```
 ## Onelinecomment
 Optional: `treesitter` \
 Summary: Toggle comments out the text, can detect filetype with treesitter. \
