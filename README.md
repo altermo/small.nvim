@@ -52,6 +52,11 @@ Required: [`tgpt`](https://github.com/aandrew-me/tgpt)\
 Summary: Runs tgpt in buffer\
 Commands: `tgpt.run()`
 
+## Cmd2ins
+Summary: Run insert mappings (like [nvim-autopairs](https://github.com/windwp/nvim-autopairs)) in the cmdline \
+Commands:
++ `cmd2ins.map(key)` run key from command mode in insert mode
+
 ## Dff
 Summary: The hop/leap/flash style selector + a file explorer (not manager).\
 Commands:
