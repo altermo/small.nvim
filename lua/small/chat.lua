@@ -3,10 +3,9 @@ function M.ask(text,opt)
     local out=''
     local function update() vim.api.nvim_buf_set_lines(opt.buf,0,-1,false,vim.split(out,'\n')) end
     update()
-    return vim.system({'tgpt',text},{stdout=function (err,data)
+    return vim.system({'tgpt','-q',text},{stdout=function (err,data)
         if err then error(err) end
         if data then out=out..data end
-        if (data or ''):sub(1,1)=='\r' then out=vim.trim(data) end
         vim.schedule(update)
     end})
 end
