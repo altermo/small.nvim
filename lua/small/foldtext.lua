@@ -3,8 +3,8 @@ function M.MyFoldText()
     local bul='•'
     local wininfo=vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
     local line=vim.fn.getline(vim.v.foldstart) --[[@as string]]
-    local ident=line:match('^%W*')
-    local left=('%s %s '):format(bul..bul:rep(#ident-2),line:sub(#ident+1))
+    local ident=line:match('^[%s-]*')
+    local left=('%s%s '):format(#ident>0 and bul:rep(#ident-1)..' ' or '',line:sub(#ident+1))
     local precent=(vim.v.foldend-vim.v.foldstart+1)/vim.api.nvim_buf_line_count(0)*100
     local right=string.format(
         ' %d lines:%3s%% %s',
