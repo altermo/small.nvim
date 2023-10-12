@@ -3,7 +3,8 @@ local M={}
 ---@param statusline? string
 ---@return string[][]
 function M.get_statusline(opt,statusline)
-    local s=vim.api.nvim_eval_statusline(statusline or vim.o.statusline,setmetatable({highlights=true},{__index=opt}))
+    opt=vim.tbl_extend('force',{highlights=true},opt)
+    local s=vim.api.nvim_eval_statusline(statusline or vim.o.statusline,opt)
     local str=s.str
     local high=s.highlights
     local out={}
@@ -14,7 +15,7 @@ function M.get_statusline(opt,statusline)
     return out
 end
 function M.replace_statusline()
-    if vim.o.laststatus~=3 then
+    if vim.o.laststatus~=3  then
         error('\nWill not work if laststatus is not 3\nNote: if you change laststatus while it is active then it may break')
         return
     end
@@ -27,12 +28,17 @@ function M.replace_statusline()
         style='minimal'
     })
     local update=vim.schedule_wrap(function ()
+        if vim.o.statusline==' ' then return end
         if vim.api.nvim_get_current_win()==win then return end
-        vim.api.nvim_buf_set_lines(buf,0,-1,false,{vim.api.nvim_eval_statusline(vim.o.statusline,{}).str})
+        vim.api.nvim_buf_set_lines(buf,0,-1,false,{vim.api.nvim_eval_statusline(vim.o.statusline,{maxwidth=vim.o.columns}).str})
         local col=0
-        for _,v in ipairs(M.get_statusline()) do
+        for _,v in ipairs(M.get_statusline({maxwidth=vim.o.columns})) do
             vim.highlight.range(buf,vim.api.nvim_create_namespace(''),v[2],{0,col},{0,col+#v[1]})
             col=col+#v[1]
+        end
+        vim.o.statusline=' '
+        for _,v in ipairs(vim.api.nvim_list_wins()) do
+            vim.wo[v].statusline=' '
         end
     end)
     vim.api.nvim_create_autocmd('OptionSet',{pattern='statusline',callback=update})

@@ -22,6 +22,7 @@ function M.pos_tree_lang()
     local lang=parser:language_for_range({row,col,row,col})
     return lang:lang()
 end
+--TODO: make somehow use of vim.ui.input
 ---@param timeout? number
 ---@param update? fun(inp:string)
 ---@return string
@@ -49,5 +50,27 @@ function M.timeout_input(timeout,update)
         if status==-1 then break end
     end
     return ret
+end
+---@param preset string
+---@param on_confirm fun(inp:string?)
+---@param opt table
+function M.preset_input(preset,on_confirm,opt)
+    opt=vim.tbl_extend('force',{
+        completion=nil,
+        prompt='>',
+        prehl='Comment',
+    })
+    vim.nvim_echo({{opt.prompt,'Normal'},{preset,opt.prehl}},false,{})
+    local char=vim.fn.getcharstr()
+    if char=='\27' then
+        on_confirm(nil) return
+    elseif char=='\r' then
+        on_confirm(preset) return
+    end
+    vim.ui.input({
+        prompt=opt.prompt,
+        default=char,
+        completion=opt.completion,
+    },on_confirm)
 end
 return M
