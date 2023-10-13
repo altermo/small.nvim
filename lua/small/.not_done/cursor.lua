@@ -1,3 +1,15 @@
+--[[TODO
+Make each cursor be able to have a mode which they are in
+Make it so that you can do an action at each cursor
+Be able to create groups of cursors (buffer/window/id specific)
+    And only show in those buffers/windows/a function returning boolean
+A telescope selector for cursor (and groups of cursors)
+A cursor spawner: looks like a normal cursor but when you trie to use it, it spawns a cursor
+A temp cursor: cursor which is temporary and will be deleted once not focused (can be made permanent)
+    spawner + temp : a mark system
+Option to hide cursor/ make it look different
+    Different colors for different modes
+--]]
 local M={conf={ns=nil}}
 function M.get_ns()
     return M.conf.ns or vim.api.nvim_create_namespace('small_cursor')
