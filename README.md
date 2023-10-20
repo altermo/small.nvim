@@ -3,9 +3,11 @@ This is my personal collection of small plugins that I created for myself.
 
 **As it is my personal plugins, I might change things without warning.**
 
+The documentation might not be up to date
+
 I would recommend checking out [whint](#Whint), [bufend](#Bufend) and [dff](#Dff) as those are the ones that helps me the most.
 
-Global optional but recommend dependencies:
+Optional dependencies:
 + `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
 + `rcarriga/nvim-notify` many plugins use `vim.notify`
 
