@@ -4,7 +4,7 @@ function M.I.to_lsp_range(reg)
     local end_line=math.max(unpack(vim.tbl_keys(reg)))
     local start_col=reg[start_line][1]
     local end_col=reg[end_line][2]
-    if end_col=='-1' then end_col=#vim.api.nvim_buf_get_lines(0,end_line+1,end_line,false)[1] end
+    if end_col==-1 then end_col=#vim.api.nvim_buf_get_lines(0,end_line,end_line+1,false)[1] end
     return {start={line=start_line,character=start_col},['end']={line=end_line,character=end_col}}
 end
 M.I.get_range=function(reg)
@@ -19,14 +19,14 @@ M.I.get_range=function(reg)
     end
     return table.concat(lines,'\n')
 end
-function M.ex_range(start,fin)
+function M.ex_range(start,fin,regt)
     if not M.save then
         local ns=vim.api.nvim_create_namespace('exchange')
-        vim.highlight.range(0,ns,'CurSearch',start,fin,{inclusive=true})
-        M.save=vim.region(0,start,fin,'',true)
+        vim.highlight.range(0,ns,'CurSearch',start,fin,{inclusive=true,regtype=regt})
+        M.save=vim.region(0,start,fin,regt or '',true)
         return
     end
-    local reg=vim.region(0,start,fin,'',true)
+    local reg=vim.region(0,start,fin,regt or '',true)
     local edit1={range=M.I.to_lsp_range(reg),newText=M.I.get_range(M.save)}
     local edit2={range=M.I.to_lsp_range(M.save),newText=M.I.get_range(reg)}
     vim.lsp.util.apply_text_edits({edit1,edit2},0,'urt-8')
@@ -37,16 +37,7 @@ function M.ex_line()
     M.ex_range({line,0},{line,#vim.api.nvim_get_current_line()})
 end
 function M.ex_visual()
-    if vim.fn.mode()~='V' then
-        M.ex_range('.','v')
-    else
-        local fin,start=vim.fn.line'v'-1,vim.fn.line'.'-1
-        if start>fin then
-            M.ex_range({fin,0},{start,#vim.api.nvim_get_current_line()})
-        else
-            M.ex_range({start,0},{fin,#vim.api.nvim_buf_get_lines(0,fin,fin+1,false)[1]})
-        end
-    end
+    if vim.fn.mode()~='\x16' then M.ex_range('.','v',vim.fn.mode()) end
     vim.api.nvim_input('<esc>')
 end
 function M.ex_oper()

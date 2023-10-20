@@ -1,6 +1,7 @@
 --[[TODO
 Make each cursor be able to have a mode which they are in
 Make it so that you can do an action at each cursor
+    also preview action at each cursor
 Be able to create groups of cursors (buffer/window/id specific)
     And only show in those buffers/windows/a function returning boolean
 A telescope selector for cursor (and groups of cursors)
