@@ -109,6 +109,11 @@ Setup: `foldtext.setup()`
 Summary: Highlight matching selected text in visual mode. \
 Setup: `highlight_selected.setup()`
 
+## Kitty
+Summary: Synchronize with kitty terminal\
+NOTE: Can't be configured yet.\
+Setup: `kitty.setup()`
+
 ## Labull
 Summary: Auto adds bullets for bullet-list.\
 Commands: `labull.run()` (map-expr)
