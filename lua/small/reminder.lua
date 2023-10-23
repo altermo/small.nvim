@@ -6,7 +6,7 @@ function M.parse_date(date)
 end
 function M.get_times()
     local times={}
-    local reg=[[^%s*%- %[ %]%s*([^(]*)%s%(@(%d%d%d%d%-%d%d%-%d%d %d%d:%d%d)%)]]
+    local reg=[[^%s*%- %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d %d%d:%d%d)%)]]
     for i in io.lines(M.conf.path) do
         local doc,date=i:match(reg)
         if doc then table.insert(times,{doc,M.parse_date(date)}) end
