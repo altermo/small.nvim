@@ -21,7 +21,7 @@ end
 function M.get_next_file(path,prev)
     path=vim.fn.fnamemodify(path,':p')
     path=M.getnext(path,prev)
-    while vim.fn.isdirectory(path)==1 do path=M.getnext(path,prev) end
+    repeat path=M.getnext(path,prev) until vim.fn.isdirectory(path)==0
     return path
 end
 function M.toggle(opt,on,off)
@@ -45,7 +45,7 @@ function M.set_opt()
         C={opt='cmdheight',on=1,off=0},B={opt='showbreak',on='↳'},
     }
     local buf=vim.api.nvim_create_buf(false,true)
-    vim.api.nvim_buf_set_option(buf,'bufhidden','wipe')
+    vim.bo[buf].bufhidden='wipe'
     for _,k in ipairs(vim.fn.reverse(vim.fn.sort(vim.tbl_keys(opts)))) do
         vim.api.nvim_buf_set_lines(buf,0,0,false,{k..' : '..(opts[k].opt or opts[k])})
     end

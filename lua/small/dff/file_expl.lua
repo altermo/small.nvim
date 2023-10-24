@@ -68,7 +68,7 @@ function M.mainloop(buf,path,conf)
         if key=='\x80kb' then
             if dff.back(search) then
                 path=vim.fs.dirname(path) --[[@as string]]
-                while path~='/' and #vim.fn.readdir(path)==1 do path=vim.fs.dirname(path) --[[@as string]] end
+                repeat path=vim.fs.dirname(path) --[[@as string]] until path=='/' or #vim.fn.readdir(path)~=1
                 search=dff.create_search(vim.fn.readdir(path),conf)
             end
             return rerun()
