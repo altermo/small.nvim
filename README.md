@@ -41,7 +41,6 @@ Optional: `python`,`mojo`,`fish`,`lua5.1`,`fennel`,`dotnet`,`rust`,`zig` (used a
 Summary: Basically, a simple run file system. \
 Commands:
 + `builder.termbuild` runs the file in the terminal
-+ <s>`builder.build` runs the file in the quickfix window</s>
 + `builder.eval` evaluates the file as vim code
 + `builder.swap` swap commonly used runners (like `rustc` and `cargo run`)
 + `builder.set` set the builder for the current filetype
