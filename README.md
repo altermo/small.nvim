@@ -103,6 +103,8 @@ Commands: `foldselect.run()`
 ## Foldtext
 Summary: A simple foldtext. \
 Setup: `foldtext.setup()`
+Config:
++ `foldtext.conf.treesitter` whether to use treesitter Highlighting
 
 ## Highlight_selected
 Summary: Highlight matching selected text in visual mode. \
