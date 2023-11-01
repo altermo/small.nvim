@@ -11,19 +11,20 @@ function M.GetTreesitterFoldText(just,fallback)
         local len=#vim.str_utf_pos(fallback)
         return {{fallback}},len
     end
+    table.insert(foldtext,{' '})
+    if just~=1 then
+        while just>0 do
+            just=just-1
+            if foldtext[1][1]=='' then
+                table.remove(foldtext,1)
+            else
+                foldtext[1][1]=foldtext[1][1]:sub(2)
+            end
+        end
+    end
     local len=0
     for _,v in ipairs(foldtext) do
         len=len+#(v[1])
-    end
-    table.insert(foldtext,{' '})
-    if just==1 then return foldtext,len end
-    while just>0 do
-        just=just-1
-        if foldtext[1][1]=='' then
-            table.remove(foldtext,1)
-        else
-            foldtext[1][1]=foldtext[1][1]:sub(2)
-        end
     end
     return foldtext,len
 end
