@@ -221,6 +221,11 @@ Commands:
 Config:
 + `trans.conf.from` the language to translate from (can be modified whenever)
 + `trans.conf.to` the language to translate to (can be modified whenever)
+## Tree_lua_block_split_join
+Required: `treesitter`\
+Summary: Split-join if/for/function_definition blocks\
+Commands: `tree_lua_block_split_join.run()`
+
 ## Unimpaired
 Summary: Goto next/previous file OR quickly change options\
 Commands:
