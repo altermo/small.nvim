@@ -9,7 +9,6 @@ function M.wrapp_toggle_statement(times)
         for i in node:child(times+1):iter_children() do
             table.insert(ret,vim.treesitter.get_node_text(i,0))
         end
-        vim.pprint(node)
         table.insert(ret,vim.treesitter.get_node_text(node:child(times+2),0))
         if vim.treesitter.get_node_text(node,0):find'\n' then
             return {table.concat(ret,' ')}
