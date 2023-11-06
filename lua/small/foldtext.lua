@@ -11,17 +11,16 @@ function M.GetTreesitterFoldText(just,fallback)
         local len=#vim.str_utf_pos(fallback)
         return {{fallback}},len
     end
-    table.insert(foldtext,{' '})
     if just~=1 then
         while just>0 do
             just=just-1
             if foldtext[1][1]=='' then
                 table.remove(foldtext,1)
-            else
-                foldtext[1][1]=foldtext[1][1]:sub(2)
             end
+            foldtext[1][1]=foldtext[1][1]:sub(2)
         end
     end
+    table.insert(foldtext,{' '})
     local len=0
     for _,v in ipairs(foldtext) do
         len=len+#(v[1])
@@ -29,6 +28,7 @@ function M.GetTreesitterFoldText(just,fallback)
     return foldtext,len
 end
 function M.MyFoldText()
+    vim.lgclear()
     local bul='•'
     local ret={}
     local wininfo=vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
@@ -36,7 +36,7 @@ function M.MyFoldText()
     local ident=line:match('^[%s-]*')
     local indent=#ident>0 and bul:rep(#ident-1)..' ' or ''
     table.insert(ret,{indent})
-    local left,leftlen=M.GetTreesitterFoldText(#ident+1,line)
+    local left,leftlen=M.GetTreesitterFoldText(#ident,line)
     vim.list_extend(ret,left)
     local precent=(vim.v.foldend-vim.v.foldstart+1)/vim.api.nvim_buf_line_count(0)*100
     local right=string.format(
