@@ -22,6 +22,17 @@ function M.pos_tree_lang()
     local lang=parser:language_for_range({row,col,row,col})
     return lang:lang()
 end
+---@overload fun(self:LanguageTree,range:Range4):LanguageTree[]
+function M.languages_for_range(self,range,_s)
+    _s=_s or {}
+    table.insert(_s,1,self)
+    for _, child in pairs(self._children) do
+        if child:contains(range) then
+            return M._langauges_for_range(child,range,_s)
+        end
+    end
+    return _s
+end
 --TODO: make somehow use of vim.ui.input
 ---@param timeout? number
 ---@param update? fun(inp:string)
