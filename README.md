@@ -107,6 +107,7 @@ Config:
 + `foldtext.conf.treesitter` whether to use treesitter Highlighting
 
 ## Help_readme
+Required: `ctags`\
 Summary: Generates tag with the prefix `readme-` from readme files (so that you can `:help readme-*`). \
 Setup: `help_readme.setup()` \
 Commands:
