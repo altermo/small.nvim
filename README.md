@@ -106,6 +106,15 @@ Setup: `foldtext.setup()`
 Config:
 + `foldtext.conf.treesitter` whether to use treesitter Highlighting
 
+## Help_readme
+Summary: Generates tag with the prefix `readme-` from readme files (so that you can `:help readme-*`). \
+Setup: `help_readme.setup()` \
+Commands:
++ `help_readme.generate()` generate tag file from readme to path
+
+Config:
++ `help_readme.conf.path` where the readmes/tagfile is put
+
 ## Highlight_selected
 Summary: Highlight matching selected text in visual mode. \
 Setup: `highlight_selected.setup()`
