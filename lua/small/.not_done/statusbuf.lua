@@ -30,9 +30,11 @@ function M.replace_statusline()
     local update=vim.schedule_wrap(function ()
         if vim.o.statusline==' ' then return end
         if vim.api.nvim_get_current_win()==win then return end
-        vim.api.nvim_buf_set_lines(buf,0,-1,false,{vim.api.nvim_eval_statusline(vim.o.statusline,{maxwidth=vim.o.columns}).str})
+        local s,maxwidth=pcall(vim.api.nvim_win_get_width,win)
+        if not s then maxwidth=vim.o.columns end
+        vim.api.nvim_buf_set_lines(buf,0,-1,false,{vim.api.nvim_eval_statusline(vim.o.statusline,{maxwidth=maxwidth}).str})
         local col=0
-        for _,v in ipairs(M.get_statusline({maxwidth=vim.o.columns})) do
+        for _,v in ipairs(M.get_statusline({maxwidth=maxwidth})) do
             vim.highlight.range(buf,vim.api.nvim_create_namespace(''),v[2],{0,col},{0,col+#v[1]})
             col=col+#v[1]
         end
