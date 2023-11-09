@@ -49,6 +49,7 @@ function M.draw(chan,lines,pos,extra)
     if extra then vim.api.nvim_chan_send(chan,extra) end
 end
 ---@param on_input fun(in:small.mode.on_redraw_param):string[]?,number[]?,string?
+---@return fun(lines?:string[],pos?:number[],extra?:string)
 function M.open_mode(on_input)
     local buf=vim.api.nvim_create_buf(true,true)
     vim.api.nvim_buf_set_lines(buf,0,-1,false,{'a'})
@@ -69,9 +70,7 @@ function M.open_mode(on_input)
     end
     au=vim.api.nvim_create_autocmd('WinResized',{callback=redraw})
     vim.api.nvim_set_current_buf(buf)
-end
-function M.clear(chan)
-    vim.api.nvim_chan_send(chan,I.clear())
+    return function (lines,pos,extra) M.draw(chan,lines,pos,extra) end
 end
 if vim.dev then
     vim.cmd.vsplit()

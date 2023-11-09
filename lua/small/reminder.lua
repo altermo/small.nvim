@@ -32,7 +32,7 @@ function M.fn()
     vim.defer_fn(function() vim.notify('Reminder in 3s') end,7000)
     vim.defer_fn(function() vim.notify('Reminder in 2s') end,8000)
     vim.defer_fn(function() vim.notify('Reminder in 1s') end,9000)
-    vim.defer_fn(function () vim.ui.select(to_dos,{default=''},function() end) end,10000)
+    vim.defer_fn(function () vim.ui.input({prompt=to_dos},function() end) end,10000)
 end
 function M.setup()
     if not M.conf.path then

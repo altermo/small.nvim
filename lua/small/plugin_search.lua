@@ -4,7 +4,7 @@ function M.handle_plugin(path)
     local select=vim.fn.readdir(path..'/lua')
     pcall(vim.cmd.helptags,'ALL')
     if #select==0 then return end
-    vim.ui.select(select,{},function (inp)
+    require'small.lib.select'(select,{},function (inp)
         if not inp then return end
         if not pcall(require,inp) then
           package[inp]=nil
@@ -18,7 +18,7 @@ function M.run()
         table.insert(ret,({string.gsub(v,'^(%S+%s+)%S*%s*%S*%s*%S*%s*%S+%s*(.-) *$','%1%2')})[1])
     end
     table.remove(ret,1)
-    vim.ui.select(ret,{},function (index)
+    require'small.lib.select'(ret,{},function (index)
         if not index then return end
         local url=index:gsub('^(%S+).*$','%1')
         local tmp=vim.fn.tempname()..'/'

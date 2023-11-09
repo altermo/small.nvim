@@ -12,7 +12,7 @@ function M.get_folds()
     return ret
 end
 function M.goto_select_folds(folds)
-    vim.ui.select(folds,{},function (i)
+    require'small.lib.select'(folds,{},function (i)
         if not i then return end
         vim.cmd(i:match('^[^ ]*'))
     end)
