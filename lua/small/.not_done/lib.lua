@@ -70,8 +70,8 @@ function M.preset_input(preset,on_confirm,opt)
         completion=nil,
         prompt='>',
         prehl='Comment',
-    })
-    vim.nvim_echo({{opt.prompt,'Normal'},{preset,opt.prehl}},false,{})
+    },opt)
+    vim.api.nvim_echo({{opt.prompt,'Normal'},{preset,opt.prehl}},false,{})
     local char=vim.fn.getcharstr()
     if char=='\27' then
         on_confirm(nil) return

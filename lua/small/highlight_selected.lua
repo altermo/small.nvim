@@ -17,6 +17,7 @@ function M.do_highlight()
     M.clear()
     local line=M.get_visual()
     if not line or vim.trim(line)=='' or #line<2 then return end
+    if vim.fn.type(line)==10 then return end
     M.prev_match={vim.fn.matchadd('Visual','\\M'..vim.fn.escape(line,'\\')),vim.api.nvim_get_current_win()}
 end
 function M.setup()
