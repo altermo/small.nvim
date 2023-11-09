@@ -15,7 +15,7 @@ function M.goto_file(key)
     if M.locked_files[key] then vim.cmd.edit(M.locked_files[key])
     elseif #dict==0 then
         if not vim.regex('\\v[a-z.-_]'):match_str(key) then return end
-        require'small.lib.select'(vim.fn.glob(('`fd -t file ^%s`'):format(key),true,true),{},function (file) vim.cmd.edit(file) end)
+        require'small.lib.select'(vim.fs.find(function (name) return name:sub(1,1)==key end,{type='file',limit=math.huge}),{},function (file) vim.cmd.edit(file) end)
     elseif #dict==1 then vim.cmd.edit(dict[1])
     else M.select(key) end
 end

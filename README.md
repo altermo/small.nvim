@@ -12,7 +12,6 @@ Optional dependencies:
 + `rcarriga/nvim-notify` many plugins use `vim.notify`
 
 ## Bufend
-Requires: `fd` \
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
 <details><summary>Pseudocode explanation: of what <code>bufend.run()</code> does</summary>
