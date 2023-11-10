@@ -55,23 +55,26 @@ function M.open(on_input,bufname,_)
     local au
     local function input()
         vim.schedule(function()
-            if not vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_del_autocmd(au) return end
-            local data=vim.fn.getcharstr()
-            local ret={M.pass_params(chan,on_input,data)}
-            if data~='§' then vim.api.nvim_input('§§') end
-            if #ret==0 then return end
-            vim.api.nvim_chan_send(chan,'\x1b[2J\x1b[H')
-            M.draw(chan,unpack(ret))
-            input()
+            if not vim.api.nvim_buf_is_valid(buf) then pcall(vim.api.nvim_del_autocmd,au) return end
+            vim.cmd.redraw{bang=true}
+            vim.schedule(function()
+                local data=vim.fn.getcharstr()
+                local ret={M.pass_params(chan,on_input,data)}
+                if #ret==0 then return end
+                vim.api.nvim_chan_send(chan,'\x1b[2J\x1b[H')
+                M.draw(chan,unpack(ret))
+                vim.defer_fn(input,10)
+            end)
         end)
     end
     local redraw=function ()
-        if not vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_del_autocmd(au) return end
+        if not vim.api.nvim_buf_is_valid(buf) then pcall(vim.api.nvim_del_autocmd,au) return end
         if chan then vim.api.nvim_chan_send(chan,'\x1b[2J\x1b[2H') end
-        chan=vim.api.nvim_open_term(buf,{})
+        --chan=vim.api.nvim_open_term(buf,{})
         M.draw(chan,M.pass_params(chan,on_input))
     end
     au=vim.api.nvim_create_autocmd('WinResized',{callback=redraw})
+    chan=vim.api.nvim_open_term(buf,{})
     redraw()
     vim.schedule(input)
     vim.api.nvim_set_current_buf(buf)

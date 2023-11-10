@@ -24,7 +24,6 @@ Config:
 + `beacon.conf.minimal` minimal size of move to flash cursor
 
 ## Bufend
-NOTE: visual output doesn't work
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
 <details><summary>Pseudocode explanation: of what <code>bufend.run()</code> does</summary>
@@ -292,4 +291,3 @@ If you want to donate then you need to find the correct link (hint: chess-bird):
 * [4a]() [4b]() [4c]() [4d]() [4e]() [4f](https://www.buymeacoffee.com/altermo) [4g]() [4h]()
 * [5a]() [5b]() [5c]() [5d]() [5e]() [5f]() [5g]() [5h]()
 * [6a]() [6b]() [6c]() [6d]() [6e]() [6f]() [6g]() [6h]()
-<!-- vim:ft=markdown: -->
