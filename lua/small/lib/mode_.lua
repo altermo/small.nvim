@@ -71,7 +71,6 @@ function M.open(on_input,bufname,startinsert)
         if not vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_del_autocmd(au) return end
         if chan then vim.api.nvim_chan_send(chan,'\x1b[2J\x1b[2H') end
         chan=vim.api.nvim_open_term(buf,{on_input=vim.schedule_wrap(input)})
-        vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
         M.draw(chan,M.pass_params(chan,on_input))
     end
     au=vim.api.nvim_create_autocmd('WinResized',{callback=redraw})

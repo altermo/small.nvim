@@ -24,6 +24,7 @@ Config:
 + `beacon.conf.minimal` minimal size of move to flash cursor
 
 ## Bufend
+NOTE: visual output doesn't work
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
 <details><summary>Pseudocode explanation: of what <code>bufend.run()</code> does</summary>
