@@ -59,6 +59,7 @@ end
 ---@return fun(lines?:string[]|true,pos?:number[],extra?:string)
 function M.open(on_input,bufname,startinsert)
     local buf=vim.api.nvim_create_buf(true,true)
+    if bufname then vim.api.nvim_buf_set_name(buf,bufname) end
     local chan
     local au
     local function input(_,_,_,data)
@@ -71,14 +72,16 @@ function M.open(on_input,bufname,startinsert)
         if not vim.api.nvim_buf_is_valid(buf) then vim.api.nvim_del_autocmd(au) return end
         if chan then vim.api.nvim_chan_send(chan,'\x1b[2J\x1b[2H') end
         chan=vim.api.nvim_open_term(buf,{on_input=vim.schedule_wrap(input)})
-    vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
+        vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
         M.draw(chan,M.pass_params(chan,on_input))
     end
     au=vim.api.nvim_create_autocmd('WinResized',{callback=redraw})
     vim.api.nvim_set_current_buf(buf)
-    if startinsert then vim.schedule(vim.cmd.startinsert) end
-    if bufname then vim.api.nvim_buf_set_name(buf,bufname) end
-    return function (lines,pos,extra,delete) M.draw(chan,lines,pos,extra,delete) end
+    if startinsert then vim.schedule(function()
+        vim.cmd.startinsert()
+    end)
+    end
+    return function (lines,pos,extra) M.draw(chan,lines,pos,extra) end
 end
 if vim.dev then
     vim.cmd.vsplit()
