@@ -6,10 +6,14 @@ function M.wrapp_toggle_statement(times)
             table.insert(start,vim.treesitter.get_node_text(node:child(i),0))
         end
         local ret={table.concat(start,' ')}
-        for i in node:child(times+1):iter_children() do
-            table.insert(ret,vim.treesitter.get_node_text(i,0))
+        if node:child(times+2) then
+            for i in node:child(times+1):iter_children() do
+                table.insert(ret,vim.treesitter.get_node_text(i,0))
+            end
+            table.insert(ret,vim.treesitter.get_node_text(node:child(times+2),0))
+        else
+            table.insert(ret,vim.treesitter.get_node_text(node:child(times+1),0))
         end
-        table.insert(ret,vim.treesitter.get_node_text(node:child(times+2),0))
         if vim.treesitter.get_node_text(node,0):find'\n' then
             return {table.concat(ret,' ')}
         else
