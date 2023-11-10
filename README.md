@@ -126,6 +126,10 @@ Setup: `foldtext.setup()`
 Config:
 + `foldtext.conf.treesitter` whether to use treesitter Highlighting
 
+## Help_cword
+Summary: Try to get help from current word. \
+Commands: `help_cword.run()`
+
 ## Help_readme
 Required: `ctags`\
 Summary: Generates tag with the prefix `readme-` from readme files (so that you can `:help readme-*`). \
