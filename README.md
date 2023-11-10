@@ -107,6 +107,15 @@ vim.keymap.set('n','cxc',exchange.ex_cancel)
 vim.keymap.set('x','X',exchange.ex_visual)
 ```
 
+## Float
+Summary: create, move and resize floating windows, use ctrl-mouse to move/resize windows \
+Setup: `float.setup()` \
+Commands:
++ `float.make_floating(win,opt)` make win floating
+
+Config:
++ `float.conf.make_non_float_float_on_drag` when dragging non-floating window, make it floating
+
 ## Foldselect
 Summary: Select from folds using `vim.ui.select`. \
 Commands: `foldselect.run()`
