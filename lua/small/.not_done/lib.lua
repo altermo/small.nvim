@@ -84,4 +84,5 @@ function M.preset_input(preset,on_confirm,opt)
         completion=opt.completion,
     },on_confirm)
 end
+M.userdata=function () return newproxy(true) end
 return M
