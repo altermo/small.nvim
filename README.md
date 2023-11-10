@@ -11,6 +11,18 @@ Optional dependencies:
 + `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
 + `rcarriga/nvim-notify` many plugins use `vim.notify`
 
+## Beacon
+Summary: Simple flash cursor at pos. \
+Commands:
++ `beacon.flash` flashes the cursor
++ `beacon.create_autocmd` returns an autocmd to flash the cursor on move
+
+Config:
++ `beacon.conf.interval` ms between flashes
++ `beacon.conf.count` how many flashes
++ `beacon.conf.color` color of flash (may be #rgb or color-name)
++ `beacon.conf.minimal` minimal size of move to flash cursor
+
 ## Bufend
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
