@@ -5,17 +5,17 @@ lib/
 >> c >>
 main.c
 --]]
----@class dff.search_obj
+---@class smakk.dff.search_obj
 ---@field list string[] sorted
 ---@field range table<number,number>
 ---@field history table<{k:string,range:table<number,number>,col:number}>
 ---@field col number
----@field opt dff.config
+---@field opt small.dff.config
 
 local M={}
 ---@param list string[]
----@param opt dff.config
----@return dff.search_obj
+---@param opt small.dff.config
+---@return smakk.dff.search_obj
 function M.create_search(list,opt)
     list=vim.fn.copy(list)
     vim.fn.sort(list)
@@ -31,13 +31,13 @@ function M.create_search(list,opt)
     if #list~=1 then M.inc_while_all_same(obj) end
     return obj
 end
----@param obj dff.search_obj
+---@param obj smakk.dff.search_obj
 function M.inc_while_all_same(obj)
     while M.all_same(obj) do
         obj.col=obj.col+1
     end
 end
----@param obj dff.search_obj
+---@param obj smakk.dff.search_obj
 ---@param key string
 function M.send_key(obj,key)
     table.insert(obj.history,{k=key,range=obj.range,col=obj.col})
@@ -55,7 +55,7 @@ function M.send_key(obj,key)
     obj.range={first,last}
     M.inc_while_all_same(obj)
 end
----@param obj dff.search_obj
+---@param obj smakk.dff.search_obj
 ---@param key string
 ---@return number?
 ---@return number?
@@ -67,7 +67,7 @@ function M.get_first_and_last(obj,key)
     while obj.range[2]>=i+1 and obj.list[i+1]:sub(obj.col,obj.col)==key do i=i+1 end
     return first,i
 end
----@param obj dff.search_obj
+---@param obj smakk.dff.search_obj
 ---@return boolean?
 function M.all_same(obj)
     local char=obj.list[obj.range[1]]:sub(obj.col,obj.col)
@@ -76,7 +76,7 @@ function M.all_same(obj)
     end
     return true
 end
----@param obj dff.search_obj
+---@param obj smakk.dff.search_obj
 ---@return boolean?
 function M.back(obj)
     local o=obj.history[#obj.history]

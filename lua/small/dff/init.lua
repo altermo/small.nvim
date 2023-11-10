@@ -1,18 +1,10 @@
----@class dff.config
----@field wintype 'current'|'split'|'vsplit'--|function|'float'
----@field wjust number
----@field hjust number
+---@class small.dff.config
 ---@field ending string
-local default_conf={
-    wintype='current',
-    wjust=10,
-    hjust=3,
-    ending='\n',
-}
-
-local file_expl=require'small.dff.file_expl'
+local default_conf={ending='\n', }
 local M={conf=default_conf}
-function M.file_expl(file)
-    file_expl.open(file)
+---@param path string?
+---@param conf small.dff.config?
+function M.file_expl(path,conf)
+    require'small.dff.file_expl'.open(path,conf)
 end
 return M

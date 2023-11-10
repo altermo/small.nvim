@@ -9,7 +9,6 @@ function M.run(cmd,smart_quit_nvim)
         if smart_quit_nvim and #vim.fn.getbufinfo()==1 and vim.api.nvim_get_current_buf()==buf then vim.cmd.quitall() end
         pcall(vim.cmd.bdelete,{buf,bang=true})
     end})
-    vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
     vim.cmd.startinsert()
 end
 return M
