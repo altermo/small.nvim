@@ -28,7 +28,6 @@ function M.GetTreesitterFoldText(just,fallback)
     return foldtext,len
 end
 function M.MyFoldText()
-    vim.lgclear()
     local bul='•'
     local ret={}
     local wininfo=vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
