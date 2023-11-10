@@ -45,7 +45,7 @@ function M.resize_floating_window(win)
     local mouse=vim.fn.getmousepos()
     local rowdiff=inst.mouse.screenrow-mouse.screenrow
     local coldiff=inst.mouse.screencol-mouse.screencol
-    vim.api.nvim_win_set_config(win,{height=inst.win.height-rowdiff,width=inst.win.width-coldiff})
+    vim.api.nvim_win_set_config(win,{height=math.max(1,inst.win.height-rowdiff),width=math.max(1,inst.win.width-coldiff)})
 end
 ---@param win? number
 function M.initlize(win)
@@ -66,6 +66,7 @@ function M.setup()
 end
 if vim.dev then
     vim.cmd.split()
+    M.make_floating()
     M.setup()
 end
 return M
