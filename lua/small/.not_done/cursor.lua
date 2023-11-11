@@ -21,6 +21,7 @@ Have a main cursor object (which is auto created?)
 ---@field _extmark number
 ---@field highlight? cursor.highlight
 ---@field type 'normal'|'temp'|'spawner'
+---@field active boolean
 ---@class cursor.highlight
 ---@field hidden? boolean
 ---@field mode_hl? table<string,string>
