@@ -1,15 +1,15 @@
 local M={conf={treesitter=false}}
 function M.GetTreesitterFoldText(just,fallback)
     if not M.conf.treesitter then
-        fallback=fallback:sub(just)..' '
+        fallback=fallback:sub(just+1)..' '
         local len=#vim.str_utf_pos(fallback)
-        return {{fallback}},len
+        return {{fallback}},len+1
     end
     local foldtext=vim.treesitter.foldtext()
     if type(foldtext)=='string' then
-        fallback=fallback:sub(just)..' '
+        fallback=fallback:sub(just+1)..' '
         local len=#vim.str_utf_pos(fallback)
-        return {{fallback}},len
+        return {{fallback}},len+1
     end
     if just~=1 then
         while just>0 do
