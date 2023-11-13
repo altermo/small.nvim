@@ -32,6 +32,7 @@ end
 function M.setup()
     if not M.in_kitty() then return end
     vim.api.nvim_create_autocmd('ColorScheme',{callback=M.sync_background})
+    M.sync_background()
     M.set_opacity(90)
     vim.api.nvim_create_autocmd('OptionSet',{pattern='guifont',callback=M.sync_font_size})
     M.sync_font_size()
