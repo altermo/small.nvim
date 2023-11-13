@@ -84,5 +84,12 @@ function M.preset_input(preset,on_confirm,opt)
         completion=opt.completion,
     },on_confirm)
 end
+---@return userdata
 M.userdata=function () return newproxy(true) end
+---@param source string
+---@return any
+function M.req(source)
+  package.loaded[source]=nil
+  return require(source)
+end
 return M
