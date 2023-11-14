@@ -2,7 +2,8 @@ local M={}
 M.comments={
     lua='--%s',
     python='#%s',
-    [true]='/*%s*/'
+    [true]='/*%s*/',
+    commonlisp=';%s'
 }
 function M.get_ft()
     local stat,parser=pcall(vim.treesitter.get_parser,0)
