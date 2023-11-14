@@ -182,6 +182,20 @@ Commands:
 
 Config:
 + `nodeswap.conf.nodes` which tsnodes should be considered as nodes
+
+## Notify
+summary: a rewrite of [fidget.nvim](https://github.com/j-hui/fidget.nvim)\
+Commands:
++ `notify.notify(msg,level,opts)` do a notify
++ `notify.open_history()` open the history in a new buffer
++ `notify.overide_notify()` override `vim.notify`
+
+Config:
++ `notify.conf.style`: what styles to use for which level
++ `notify.conf.fallback_notify`: fallback notify (not used)
++ `notify.conf.timeout=2000`: time until notification closes
++ `notify.conf.historysize=100`: the size of history
+
 ## Nterm
 Summary: Run terminal or use neovim as a terminal.\
 Commands:
