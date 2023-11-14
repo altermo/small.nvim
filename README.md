@@ -189,6 +189,7 @@ Commands:
 + `notify.notify(msg,level,opts)` do a notify
 + `notify.open_history()` open the history in a new buffer
 + `notify.overide_notify()` override `vim.notify`
++ `notify.dismiss()` dismiss the current notifications
 
 Config:
 + `notify.conf.style`: what styles to use for which level

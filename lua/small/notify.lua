@@ -72,9 +72,17 @@ function M.notify(msg,level,opts)
     while M.notifs[time] do time=time+1 end
     M.notifs[time]={msg=msg,level=level,opts=opts}
     vim.defer_fn(function ()
-        M.notifs[time].dispand=true
-        M.update()
+        if M.notifs[time] then
+            M.notifs[time].dispand=true
+            M.update()
+        end
     end,M.conf.timeout)
+    M.update()
+end
+function M.dismiss()
+    for _,v in pairs(M.notifs) do
+        v.dispand=true
+    end
     M.update()
 end
 if vim.dev then
