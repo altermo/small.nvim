@@ -1,7 +1,7 @@
 # Small.nvim
-This is my personal collection of small plugins that I created for myself.
+This is a collection of small plugins (cause I can't stop making them).
 
-**As it is my personal plugins, I might change things without warning.**
+**I don't plan on doing good maintenance, so I might change things without warning.**
 
 The documentation might not be up to date
 
