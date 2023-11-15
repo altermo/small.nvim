@@ -5,7 +5,7 @@ This is a collection of small plugins (cause I can't stop making them).
 
 The documentation might not be up to date
 
-I would recommend checking out [whint](#Whint), [bufend](#Bufend) and [dff](#Dff) as those are the ones that helps me the most.
+Here some plugins that I would recommend you check out: [whint](#Whint), [bufend](#Bufend), [dff](#Dff).
 
 Optional dependencies:
 + `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
