@@ -28,10 +28,10 @@ function M.fn()
         end
     end
     if #to_dos==0 then return end
-    vim.defer_fn(function() vim.notify('Reminder in 3s') end,0)
+    vim.defer_fn(function() vim.notify('Reminder in 2s') end,0)
     for k,v in ipairs(to_dos) do
-        vim.defer_fn(function() vim.notify(v) end,3000+(k-1)*1000)
-        vim.defer_fn(function() vim.notify(v) end,3000*(#to_dos+1)+(k-1)*1000)
+        vim.defer_fn(function() vim.notify(v) end,2000+(k-1)*1000)
+        vim.defer_fn(function() vim.notify(v) end,2000*(#to_dos+1)+(k-1)*1000)
     end
 end
 function M.setup()

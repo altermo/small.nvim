@@ -10,7 +10,7 @@ local M={conf={
     },
     fallback_notify=vim.notify,
     historysize=100,
-    timeout=2000,
+    timeout=3000,
 }}
 M.history={}
 M.notifs={}
