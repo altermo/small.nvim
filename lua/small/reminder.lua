@@ -21,9 +21,8 @@ end
 function M.fn()
     local times=M.get_times()
     local to_dos={}
-    for k,v in ipairs(times) do
-        if not M.done[k] and M.is_overdo(v[2]) then
-            M.done[k]=true
+    for _,v in ipairs(times) do
+        if M.is_overdo(v[2]) then
             table.insert(to_dos,v[1])
         end
     end
@@ -38,7 +37,6 @@ function M.setup()
     if not M.conf.path then
         error('conf: reminder.path is not set')
     end
-    M.done={}
     vim.fn.timer_start(30000,M.fn,{['repeat']=-1})
 end
 return M
