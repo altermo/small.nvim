@@ -19,13 +19,6 @@ end
 function M.sync_background()
     M.send_cmd('set-color','background=#'..vim.fn.printf('%06x',vim.api.nvim_get_hl(0,{name='Normal'}).bg))
 end
-function M.set_opacity(proc)
-    M.get_kitty_winid(function (kitty_winid)
-        vim.system{'xprop','-f','_NET_WM_WINDOW_OPACITY','32c','-set','_NET_WM_WINDOW_OPACITY',
-            vim.fn.printf('0x%08x',vim.fn.floor(0xFFFFFFFF*proc/100)),
-            '-id',kitty_winid}
-    end)
-end
 function M.sync_font_size()
     M.send_cmd('set-font-size',M.get_font_size())
 end
@@ -33,7 +26,6 @@ function M.setup()
     if not M.in_kitty() then return end
     vim.api.nvim_create_autocmd('ColorScheme',{callback=M.sync_background})
     M.sync_background()
-    M.set_opacity(90)
     vim.api.nvim_create_autocmd('OptionSet',{pattern='guifont',callback=M.sync_font_size})
     M.sync_font_size()
     M.setup_keymaps()
