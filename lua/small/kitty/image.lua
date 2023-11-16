@@ -1,5 +1,4 @@
 local M={}
-local w=io.write
 ---@return boolean?
 function M.is_png(source)
     local fd=vim.uv.fs_open(source,'r',0)
@@ -15,18 +14,21 @@ function M.make_into_png(source,fn,...)
         if out.code~=0 then
             error('convertion to png faild with exit code '..out.code)
         end
-        fn(M.tempfile,unpack(args))
+        vim.schedule_wrap(fn)(M.tempfile,unpack(args))
     end)
 end
-function M.send_png_packet(payload,last,x,y,width,height)
-    if x and y then w('\x1b['..y..';'..x..'H') end
-    w('\x1b_G')
-    local cmd={'f=100','a=T',m=last and '1' or '0'}
-    if height then table.insert(cmd,'r='..height) end
-    if width then table.insert(cmd,'c='..width) end
-    w(table.concat(cmd,','))
-    if payload then w(';'..payload) end
-    w('\x1b\\')
+function M.send_png_packet(payload,last,first,width,height)
+    io.write('\x1b_G')
+    local cmd={'m='..(last and '0' or '1')}
+    if first then
+        table.insert(cmd,'a=T')
+        table.insert(cmd,'f=100')
+        if height then table.insert(cmd,'r='..height) end
+        if width then table.insert(cmd,'c='..width) end
+    end
+    io.write(table.concat(cmd,','))
+    if payload then io.write(';'..payload) end
+    io.write('\x1b\\')
 end
 function M.render(source,x,y,width,height)
     if not M.is_png(source) then
@@ -37,14 +39,17 @@ function M.render(source,x,y,width,height)
     if not fd then error('failed to open image file') end
     local data=vim.base64.encode(fd:read('*a'))
     local chunk
+    if x and y then io.write('\x1b['..y..';'..x..'H') end
+    local first=true
     while data~='' do
-        chunk,data=data:sub(1,0x1000),data:sub(0x1000)
+        chunk,data=data:sub(1,0x1000),data:sub(0x1000+1)
         local last=data==''
-        M.send_png_packet(chunk,last,x,y,width,height)
+        M.send_png_packet(chunk,last,first,width,height)
+        first=false
     end
 end
 function M.clear()
-    w('\x1b_Ga=d\x1b\\')
+    io.write('\x1b_Ga=d\x1b\\')
 end
 if vim.dev then
     M.clear()
