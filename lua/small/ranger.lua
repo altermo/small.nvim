@@ -2,7 +2,7 @@ local M={conf={exit_if_single=false}}
 function M.ranger(path)
     local realpath=vim.fn.fnamemodify(path,':p')
     local file='/tmp/chosenfile'
-    local cmd=';ranger --cmd "set show_hidden=true" --cmd "set preview_images=true" --cmd "map r chain cd ..;open_with" --choosefiles='..file
+    local cmd=';ranger --cmd "map r chain cd ..;open_with" --choosefiles='..file
     vim.cmd.enew()
     local buf=vim.api.nvim_get_current_buf()
     vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
