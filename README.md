@@ -9,7 +9,7 @@ Here some plugins that I would recommend you check out: [whint](#Whint), [bufend
 
 Optional dependencies:
 + `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
-+ `rcarriga/nvim-notify` many plugins use `vim.notify`
++ `rcarriga/nvim-notify` or something similar: many plugins use `vim.notify`
 
 ## Beacon
 Summary: Simple flash cursor at pos. \
