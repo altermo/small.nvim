@@ -20,7 +20,6 @@ function M.getnext(path,prev)
 end
 function M.get_next_file(path,prev)
     path=vim.fn.fnamemodify(path,':p')
-    path=M.getnext(path,prev)
     repeat path=M.getnext(path,prev) until vim.fn.isdirectory(path)==0
     return path
 end
