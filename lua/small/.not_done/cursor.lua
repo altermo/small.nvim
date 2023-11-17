@@ -11,6 +11,7 @@ A temp cursor: cursor which is temporary and will be deleted once not focused (c
 Option to hide cursor/ make it look different
     Different colors for different modes
 Have a main cursor object (which is auto created?)
+Use visual mode to quickly select multiple cursors to activate
 --]]
 ---@class cursor.group
 ---@field content cursor.cursor[]
