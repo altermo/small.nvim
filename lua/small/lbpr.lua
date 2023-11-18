@@ -7,9 +7,9 @@
 
 local M={}
 M.I={
-   buf_set_opt=function(buf,name,value)
-       return vim.api.nvim_set_option_value(name,value,{buf=buf})
-   end
+    buf_set_opt=function(buf,name,value)
+        return vim.api.nvim_set_option_value(name,value,{buf=buf})
+    end
 }
 ---@param _ number buf
 ---@return string
@@ -24,6 +24,13 @@ return new_lst]]
 end
 ---@param data lbpr.data
 function M.setpreview(data)
+    local win=vim.api.nvim_open_win(data.working_buf,false,{
+        hide=true,noautocmd=true,focusable=false,
+        width=1,height=1,
+        relative='editor',
+        col=1,row=1
+    })
+    vim.wo[win].diff=true
     local buf=vim.api.nvim_create_buf(true,true)
     M.I.buf_set_opt(buf,'bufhidden','wipe')
     M.I.buf_set_opt(buf,'buftype','acwrite')
@@ -31,6 +38,7 @@ function M.setpreview(data)
     M.I.buf_set_opt(buf,'modifiable',false)
     M.I.buf_set_opt(buf,'filetype',vim.api.nvim_buf_get_option(data.working_buf,'filetype'))
     vim.api.nvim_set_current_buf(buf)
+    vim.wo.diff=true
     vim.api.nvim_buf_set_name(buf,'lpbr-preview')
     vim.api.nvim_create_autocmd('BufWriteCmd',{callback=function ()
         M.save(data)
