@@ -13,6 +13,6 @@ function M._create_undotree(buf)
 end
 if vim.dev then
     local buf=vim.fn.bufnr('temp.md')
-    vim.pprint(M._create_undotree(buf))
+    vim.lg(M._create_undotree(buf))
 end
 return M
