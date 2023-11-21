@@ -11,6 +11,10 @@ local M={conf={options={
     }
 }}}
 function M.open()
+    if M.conf.call then
+        M.conf.call()
+        return
+    end
     local buf=vim.api.nvim_create_buf(false,true)
     vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
     local win=vim.api.nvim_open_win(buf,false,{

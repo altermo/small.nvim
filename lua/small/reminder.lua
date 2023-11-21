@@ -29,9 +29,9 @@ end
 function M.notify_timed()
     local times=M.get_times()
     for _,v in ipairs(times) do
-        if os.time()>os.time(v[2]) and #v[3]==16 then
+        if #v[3]==16 and os.time()>os.time(v[2]) then
             ---@diagnostic disable-next-line: redundant-parameter
-            vim.notify(vim.fn.printf('%s %s',v[1],v[3]))
+            vim.notify(v[1]..' '..v[3])
         end
     end
 end
@@ -40,10 +40,10 @@ function M.notify_today()
     for _,v in ipairs(times) do
         if os.time()>os.time(v[2]) then
             ---@diagnostic disable-next-line: redundant-parameter
-            vim.notify(vim.fn.printf('%s %16s',v[1],v[3]))
+            vim.notify(v[1]..' '..v[3]..(' '):rep(16-#v[3]))
     elseif M.next_day()>os.time(v[2]) then
             ---@diagnostic disable-next-line: redundant-parameter
-            vim.notify(vim.fn.printf('%s %s',v[1],v[3]),vim.log.levels.TRACE)
+            vim.notify(v[1]..' '..v[3],vim.log.levels.TRACE)
         end
     end
 end

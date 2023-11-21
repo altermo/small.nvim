@@ -244,6 +244,7 @@ Commands:
 
 Config:
 + `splitbuf.conf.options` a table of commands (see source code)
++ `splitbuf.conf.call` a function which overides the default behaviour
 ## Tabline
 Summary: A simple tabline. \
 Setup: `tabline.setup()`
