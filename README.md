@@ -245,6 +245,14 @@ Commands:
 Config:
 + `splitbuf.conf.options` a table of commands (see source code)
 + `splitbuf.conf.call` a function which overides the default behaviour
+
+## Tablemode
+Summary: auto format markdown tables \
+Commands:
++ `tablemode.enable()`: enable tablemode
++ `tablemode.disable()`: disable tablemode
++ `tablemode.toggle()`: toggle tablemode
+
 ## Tabline
 Summary: A simple tabline. \
 Setup: `tabline.setup()`
