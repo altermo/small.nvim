@@ -40,8 +40,9 @@ function M.run(char)
             for _,max in ipairs(tmax) do table.insert(o,('-'):rep(max+2)) end
             o[#o]=''
         else
-            for k,line in ipairs(t) do
-                table.insert(o,' '..line..(' '):rep(tmax[k]-#line+1))
+            for k,max in ipairs(tmax) do
+                local line=t[k] or ''
+                table.insert(o,' '..line..(' '):rep(max-#line+1))
             end
         end
         mlines[#mlines+1]=o
@@ -50,10 +51,9 @@ function M.run(char)
     for _,line in ipairs(mlines) do
         table.insert(olines,indent..vim.trim('|'..table.concat(line,'|')))
     end
-    local x=#indent+2
+    local x=#indent+1
     for _,line in ipairs{unpack(mlines[currow],1,count)} do
-        vim.pprint(line)
-        x=x+#line
+        x=x+#line+1
     end
     vim.schedule(function ()
         vim.api.nvim_buf_set_lines(0,rows-1,rowe,false,olines)
