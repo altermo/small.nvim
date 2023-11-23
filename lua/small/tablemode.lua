@@ -30,7 +30,7 @@ function M.run(char)
     local tmax={}
     for _,t in ipairs(tbl) do
         for k,v in ipairs(t.is_sep and {} or t) do
-            if not tmax[k] or #v>tmax[k] then tmax[k]=#v end
+            if not tmax[k] or vim.api.nvim_strwidth(v)>tmax[k] then tmax[k]=vim.api.nvim_strwidth(v) end
         end
     end
     local mlines={}
@@ -42,7 +42,7 @@ function M.run(char)
         else
             for k,max in ipairs(tmax) do
                 local line=t[k] or ''
-                table.insert(o,' '..line..(' '):rep(max-#line+1))
+                table.insert(o,' '..line..(' '):rep(max-vim.api.nvim_strwidth(line)+1))
             end
         end
         mlines[#mlines+1]=o
@@ -51,9 +51,9 @@ function M.run(char)
     for _,line in ipairs(mlines) do
         table.insert(olines,indent..vim.trim('|'..table.concat(line,'|')))
     end
-    local x=#indent+1
+    local x=vim.api.nvim_strwidth(indent)+1
     for _,line in ipairs{unpack(mlines[currow],1,count)} do
-        x=x+#line+1
+        x=x+vim.api.nvim_strwidth(line)+1
     end
     vim.schedule(function ()
         vim.api.nvim_buf_set_lines(0,rows-1,rowe,false,olines)
