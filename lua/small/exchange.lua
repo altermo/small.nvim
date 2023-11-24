@@ -9,15 +9,8 @@ function M.I.to_lsp_range(reg)
 end
 M.I.get_range=function(reg)
     local r=M.I.to_lsp_range(reg)
-    local lines=vim.api.nvim_buf_get_lines(0,r.start.line,r['end'].line+1,false)
-    --TODO: use `nvim_buf_get_text` instead
-    if r.start.line==r['end'].line then
-        lines[1]=lines[1]:sub(r.start.character+1,r['end'].character)
-    else
-        lines[1]=lines[1]:sub(r.start.character+1)
-        lines[#lines]=lines[#lines]:sub(1,r['end'].character)
-    end
-    return table.concat(lines,'\n')
+    local rlines=vim.api.nvim_buf_get_text(0,r.start.line,r.start.character,r['end'].line,r['end'].character,{})
+    return table.concat(rlines,'\n')
 end
 function M.ex_range(start,fin,regt)
     if not M.save then

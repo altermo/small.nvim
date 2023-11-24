@@ -92,4 +92,15 @@ function M.req(source)
   package.loaded[source]=nil
   return require(source)
 end
+---@generic T,P
+---@param fn fun(...:T,cb:fun(arg:P)):P
+---@param ... T
+---@return P
+function M.psudo_async(fn,...)
+    local co=assert(coroutine.running())
+    local args={...}
+    table.insert(args,function (...) coroutine.resume(co,...) end)
+    fn(unpack(args))
+    return coroutine.yield(co)
+end
 return M
