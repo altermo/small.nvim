@@ -1,28 +1,33 @@
 ---@diagnostic disable: param-type-mismatch
 local M={}
-local function getword(x1,x2,y) return vim.fn.strcharpart(vim.fn.getline(y),x1,x2-x1+1) end
+function M.getword(x1,x2,line)
+    local offset=vim.str_utf_pos(line)
+    return line:sub(offset[x1],offset[x2]+vim.str_utf_end(line,offset[x2]))
+end
 function M.wordcolumn()
-    local reg=vim.region(0,'v','.','',false)
-    if vim.tbl_count(reg)>1 then return end
-    local beg,pos=next(reg)
-    local _end=beg
-    local col1,col2=unpack(pos)
-    local word=getword(col1,col2,".")
-    while beg>=1 and getword(col1,col2,beg)==word do beg=beg-1 end
-    while _end<vim.fn.line("$") and getword(col1,col2,_end+1)==word do _end=_end+1 end
-    return '<esc>'..(beg+1)..'gg'..(col1+1)..'|<C-v>o'.._end..'gg'..(col2+1)..'|'
+    local beg=vim.fn.line('.')
+    local _end=vim.fn.line('v')
+    if beg~=_end then return end
+    local col1=vim.fn.virtcol('.')
+    local col2=vim.fn.virtcol('v')
+    if col2<col1 then col1,col2=col2,col1 end
+    local line=vim.api.nvim_get_current_line()
+    local word=M.getword(col1,col2,line)
+    while beg>=1 and M.getword(col1,col2,vim.fn.getline(beg))==word do beg=beg-1 end
+    while _end<vim.fn.line("$") and M.getword(col1,col2,vim.fn.getline(_end+1))==word do _end=_end+1 end
+    return '<esc>'..(beg+1)..'gg'..col1..'|<C-v>o'.._end..'gg'..col2..'|'
 end
 function M.charcolumn() return M.wordcolumn()..vim.v.operator end
-local function getchar(x,y) return vim.fn.strcharpart(vim.fn.getline(y+1),x,1) end
 function M.wordrow()
-    local reg=vim.region(0,'v','.','',false)
-    if vim.tbl_count(reg)>1 then return end
-    local line,pos=next(reg)
-    local col1,col2=unpack(pos)
-    local char=getchar(col1,line)
-    while col1>=1 and getchar(col1-1,line)==char do col1=col1-1 end
-    while col2<#vim.fn.getline(line+1) and getchar(col2,line)==char do col2=col2+1 end
-    return '<esc>'..(col1+1)..'|<C-v>o'..col2..'|'
+    if vim.fn.line('.')~=vim.fn.line('v') then return end
+    local col1=vim.fn.virtcol('.')
+    local col2=vim.fn.virtcol('v')
+    if col1~=col2 then return end
+    local line=vim.api.nvim_get_current_line()
+    local char=M.getword(col1,col2,line)
+    while col1>1 and M.getword(col1-1,col1-1,line)==char do col1=col1-1 end
+    while col2<#line and M.getword(col2+1,col2+1,line)==char do col2=col2+1 end
+    return '<esc>'..col1..'|<C-v>o'..col2..'|'
 end
 function M.charrow() return M.wordrow()..vim.v.operator end
 return M
