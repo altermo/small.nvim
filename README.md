@@ -156,6 +156,14 @@ Keymap (example):
 ```lua
 vim.keymap.set('n','o',labull.run,{expr=true})
 ```
+## Layout
+Summary: Save and load current tabpage layout. \
+Commands:
++ `layout.save()` save current tabpage layout to path
++ `layout.load()` load tabpage layout from path
+
+Config:
++ `layout.conf.savepath` path to save the layout
 ## Lbpr
 Inspired by: [pyro](https://github.com/rraks/pyro) \
 Summary: Code based replace file wide. \
