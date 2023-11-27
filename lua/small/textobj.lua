@@ -2,7 +2,7 @@
 local M={}
 function M.getword(x1,x2,line)
     local offset=vim.str_utf_pos(line)
-    return line:sub(offset[x1],offset[x2]+vim.str_utf_end(line,offset[x2]))
+    return #line>=x2 and line:sub(offset[x1],offset[x2]+vim.str_utf_end(line,offset[x2])) or ''
 end
 function M.wordcolumn()
     local beg=vim.fn.line('.')
