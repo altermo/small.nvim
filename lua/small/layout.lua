@@ -2,7 +2,12 @@ local M={conf={savepath=vim.fn.stdpath('data')..'/layout.json'}}
 function M.layout_add_info(layout)
     if layout[1]=='leaf' then
         local buf=vim.api.nvim_win_get_buf(layout[2])
-        layout[2]={win=layout[2],file=vim.api.nvim_buf_get_name(buf)}
+        layout[2]={
+            win=layout[2],
+            file=vim.api.nvim_buf_get_name(buf),
+            winline=vim.fn.winline(),
+            curpos=vim.api.nvim_win_get_cursor(layout[2]),
+        }
     else
         for _,v in ipairs(layout[2]) do
             M.layout_add_info(v)
