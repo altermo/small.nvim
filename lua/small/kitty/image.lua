@@ -41,7 +41,11 @@ function M.chunckify(str)
     end
     return ret
 end
-function M.render(source,x,y,width,height)
+function M.render(source,x,y,width,height,win)
+    if win then
+        local row,col=unpack(vim.api.nvim_win_get_position(win))
+        y,x=y+row,x+col
+    end
     if not M.is_png(source) then
         M.make_into_png(source,M.render,x,y,width,height)
         return
