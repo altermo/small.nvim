@@ -61,7 +61,7 @@ M.update=function()
             end
             v.hasbuf=true
         end
-        if not v.win then
+        if not v.win or not vim.api.nvim_win_is_valid(v.win) then
             local style=M.conf.style[level] or {hl='Normal'}
             if type(style)=='string' then style={hl=style} end
             local s,win=pcall(vim.api.nvim_open_win,v.buf,false,vim.tbl_extend('force',{style='minimal',noautocmd=true},winopt))
