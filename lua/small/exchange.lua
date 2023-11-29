@@ -15,7 +15,7 @@ end
 function M.ex_range(start,fin,regt)
     if not M.save then
         local ns=vim.api.nvim_create_namespace('exchange')
-        vim.highlight.range(0,ns,'CurSearch',start,fin,{inclusive=true,regtype=regt})
+        vim.highlight.range(0,ns,'CurSearch',start,vim.fn.copy(fin),{inclusive=true,regtype=regt})
         M.save=vim.region(0,start,fin,regt or '',true)
         return
     end
