@@ -9,16 +9,10 @@ function M.get_times()
     local times={}
     local reg1=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d %d%d:%d%d)%)]]
     local reg2=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d)%)]]
-    local reg3=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d %-%d%d:%d%d)%)]]
     for i in io.lines(M.conf.path) do
         for _,reg in ipairs{reg1,reg2} do
             local doc,date=i:match(reg)
             if doc then table.insert(times,{doc,M.parse_date(date),date}) end
-        end
-        local doc,date=i:match(reg3)
-        if doc then
-            local d=M.parse_date(date:gsub(' %-',' '))
-            if os.time(d)<=os.time() then table.insert(times,{doc,d,date:sub(1,10)}) end
         end
     end
     table.sort(times,function(a,b) return os.time(a[2])<os.time(b[2]) end)
@@ -57,6 +51,37 @@ function M.setup()
     if not M.conf.path then error('conf: small.reminder.conf.path is not set') end
     vim.fn.timer_start(30000,vim.schedule_wrap(M.notify_timed),{['repeat']=-1})
     vim.defer_fn(M.notify_today,1000)
+end
+function M.sidebar()
+    local times=M.get_times()
+    local dates=vim.defaulttable()
+    for _,v in ipairs(times) do
+        table.insert(dates[v[2].year..'-'..v[2].month..'-'..v[2].day],v)
+    end
+    local lines={}
+    for k,v in vim.spairs(dates) do
+        table.sort(v,function(a,b) return os.time(a[2])<os.time(b[2]) end)
+        table.insert(lines,'')
+        table.insert(lines,'#'..k)
+        for _,i in ipairs(v) do
+            if #i[3]==16 then
+                table.insert(lines,i[2].hour..':'..i[2].min..' '..i[1])
+            elseif type(i[1])=='string' then
+                table.insert(lines,i[1])
+            end
+        end
+    end
+    table.remove(lines,1)
+    local buf=vim.api.nvim_create_buf(true,true)
+    vim.bo[buf].bufhidden='wipe'
+    vim.lg(lines)
+    vim.api.nvim_buf_set_lines(buf,0,-1,true,lines)
+    vim.cmd.vnew()
+    vim.api.nvim_set_current_buf(buf)
+end
+if vim.dev then
+    M.conf.path='/home/user/.gtd/vault/gtd/Plans.md'
+    M.sidebar()
 end
 return M
 

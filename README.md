@@ -241,6 +241,9 @@ Config:
 ## Reminder
 Summary: Searches the `reminder.conf.path` for any bullet list with `-`, and a date `(@YYYY-MM-DD HH:MM)`, and does a reminder when the time comes. \
 Setup: `reminder.setup()`\
+Commands:
++ `reminder.sidebar`: open a sidebar with all the reminders
+
 Config:
 + `reminder.conf.path` (required) file to find reminders in
 ## Splitbuf
