@@ -9,10 +9,16 @@ function M.get_times()
     local times={}
     local reg1=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d %d%d:%d%d)%)]]
     local reg2=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d)%)]]
+    local reg3=[[^%s*[-+] %[ %]%s*(.*)%s%(@(%d%d%d%d%-%d%d%-%d%d %-%d%d:%d%d)%)]]
     for i in io.lines(M.conf.path) do
         for _,reg in ipairs{reg1,reg2} do
             local doc,date=i:match(reg)
             if doc then table.insert(times,{doc,M.parse_date(date),date}) end
+        end
+        local doc,date=i:match(reg3)
+        if doc then
+            local d=M.parse_date(date:gsub(' %-',' '))
+            if os.time(d)<=os.time() then table.insert(times,{doc,d,date:sub(1,10)}) end
         end
     end
     table.sort(times,function(a,b) return os.time(a[2])<os.time(b[2]) end)
@@ -41,7 +47,7 @@ function M.notify_today()
         if os.time()>os.time(v[2]) then
             ---@diagnostic disable-next-line: redundant-parameter
             vim.notify(v[1]..' '..v[3]..(' '):rep(16-#v[3]))
-    elseif M.next_day()>os.time(v[2]) then
+        elseif M.next_day()>os.time(v[2]) then
             ---@diagnostic disable-next-line: redundant-parameter
             vim.notify(v[1]..' '..v[3],vim.log.levels.TRACE)
         end
