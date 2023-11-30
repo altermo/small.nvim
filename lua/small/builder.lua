@@ -2,7 +2,7 @@ local M={conf={builders={
     python={normal='python %s',source='pyfile %'},
     mojo={normal='mojo %s'},
     fish={normal='fish %s'},
-    lua={normal='lua5.1 %s',source='source'},
+    lua={normal='luajit %s',source='source'},
     fennel={normal='fennel %s',source='lua dofile("/usr/share/lua/5.4/fennel.lua").dofile(vim.fn.expand("%"))'},
     cs={normal='csharp %s',altern='dotnet run'},
     rust={normal='rustc %s -o __tmp;./__tmp;rm __tmp',alter='cargo run'},
