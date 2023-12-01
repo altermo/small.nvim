@@ -317,6 +317,15 @@ Keymap (example):
 ```lua
 vim.keymap.set('i',':',whint.run,{expr=true})
 ```
+## Winpick
+Inspired by: [nvim-window-picker](https://github.com/s1n7ax/nvim-window-picker) \
+Summary: pick window by symbol \
+Commands: `winpick.pick()`
+
+Configs:
++ `winpick.conf.color` color of winbar (may be #rgb or color-name)
++ `winpick.conf.symbols` symbols to use
+
 ## Zen
 Summary: Simple zen \
 Commands: `zen.run()`
