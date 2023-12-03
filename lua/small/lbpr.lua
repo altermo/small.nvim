@@ -36,7 +36,7 @@ function M.setpreview(data)
     M.I.buf_set_opt(buf,'buftype','acwrite')
     vim.api.nvim_buf_set_lines(buf,0,-1,false,data.lines)
     M.I.buf_set_opt(buf,'modifiable',false)
-    M.I.buf_set_opt(buf,'filetype',vim.api.nvim_buf_get_option(data.working_buf,'filetype'))
+    M.I.buf_set_opt(buf,'filetype',vim.bo[data.working_buf].filetype)
     vim.api.nvim_set_current_buf(buf)
     vim.wo.diff=true
     vim.api.nvim_buf_set_name(buf,'lpbr-preview')
