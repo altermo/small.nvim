@@ -2,8 +2,12 @@ local M={conf={exit_if_single=false}}
 function M.ranger(path)
     local realpath=vim.fn.fnamemodify(path,':p')
     local file='/tmp/chosenfile'
-    --local cmd=';ranger --cmd "map r chain cd ..;open_with" --choosefiles='..file
-    local cmd=';ranger --cmd "map r shell nvr ." --choosefiles='..file
+    local cmd
+    if vim.fn.executable'nvr'==1 then
+        cmd=';ranger --cmd "map r chain shell nvr .;quit" --choosefiles='..file
+    else
+        cmd=';ranger --cmd "map r chain cd ..;open_with" --choosefiles='..file
+    end
     vim.cmd.enew()
     local buf=vim.api.nvim_get_current_buf()
     vim.api.nvim_set_option_value('bufhidden','wipe',{buf=buf})
