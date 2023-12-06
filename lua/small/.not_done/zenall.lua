@@ -2,6 +2,9 @@ local M={
     ns=vim.api.nvim_create_namespace'small_zenall',
     augroup=vim.api.nvim_create_augroup('small_zenall',{}),
 }
+-----TODO:
+--- USE vim.wo[win][buf].opt=value instead of vim.wo[win].opt=value
+-----
 function M.redraw(buf)
     _=buf
 end
