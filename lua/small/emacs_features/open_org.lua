@@ -1,9 +1,12 @@
 local M={}
---TODO: continue
 function M.setup()
     vim.api.nvim_create_autocmd({'Filetype'},{callback=function (args)
-        vim.fn.termopen({'emacs','-nw','--',args.file})
-        vim.api.nvim_buf_set_name(0,args.file)
+        local buf=vim.api.nvim_get_current_buf()
+        vim.fn.termopen({'emacsclient','-c','-a','emacs','-nw','--',args.file},{on_exit=function()
+            pcall(vim.cmd.bdelete,{buf,bang=true})
+        end})
+        vim.api.nvim_buf_set_name(buf,args.file)
+        vim.cmd.startinsert()
     end,pattern='org',group=vim.api.nvim_create_augroup('small_emacs_org',{})})
 
 end
