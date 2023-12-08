@@ -69,6 +69,12 @@ Summary: Run insert mappings (like [nvim-autopairs](https://github.com/windwp/nv
 Commands:
 + `cmd2ins.map(key)` run key from command mode in insert mode
 
+## Debugger
+Summary: Open a debugger buffer on error
+Commands:
+`debugger.error()`: run the debugger
+`debugger.overide_error()`: replace normal error with the debugger
+
 ## Dff
 Summary: The hop/leap/flash style selector + a file explorer (not manager).\
 Commands:
