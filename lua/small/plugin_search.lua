@@ -5,7 +5,12 @@ function M.handle_plugin(path)
     vim.cmd.vnew(path)
 end
 function M.run()
-    M.cache=M.cache or vim.system({'curl','https://nvim.sh/s'}):wait().stdout
+    if not M.cache then
+        vim.system({'curl','https://nvim.sh/s'},{},function (out)
+            M.cache=out.stdout
+            vim.schedule(M.run)
+        end) return
+    end
     local ret={}
     for _,v in ipairs(vim.split(M.cache,'\n')) do
         table.insert(ret,({string.gsub(v,'^(%S+%s+)%S*%s*%S*%s*%S*%s*%S+%s*(.-) *$','%1%2')})[1])
