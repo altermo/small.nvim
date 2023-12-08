@@ -1,15 +1,8 @@
 local M={}
 function M.handle_plugin(path)
     vim.opt.runtimepath:append(path)
-    local select=vim.fn.readdir(path..'/lua')
-    pcall(vim.cmd.helptags,'ALL')
-    if #select==0 then return end
-    require'small.lib.select'(select,{},function (inp)
-        if not inp then return end
-        if not pcall(require,inp) then
-          package[inp]=nil
-        end
-    end)
+    pcall(vim.cmd.helptags,path..'/doc')
+    vim.cmd.vnew(path)
 end
 function M.run()
     M.cache=M.cache or vim.system({'curl','https://nvim.sh/s'}):wait().stdout
