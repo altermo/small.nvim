@@ -60,8 +60,13 @@ end
 ---@param message any
 ---@param level?  integer
 function M.error(message,level)
-    message=message or 'nil'
     local traceback=M.get_traceback_data(3)
+    for _,i in ipairs(traceback) do
+        if i.what=='C' and i.name=='pcall' then
+            _G._ERROR(message,level)
+        end
+    end
+    message=message or 'nil'
     local guess_file=vim.fn.expand'%'
     ---@diagnostic disable-next-line: cast-local-type
     if guess_file=='' then guess_file=nil end
