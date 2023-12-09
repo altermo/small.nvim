@@ -74,7 +74,6 @@ function M.sidebar()
     table.remove(lines,1)
     local buf=vim.api.nvim_create_buf(true,true)
     vim.bo[buf].bufhidden='wipe'
-    vim.lg(lines)
     vim.api.nvim_buf_set_lines(buf,0,-1,true,lines)
     vim.cmd.vnew()
     vim.api.nvim_set_current_buf(buf)
