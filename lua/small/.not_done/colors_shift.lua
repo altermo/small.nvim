@@ -7,15 +7,17 @@ function M.get_colorscheme(colorname)
     vim.cmd.colorscheme(user_colorscheme)
     return save
 end
-function M.zip_colors(tbl_a,tbl_b)
+function M.zip_colors(colornamefrom,colornameto)
+    local from=M.get_colorscheme(colornamefrom)
+    local to=M.get_colorscheme(colornameto)
     local ret={}
-    for k,_ in pairs(tbl_a) do ret[k]={'tokyonight'} end
-    for k,_ in pairs(tbl_b) do ret[k]={'nordfox',unpack(ret[k] or {})} end
+    for k,_ in pairs(from) do ret[k]={'tokyonight'} end
+    for k,_ in pairs(to) do ret[k]={'nordfox',unpack(ret[k] or {})} end
     vim.lg(ret)
     return ret
 end
 function M._shift(colornamefrom,colornameto,time,steps)
-    local colors=M.zip_colors(M.get_colorscheme(colornamefrom),M.get_colorscheme(colornameto))
+    M.zip_colors(colornamefrom,colornameto)
     --coroutine.wrap(M.co_run)(colors,time,steps,colornamefrom,colornameto)
 end
 function M.shift(colorname,time)
