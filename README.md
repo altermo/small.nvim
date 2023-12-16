@@ -69,6 +69,10 @@ Summary: Run insert mappings (like [nvim-autopairs](https://github.com/windwp/nv
 Commands:
 + `cmd2ins.map(key)` run key from command mode in insert mode
 
+## Color_shift
+Summary: slowly shifts between two colors \
+Commands: `color_shift.shift(to_colorscheme,time,steps?)`
+
 ## Debugger
 Summary: Open a debugger buffer on error
 Commands:
