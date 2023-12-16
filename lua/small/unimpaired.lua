@@ -49,7 +49,7 @@ function M.set_opt()
         vim.api.nvim_buf_set_lines(buf,0,0,false,{k..' : '..(opts[k].opt or opts[k])})
     end
     local win=vim.api.nvim_open_win(buf,false,{
-        relative='editor',width=vim.o.columns-20,height=vim.o.lines-20,col=10,row=10,
+        relative='editor',width=vim.o.columns>20 and vim.o.columns-20 or 10,height=vim.o.lines>20 and vim.o.lines-20 or 10,col=10,row=10,
         focusable=false,style='minimal',noautocmd=true
     })
     vim.schedule(function ()
