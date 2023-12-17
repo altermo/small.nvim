@@ -1,4 +1,4 @@
-local M={var={}}
+local M={}
 ---TODO: use ColorSchemePre to make switching colors while running not cause problems
 function M.get_colorscheme(colorname)
     local user_colorscheme=vim.g.colors_name
@@ -109,6 +109,7 @@ function M.set_color(name,from,to,p)
     vim.api.nvim_set_hl(0,name,val)
 end
 function M.update()
+    if not M.var then return end
     for k,v in pairs(M.var.colors) do
         M.set_color(k,v.from,v.to,M.var.step/M.var.steps)
     end
@@ -123,17 +124,21 @@ function M.async_run(colors,time,steps,from,to)
     local function t()
         if stop_flag then
             vim.api.nvim_del_autocmd(au)
+            M.var=nil
             return
         end
         if step==steps then
             vim.api.nvim_del_autocmd(au)
             vim.cmd.colorscheme(to)
+            M.var=nil
             return
         end
         step=step+1
-        M.var.step=step
-        M.var.steps=steps
-        M.var.colors=colors
+        M.var={
+            step=step,
+            steps=steps,
+            colors=colors
+        }
         --TODO: make work for lualine
         vim.cmd.colorscheme('_color_shift')
         vim.defer_fn(t,time/steps)
