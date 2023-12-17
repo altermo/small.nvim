@@ -45,4 +45,7 @@ function M.setup_keymaps()
         M.set_font_size(font_size>1 and font_size-1 or 1)
     end)
 end
+function M.set_padding(size)
+    M.send_cmd('set-spacing','padding='..size)
+end
 return M

@@ -134,14 +134,17 @@ function M.async_run(colors,time,steps,from,to)
         M.var.step=step
         M.var.steps=steps
         M.var.colors=colors
+        --TODO: make work for lualine
         vim.cmd.colorscheme('_color_shift')
         vim.defer_fn(t,time/steps)
     end
     t()
 end
 function M._shift(colornamefrom,colornameto,time,steps)
-    local colors=M.zip_colors(colornamefrom,colornameto)
-    M.async_run(colors,time,steps,colornamefrom,colornameto)
+    vim.schedule(function ()
+        local colors=M.zip_colors(colornamefrom,colornameto)
+        M.async_run(colors,time,steps,colornamefrom,colornameto)
+    end)
 end
 function M.shift(colorname,time,steps)
     M._shift(vim.g.colors_name,colorname,time,steps or 10)
