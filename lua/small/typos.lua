@@ -16,9 +16,13 @@ function M.update(buf)
     end))
 end
 function M.setup()
-    vim.api.nvim_create_autocmd({'TextChanged','InsertLeave','BufEnter'},{callback=function (ev)
-        M.update(ev.buf)
-    end,group=vim.api.nvim_create_augroup('small_typos',{clear=true})})
+    vim.schedule(function ()
+        vim.api.nvim_create_autocmd({'TextChanged','InsertLeave','BufEnter'},{callback=function (ev)
+            if vim.bo[ev.buf].buftype~='terminal' then
+                M.update(ev.buf)
+            end
+        end,group=vim.api.nvim_create_augroup('small_typos',{clear=true})})
+    end)
 end
 if vim.dev then
     M.setup()
