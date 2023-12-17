@@ -302,6 +302,13 @@ Required: `treesitter`\
 Summary: Split-join if/for/function_definition blocks\
 Commands: `tree_lua_block_split_join.run()`
 
+## Treewarn
+Required: `treesitter`\
+Summary: Warn on some treesitter structures\
+Setup: `treewarn.setup()`
+Config:
++ `treewarn.conf[lang]`: list of queries with the capture `@warn`; and to add custo messages: ` (#set! "mes" "...")`
+
 ## Typos
 Required: `typos`\
 Summary: show code typos\
