@@ -302,6 +302,11 @@ Required: `treesitter`\
 Summary: Split-join if/for/function_definition blocks\
 Commands: `tree_lua_block_split_join.run()`
 
+## Typos
+Required: `typos`\
+Summary: show code typos\
+Setup: `typos.setup()`
+
 ## Unimpaired
 Summary: Goto next/previous file OR quickly change options\
 Commands:
