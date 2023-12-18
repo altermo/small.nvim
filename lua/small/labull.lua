@@ -24,4 +24,14 @@ function M.run()
     local laline=M.labull(vim.api.nvim_get_current_line())
     return 'o'..(laline and ('<esc>A'..laline) or '')
 end
+function M.setup()
+    vim.on_key(function(key)
+        if (key~='o' or vim.api.nvim_get_mode().mode~='n')
+            and (key~='\r' or vim.api.nvim_get_mode().mode~='i') then
+            return
+        end
+        local laline=M.labull(vim.api.nvim_get_current_line())
+        vim.schedule_wrap(vim.api.nvim_feedkeys)(vim.keycode(laline and ('<esc>A'..laline) or ''),'n',false)
+    end,vim.api.nvim_create_namespace'small_labull')
+end
 return M
