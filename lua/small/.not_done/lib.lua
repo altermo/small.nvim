@@ -22,16 +22,55 @@ function M.pos_tree_lang()
     local lang=parser:language_for_range({row,col,row,col})
     return lang:lang()
 end
----@overload fun(self:LanguageTree,range:Range4):LanguageTree[]
+---@param self LanguageTree
+---@param range Range4
+---@return LanguageTree[]
 function M.languages_for_range(self,range,_s)
     _s=_s or {}
     table.insert(_s,1,self)
-    for _, child in pairs(self._children) do
+    for _, child in pairs(self:children()) do
         if child:contains(range) then
-            return M._langauges_for_range(child,range,_s)
+            return M.languages_for_range(child,range,_s)
         end
     end
     return _s
+end
+---@param range Range4
+---@param nodetype string
+---@return boolean
+function M.in_node_type(range,nodetype,opts)
+    opts=opts or {}
+    local parser=vim.treesitter.get_parser(opts.bufnr,opts.lang)
+    for _,lang_tree in ipairs(M.languages_for_range(parser,range)) do
+        local node=lang_tree:named_node_for_range(range)
+        while node do
+            if node:type()==nodetype then return true end
+            node=node:parent()
+        end
+    end
+    return false
+end
+---@param nodetype string
+---@param range Range4|nil
+---@return boolean
+function M.in_node_type2(nodetype,range,opts)
+    if not range then
+        local pos = vim.api.nvim_win_get_cursor(0)
+        range={pos[1]-1,pos[2],pos[1]-1,pos[2]+(vim.api.nvim_get_mode()=='i' and 0 or 1)}
+    end
+    opts=opts or {}
+    local parser=vim.treesitter.get_parser(opts.bufnr,opts.lang)
+    local query=vim.treesitter.query.parse(opts.lang or vim.bo[opts.bufnr or 0].filetype,('(%s) @cap'):format(nodetype))
+    local _range=require'vim.treesitter._range'
+    for _,lang_tree in ipairs(M.languages_for_range(parser,range)) do
+        local tree=lang_tree:tree_for_range(range)
+        if tree then
+            for _,node in query:iter_captures(tree:root(),opts.bufnr,0,-1) do
+                if _range.contains({node:range()},range) then return true end
+            end
+        end
+    end
+    return false
 end
 --TODO: make somehow use of vim.ui.input
 ---@param timeout? number
@@ -89,8 +128,8 @@ M.userdata=function () return newproxy(true) end
 ---@param source string
 ---@return any
 function M.req(source)
-  package.loaded[source]=nil
-  return require(source)
+    package.loaded[source]=nil
+    return require(source)
 end
 ---@generic T,P
 ---@param fn fun(...:T,cb:fun(arg:P)):P
