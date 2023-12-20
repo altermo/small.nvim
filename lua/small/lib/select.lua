@@ -37,11 +37,11 @@ function M.select(items,conf,on_confirm)
     if type(conf.preview)=='string' then
         conf.preview=M.preview[conf.preview]
     end
-    if pcall(require,'telescope') then
-        return M.telescope_select(items,conf,on_confirm,{})
-    else
+    --if pcall(require,'telescope') then
+        --return M.telescope_select(items,conf,on_confirm,{})
+    --else
         vim.ui.select(items,conf,on_confirm)
-    end
+    --end
 end
 if vim.dev then
     M.select({'a','b','c'},{preview=function (i) return {i[1]} end},vim.pprint)

@@ -22,7 +22,7 @@ end
 function M.select(key)
     require'small.lib.select'(M.get_list(key),{format_item=function (file)
         return vim.tbl_contains(M.locked_files,file) and '>>'..file or file
-    end},function (file) vim.cmd.edit(file) end)
+    end},function (file) vim.schedule_wrap(vim.cmd.edit)(file) end)
 end
 function M.run()
     local char=vim.fn.getcharstr()
