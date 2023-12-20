@@ -14,7 +14,6 @@ function M.run()
         for k,v in pairs(M.save.opt) do vim.o[k]=v end
         M.save={opt={}}
         local s,t=pcall(require,'twilight') if s then t.disable() end
-        _G.CMD_NO_SPAM=false
         return
     end
     vim.cmd'-1 tab split'
@@ -34,7 +33,6 @@ function M.run()
     M.win_resize()
     M.save.au=vim.api.nvim_create_autocmd('WinResized',{callback=M.win_resize})
     local s,t=pcall(require,'twilight') if s then t.enable() end
-    _G.CMD_NO_SPAM=true
 end
 function M.win_resize()
     vim.api.nvim_win_set_width(M.save.left,vim.fn.floor(vim.o.columns/5))
