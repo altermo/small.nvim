@@ -80,12 +80,23 @@ function M.run()
             elseif #keys[key]==0 then
             else M.select(keys[key]) end
         elseif key:match('[%w_.-]') then
-            require'small.lib.select'(vim.tbl_map(M.file_to_lfile,vim.fs.find(function (name,path)
-                return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
-            end,{type='file',limit=math.huge})),{},function (file)
+            local cb=function (files)
+                if #files==0 then vim.notify('no files found starting with '..key,vim.log.levels.INFO) return end
+                if #files==1 then vim.cmd.edit(files[1]) return end
+                require'small.lib.select'(vim.tbl_map(M.file_to_lfile,files),{},function (file)
                     if not file then return end
                     vim.defer_fn(function () vim.cmd.edit(file) end,50)
                 end)
+            end
+            if vim.fn.executable('fd')==0 then
+                cb(vim.fs.find(function (name,path)
+                    return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
+                end,{type='file',limit=1000}))
+            else
+                vim.system({'fd','-tfile','-s','-a','^'..key},{},function (ev)
+                    vim.schedule_wrap(cb)(vim.split(ev.stdout,'\n',{trimempty=true}))
+                end)
+            end
         end
     end
 end
