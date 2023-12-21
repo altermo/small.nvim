@@ -1,4 +1,4 @@
-local M={}
+local M={conf={}}
 function M.in_kitty()
     return vim.env.TERM:find('kitty')
 end
@@ -28,7 +28,8 @@ function M.setup()
     M.sync_background()
     vim.api.nvim_create_autocmd('OptionSet',{pattern='guifont',callback=M.sync_font_size})
     M.sync_font_size()
-    M.setup_keymaps()
+    if not M.conf.no_keymap then M.setup_keymaps() end
+    if M.conf.padding then M.set_padding(M.conf.padding) end
 end
 function M.set_font_size(size) vim.o.guifont=vim.o.guifont:gsub(':h%d*',':h'..size) end
 function M.get_font_size() return vim.o.guifont:match(':h(%d*)') end
