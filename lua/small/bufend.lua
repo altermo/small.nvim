@@ -45,30 +45,31 @@ function M.run()
     })
     vim.api.nvim_buf_set_lines(buf,-1,-1,false,{'* : find files starting with *'})
     vim.cmd.redraw()
-    local char=vim.fn.getcharstr()
+    local key=vim.fn.getcharstr()
     vim.api.nvim_win_close(win,true)
     local curbuf=vim.api.nvim_get_current_buf()
-    if char==' ' then
+    if key==' ' then
         local file=M.buf_get_file(curbuf)
         if not file then return end
-        local key=vim.fn.fnamemodify(file,':t'):sub(1,1)
+        key=vim.fn.fnamemodify(file,':t'):sub(1,1)
         if M.marked_buf[key]==curbuf then
             M.unmark_buf(key)
         else
             M.mark_buf(key)
         end
-    elseif char=='\r' then M.select()
-    elseif char~='\x1b' then
-        if keys[char] then
-            if curbuf==M.marked_buf[char] then
-                keys[char]=M.get_buf_list(char)
+    elseif key=='\r' then M.select(M.get_buf_list())
+    elseif key~='\x1b' then
+        if keys[key] then
+            if curbuf==M.marked_buf[key] then
+                keys[key]=M.get_buf_list(key)
             end
-            keys[char]=vim.tbl_filter(function(x) return x~=curbuf end,keys[char])
-            if #keys[char]==1 then vim.cmd.buf(keys[char][1])
-            else M.select(keys[char]) end
-        elseif vim.regex('\\v[a-z.-_]'):match_str(char) then
+            keys[key]=vim.tbl_filter(function(x) return x~=curbuf end,keys[key])
+            if #keys[key]==1 then vim.cmd.buf(keys[key][1])
+            elseif #keys[key]==0 then
+            else M.select(keys[key]) end
+        elseif vim.regex('\\v[a-z.-_]'):match_str(key) then
             require'small.lib.select'(vim.tbl_map(M.file_to_lfile,vim.fs.find(function (name,path)
-                return name:sub(1,1)==char and not path:sub(#vim.fn.getcwd()):match('/%.')
+                return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
             end,{type='file',limit=math.huge})),{},function (file)
                     if file then vim.api.nvim_buf_call(0,function () vim.cmd.edit(file) end) end
                 end)
