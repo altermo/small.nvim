@@ -35,7 +35,7 @@ function M.run()
     end
     local buf=vim.api.nvim_create_buf(false,true)
     vim.bo[buf].bufhidden='wipe'
-    vim.api.nvim_buf_set_lines(buf,0,-1,false,{'<space>: mark buffer','<bs>   : unmark buffer','<cr>   : search buffer files',''})
+    vim.api.nvim_buf_set_lines(buf,0,-1,false,{'<space>: quick toggle buffer mark','<cr>   : search buffer files',''})
     for key,bufs in vim.spairs(keys) do
         vim.api.nvim_buf_set_lines(buf,-1,-1,false,{(M.marked_buf[key] and '#' or '')..key..' : '..table.concat(vim.tbl_map(M.buf_get_lfile,bufs),' ;; ')})
     end
@@ -47,15 +47,23 @@ function M.run()
     vim.cmd.redraw()
     local char=vim.fn.getcharstr()
     vim.api.nvim_win_close(win,true)
-    if char==' ' then M.mark_buf(vim.fn.getcharstr())
-    elseif char=='\x80kb' then M.unmark_buf(vim.fn.getcharstr())
+    local curbuf=vim.api.nvim_get_current_buf()
+    if char==' ' then
+        local file=M.buf_get_file(curbuf)
+        if not file then return end
+        local key=vim.fn.fnamemodify(file,':t'):sub(1,1)
+        if M.marked_buf[key]==curbuf then
+            M.unmark_buf(key)
+        else
+            M.mark_buf(key)
+        end
     elseif char=='\r' then M.select()
     elseif char~='\x1b' then
         if keys[char] then
-            if vim.api.nvim_get_current_buf()==M.marked_buf[char] then
+            if curbuf==M.marked_buf[char] then
                 keys[char]=M.get_buf_list(char)
             end
-            keys[char]=vim.tbl_filter(function(x) return x~=vim.api.nvim_get_current_buf() end,keys[char])
+            keys[char]=vim.tbl_filter(function(x) return x~=curbuf end,keys[char])
             if #keys[char]==1 then vim.cmd.buf(keys[char][1])
             else M.select(keys[char]) end
         elseif vim.regex('\\v[a-z.-_]'):match_str(char) then
