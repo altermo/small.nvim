@@ -17,10 +17,6 @@ function M.get_buf_list(key)
         return file and ((not key) or key==vim.fn.fnamemodify(file,':t'):sub(1,1))
     end):rev():totable()
 end
-function M.get_file(key)
-    if M.marked_buf[key] then return {M.marked_buf[key]} end
-    if M.get_buf_list(key) then return M.get_buf_list(key) end
-end
 function M.mark_buf(key) M.marked_buf[key]=vim.api.nvim_get_current_buf() end
 function M.unmark_buf(key) M.marked_buf[key]=nil end
 function M.select(list)
@@ -31,11 +27,19 @@ function M.run()
     for _,buf in pairs(M.get_buf_list()) do
         local file=assert(M.buf_get_file(buf))
         local key=vim.fn.fnamemodify(file,':t'):sub(1,1)
-        keys[key]=M.get_file(key)
+        keys[key]=M.get_buf_list(key)
+    end
+    for key,buf in pairs(M.marked_buf) do
+        keys[key]={buf}
     end
     local buf=vim.api.nvim_create_buf(false,true)
     vim.bo[buf].bufhidden='wipe'
-    vim.api.nvim_buf_set_lines(buf,0,-1,false,{'<space>: quick toggle buffer mark','<cr>   : search buffer files',''})
+    vim.api.nvim_buf_set_lines(buf,0,-1,false,{
+        '<space>: quick toggle buffer mark',
+        '<cr>   : search buffer files',
+        '<tab>  : toggle buffer mark (input)',
+        ''
+    })
     for key,bufs in vim.spairs(keys) do
         vim.api.nvim_buf_set_lines(buf,-1,-1,false,{(M.marked_buf[key] and '#' or '')..key..' : '..table.concat(vim.tbl_map(M.buf_get_lfile,bufs),' ;; ')})
     end
@@ -58,6 +62,14 @@ function M.run()
             M.mark_buf(key)
         end
     elseif key=='\r' then M.select(M.get_buf_list())
+    elseif key=='\t' then
+        key=vim.fn.getcharstr()
+        if not key:match('[%w_.-]') then return end
+        if M.marked_buf[key]==curbuf then
+            M.unmark_buf(key)
+        else
+            M.mark_buf(key)
+        end
     elseif key~='\x1b' then
         if keys[key] then
             if curbuf==M.marked_buf[key] then
@@ -67,7 +79,7 @@ function M.run()
             if #keys[key]==1 then vim.cmd.buf(keys[key][1])
             elseif #keys[key]==0 then
             else M.select(keys[key]) end
-        elseif vim.regex('\\v[a-z.-_]'):match_str(key) then
+        elseif key:match('[%w_.-]') then
             require'small.lib.select'(vim.tbl_map(M.file_to_lfile,vim.fs.find(function (name,path)
                 return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
             end,{type='file',limit=math.huge})),{},function (file)
