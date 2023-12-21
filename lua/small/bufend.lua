@@ -71,7 +71,9 @@ function M.run()
             require'small.lib.select'(vim.tbl_map(M.file_to_lfile,vim.fs.find(function (name,path)
                 return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
             end,{type='file',limit=math.huge})),{},function (file)
-                    if file then vim.api.nvim_buf_call(0,function () vim.cmd.edit(file) end) end
+                    vim.defer_fn(function ()
+                        vim.cmd('edit '..file)
+                    end,50)
                 end)
         end
     end
