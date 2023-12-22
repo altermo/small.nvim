@@ -1,4 +1,5 @@
 local M={}
+M.ns=vim.api.nvim_create_namespace('small_debugger')
 if not _G._ERROR then _G._ERROR=_G.error end
 function M.get_traceback_data(level)
     local ret={}
@@ -72,12 +73,12 @@ function M.error(message,level)
     if guess_file=='' then guess_file=nil end
     vim.on_key(function(key)
         ---@diagnostic disable-next-line: param-type-mismatch
-        vim.on_key(nil,-1)
+        vim.on_key(nil,M.ns)
         if key~='y' then return end
         vim.api.nvim_input'<esc>'
         vim.cmd.vsplit()
         M.create_traceback_buf(traceback,vim.api.nvim_get_current_win(),message,guess_file)
-    end,-1)
+    end,M.ns)
     _G._ERROR(message..'\n\n#### press y to start debugger ####\n',level)
 end
 function M.overide_error()
@@ -85,5 +86,6 @@ function M.overide_error()
 end
 if vim.dev then
     M.overide_error()
+    error(1)
 end
 return M
