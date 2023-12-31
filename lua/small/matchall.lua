@@ -9,7 +9,8 @@ function M.clear()
 end
 function M.highlight_word()
     local line=vim.api.nvim_get_current_line()
-    M.save.matchid=vim.fn.matchadd('Underline','\\M\\<'..vim.fn.escape(line:sub(M.save.beg+1,M.save.fin),'\\')..'\\>',-1)
+    local s,match=pcall(vim.fn.matchadd,'Underline','\\M\\<'..line:sub(M.save.beg+1,M.save.fin):gsub([[\]],[[\\]])..'\\>',-1)
+    if s then M.save.matchid=match end
 end
 function M.highlight_lsp()
     for _,v in ipairs(vim.lsp.get_clients({bufnr=0})) do

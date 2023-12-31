@@ -17,8 +17,8 @@ function M.ranger(path)
     cmd=cmd..(vim.fn.isdirectory(realpath)==1 and ' "' or ' --cmd "select_file ')..realpath..'"'
     vim.fn.termopen(cmd,{
         on_exit=function(_,_,_)
-            if vim.fn.filereadable(file)==1 then
-                vim.cmd.edit(vim.fn.readfile(file)[1])
+            if vim.uv.fs_stat(file) then
+                pcall(vim.cmd.edit,vim.fn.readfile(file)[1])
                 vim.fn.delete(file)
             else
                 if M.conf.exit_if_single and #vim.fn.getbufinfo()==1 and vim.api.nvim_get_current_buf()==buf then vim.cmd.quitall() end
