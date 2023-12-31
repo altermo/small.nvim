@@ -256,6 +256,14 @@ Commands:
 
 Config:
 + `reminder.conf.path` (required) file to find reminders in
+## Specfile
+Summary: Run scripts on specific file opens.\
+Setup: `specfile.setup()`\
+Config:
++ `specfile.conf.ext` which file ext runs which command name
++ `specfile.conf.prgm` command name to command
++ `specfile.conf.bigfile` limit the max file size
++ `specfile.conf.startinsert` start insert on term command
 ## Splitbuf
 Summary: A replacement for `:split` and `:vsplit`.\
 Commands:
