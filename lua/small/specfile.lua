@@ -20,8 +20,10 @@ M.conf={
     bigfile=4*1024*1024,
     startinsert=true,
 }
+---@param prgm {[number]:string,async:boolean?,name:string?}
+---@param file string
 function M.run_prgm(prgm,file)
-    local p=vim.deepcopy(prgm)
+    local p=vim.deepcopy(prgm,true)
     table.insert(p,file)
     local buf=vim.api.nvim_get_current_buf()
     if prgm.async then
@@ -31,7 +33,7 @@ function M.run_prgm(prgm,file)
         vim.api.nvim_buf_set_lines(mesbuf,0,-1,false,{'File opened in: '..(p.name or p[1])})
         vim.api.nvim_win_set_buf(0,mesbuf)
         vim.api.nvim_buf_delete(buf,{force=true})
-        vim.api.nvim_buf_set_name(0,file)
+        vim.api.nvim_buf_set_name(mesbuf,file)
         return
     end
     vim.fn.termopen(p,{on_exit=function() pcall(vim.cmd.bdelete,{buf,bang=true}) end})
