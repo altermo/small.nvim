@@ -1,0 +1,6 @@
+[submodule "vim-ditto-fork"]
+	path = vim-ditto-fork
+	url = https://github.com/altermo/vim-ditto-fork
+[submodule "vim-wordy-fork"]
+	path = vim-wordy-fork
+	url = https://github.com/altermo/vim-wordy-fork
