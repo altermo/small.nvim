@@ -1,0 +1,6 @@
+[submodule "lua/small/fork/vim-wordy-fork"]
+	path = lua/small/fork/vim-wordy-fork
+	url = https://github.com/altermo/vim-wordy-fork
+[submodule "lua/small/fork/vim-ditto-fork"]
+	path = lua/small/fork/vim-ditto-fork
+	url = https://github.com/altermo/vim-ditto-fork
