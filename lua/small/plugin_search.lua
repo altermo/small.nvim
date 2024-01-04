@@ -20,6 +20,7 @@ function M.run()
         if not index then return end
         local url=index:gsub('^(%S+).*$','%1')
         local tmp=vim.fn.tempname()..'/'
+        vim.fn.setreg('+',url)
         vim.system({'git','clone','--depth=1','https://github.com/'..url,tmp},{},function ()
             vim.schedule_wrap(M.handle_plugin)(tmp)
         end)
