@@ -4,6 +4,7 @@ function M.update(buf)
     local lines=vim.api.nvim_buf_get_lines(buf,0,-1,false)
     if M.job then M.job:wait() end
     M.job=vim.system({'typos','-','--format=json'},{stdin=lines},vim.schedule_wrap(function (ev)
+        if not vim.api.nvim_buf_is_valid(buf) then return end
         vim.diagnostic.set(M.ns,buf,vim.iter(vim.split(ev.stdout,'\n',{trimempty=true})):map(vim.json.decode):map(function (json)
             return {
                 col=json.byte_offset,
