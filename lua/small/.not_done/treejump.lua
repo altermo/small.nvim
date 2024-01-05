@@ -76,7 +76,7 @@ if vim.dev then
         for i=1,6 do
             local col1=vim.api.nvim_get_hl(0,{name='rainbow'..i}).fg
             local col2=vim.api.nvim_get_hl(0,{name='normal'}).bg
-            vim.api.nvim_set_hl(0,'rainbowr'..i,{bg=M.blend(col1,col2,0.5),blend=0})
+            vim.api.nvim_set_hl(0,'rainbowr'..i,{bg=M.blend(col1,col2,0.75),blend=0})
         end
         vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
         M.run()
