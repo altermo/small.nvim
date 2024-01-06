@@ -18,16 +18,6 @@ function M.open(path,conf)
     path=vim.fs.normalize(vim.fn.fnamemodify(path or '.',':p'))
     local search=dff.create_search(vim.fn.readdir(path),conf)
     local function fn(key)
-        if #search.list==1 then
-            path=vim.fs.joinpath(path,search.list[1])
-            if vim.fn.isdirectory(path)==0 then vim.cmd.edit(path) return true
-            else
-                search=dff.create_search(vim.fn.readdir(path),conf)
-                return
-            end
-        end
-        if key==mode.enter then key='\n' end
-        if key==mode.escape then vim.cmd.edit(path) return true end
         if key==mode.backspace then
             if dff.back(search) then
                 repeat path=vim.fs.dirname(path) --[[@as string]] until path=='/' or #vim.fn.readdir(path)~=1
@@ -35,6 +25,16 @@ function M.open(path,conf)
             end
             return
         end
+        while #search.list==1 do
+            path=vim.fs.joinpath(path,search.list[1])
+            if vim.fn.isdirectory(path)==0 then vim.cmd.edit(path) return true
+            else
+                search=dff.create_search(vim.fn.readdir(path),conf)
+            end
+            if #search.list~=1 then return end
+        end
+        if key==mode.enter then key='\n' end
+        if key==mode.escape then vim.cmd.edit(path) return true end
         local ret=dff.send_key(search,key)
         if ret then
             path=vim.fs.joinpath(path,ret)
@@ -45,7 +45,6 @@ function M.open(path,conf)
                 if vim.fn.isdirectory(path)==0 then vim.cmd.edit(path) return true
                 else
                     search=dff.create_search(vim.fn.readdir(path),conf)
-                    return
                 end
             end
         end
