@@ -1,4 +1,4 @@
-local M={ns=vim.api.nvim_create_namespace'small_cursor'}
+local M={ns=vim.api.nvim_create_namespace'small_cursor',data={}}
 function M.create_cursor()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
     vim.api.nvim_buf_set_extmark(0,M.ns,row-1,col,{})
@@ -14,7 +14,7 @@ function M.jump_to_next_cursor(create_cursor)
     if not pos then return end
     if create_cursor then M.create_cursor() end
     vim.api.nvim_win_set_cursor(0,{pos[2]+1,pos[3]})
-    vim.api.nvim_buf_del_extmark(0,M.ns,pos[1])
+    M.del_cursor(0,pos[1])
 end
 function M.jump_to_prev_cursor(create_cursor)
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
@@ -25,11 +25,15 @@ function M.jump_to_prev_cursor(create_cursor)
     if not pos then return end
     if create_cursor then M.create_cursor() end
     vim.api.nvim_win_set_cursor(0,{pos[2]+1,pos[3]})
-    vim.api.nvim_buf_del_extmark(0,M.ns,pos[1])
+    M.del_cursor(0,pos[1])
+end
+function M.del_cursor(buf,extmark_id)
+    M.data=nil
+    vim.api.nvim_buf_del_extmark(buf,M.ns,extmark_id)
 end
 function M.clear_cursor(buf)
     for _,v in ipairs(vim.api.nvim_buf_get_extmarks(buf or 0,M.ns,0,-1,{})) do
-        vim.api.nvim_buf_del_extmark(buf or 0,M.ns,v[1])
+        M.del_cursor(buf or 0,v[1])
     end
 end
 function M._update(buf)
