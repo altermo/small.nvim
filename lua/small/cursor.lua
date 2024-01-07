@@ -1,39 +1,84 @@
-local M={ns=vim.api.nvim_create_namespace'small_cursor',data={}}
+local M={
+    ns=vim.api.nvim_create_namespace'small_cursor',
+    data={},
+}
 function M.create_cursor()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
-    M.data[vim.api.nvim_buf_set_extmark(0,M.ns,row-1,col,{})]={}
+    local buf=vim.api.nvim_get_current_buf()
+    local id=vim.api.nvim_buf_set_extmark(0,M.ns,row-1,col,{id=math.max(0,unpack(vim.tbl_keys(M.data)))+1})
+    M.data[id]={buf=buf}
+end
+function M.buf_get_cursors(buf,start,end_)
+    start=start or 0
+    end_=end_ or -1
+    return vim.api.nvim_buf_get_extmarks(buf,M.ns,start,end_,{})
 end
 function M.goto_next_cursor(create_cursor)
+    local curbuf=vim.api.nvim_get_current_buf()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
-    local pos=vim.api.nvim_buf_get_extmarks(0,M.ns,{row-1,col+1},-1,{})[1]
+    local pos=vim.api.nvim_buf_get_extmarks(curbuf,M.ns,{row-1,col+1},-1,{})[1]
     if not pos then
-        --TODO: if no cursor found after, try finding cursors in other buffers
-        --PERF: create a cache which contains which buffers MAY contain cursor
+        for _,buf in ipairs(vim.api.nvim_list_bufs()) do
+            if buf>curbuf then
+                pos=M.buf_get_cursors(buf)[1]
+                if pos then break end
+            end
+        end
+    end
+    if not pos then
+        for _,buf in ipairs(vim.api.nvim_list_bufs()) do
+            if buf<curbuf then
+                pos=M.buf_get_cursors(buf)[1]
+                if pos then break end
+            end
+        end
+    end
+    if not pos then
         pos=vim.api.nvim_buf_get_extmarks(0,M.ns,0,-1,{})[1]
     end
     if not pos then return end
     if create_cursor then M.create_cursor() end
+    if curbuf~=M.data[pos[1]].buf then
+        vim.api.nvim_set_current_buf(M.data[pos[1]].buf)
+    end
     vim.api.nvim_win_set_cursor(0,{pos[2]+1,pos[3]})
-    M.del_cursor(0,pos[1])
+    M.del_cursor(pos[1])
 end
-function M.jump_to_prev_cursor(create_cursor)
+function M.goto_prev_cursor(create_cursor)
+    local curbuf=vim.api.nvim_get_current_buf()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
     local pos=table.remove(vim.api.nvim_buf_get_extmarks(0,M.ns,0,{row-1,col-1},{}))
+    if not pos then
+        for _,buf in ipairs(vim.fn.reverse(vim.api.nvim_list_bufs())) do
+            if buf<curbuf then
+                pos=table.remove(M.buf_get_cursors(buf))
+                if pos then break end
+            end
+        end
+    end
+    if not pos then
+        for _,buf in ipairs(vim.fn.reverse(vim.api.nvim_list_bufs())) do
+            if buf>curbuf then
+                pos=table.remove(M.buf_get_cursors(buf))
+                if pos then break end
+            end
+        end
+    end
     if not pos then
         pos=table.remove(vim.api.nvim_buf_get_extmarks(0,M.ns,0,-1,{}))
     end
     if not pos then return end
     if create_cursor then M.create_cursor() end
     vim.api.nvim_win_set_cursor(0,{pos[2]+1,pos[3]})
-    M.del_cursor(0,pos[1])
+    M.del_cursor(pos[1])
 end
-function M.del_cursor(buf,extmark_id)
+function M.del_cursor(extmark_id)
+    vim.api.nvim_buf_del_extmark(M.data[extmark_id].buf,M.ns,extmark_id)
     M.data[extmark_id]=nil
-    vim.api.nvim_buf_del_extmark(buf,M.ns,extmark_id)
 end
 function M.clear_cursor(buf)
     for _,v in ipairs(vim.api.nvim_buf_get_extmarks(buf or 0,M.ns,0,-1,{})) do
-        M.del_cursor(buf or 0,v[1])
+        M.del_cursor(v[1])
     end
     vim.cmd.mode()
 end
