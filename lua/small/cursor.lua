@@ -128,7 +128,7 @@ if vim.dev then
     vim.keymap.set('n','m',function() M.create_cursor() end)
     vim.keymap.set('n',"'",function() M.goto_next_cursor(true) end)
     vim.keymap.set('n',"<C-'>",function() M.goto_next_cursor() end)
-    vim.keymap.set('n','¨',function() M.clear_cursor() end)
+    vim.keymap.set('n','<F1>',function() M.clear_cursor() end)
     M.setup()
 end
 return M
