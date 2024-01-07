@@ -1,6 +1,7 @@
 local M={
     ns=vim.api.nvim_create_namespace'small_cursor',
     data={},
+    conf={},
 }
 function M.create_cursor()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
@@ -80,11 +81,22 @@ function M.clear_cursor(buf)
     for _,v in ipairs(vim.api.nvim_buf_get_extmarks(buf or 0,M.ns,0,-1,{})) do
         M.del_cursor(v[1])
     end
-    vim.cmd.mode()
+    vim.cmd.redraw{bang=true}
 end
-function M._update(buf)
+function M._update(buf,win)
+    if vim.bo[buf].buftype~='' then return end
+    local curwin=vim.api.nvim_get_current_win()
     local tns=vim.api.nvim_create_namespace'small_cursor_ephemeral'
-    for _,v in ipairs(vim.api.nvim_buf_get_extmarks(buf,M.ns,0,-1,{})) do
+    local cursors=vim.api.nvim_buf_get_extmarks(buf,M.ns,0,-1,{})
+    if M.conf.show_cursors then
+        for _,v in ipairs(vim.fn.win_findbuf(buf)) do
+            if v~=curwin or curwin~=win then
+                local row,col=unpack(vim.api.nvim_win_get_cursor(v))
+                table.insert(cursors,{-1,row-1,col})
+            end
+        end
+    end
+    for _,v in ipairs(cursors) do
         if v[3]>=#vim.fn.getline(v[2]+1) then
             vim.api.nvim_buf_set_extmark(buf,tns,v[2],v[3],{
                 virt_text={{' ','Cursor'}},
@@ -97,9 +109,14 @@ function M._update(buf)
     end
 end
 function M.setup()
-    vim.api.nvim_set_decoration_provider(M.ns,{on_win=function (_,_,bufnr,_)
-        M._update(bufnr)
+    vim.api.nvim_set_decoration_provider(M.ns,{on_win=function (_,winid,bufnr,_)
+        M._update(bufnr,winid)
     end})
+    if M.conf.show_cursors then
+        vim.api.nvim_create_autocmd('CursorMoved',{callback=function ()
+            vim.cmd.redraw{bang=true}
+        end})
+    end
 end
 if vim.dev then
     vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
