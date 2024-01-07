@@ -119,7 +119,7 @@ function M.setup()
     end
     vim.api.nvim_create_autocmd('BufDelete',{callback=function (ev)
         for _,v in ipairs(vim.api.nvim_buf_get_extmarks(ev.buf,M.ns,0,-1,{})) do
-            M.del_cursor(v[1])
+            M.data[v[1]]=nil
         end
     end})
 end
