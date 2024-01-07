@@ -117,6 +117,11 @@ function M.setup()
             vim.cmd.redraw{bang=true}
         end})
     end
+    vim.api.nvim_create_autocmd('BufDelete',{callback=function (ev)
+        for _,v in ipairs(vim.api.nvim_buf_get_extmarks(ev.buf,M.ns,0,-1,{})) do
+            M.del_cursor(v[1])
+        end
+    end})
 end
 if vim.dev then
     vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
