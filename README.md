@@ -3,7 +3,7 @@ This is a collection of small plugins (cause I can't stop making them).
 
 **I don't plan on doing good maintenance, so I might change things without warning.**
 
-The documentation might not be up to date
+The documentation is not up to date.
 
 Here some plugins that I would recommend you check out: [whint](#Whint), [bufend](#Bufend), [dff](#Dff).
 
@@ -72,6 +72,14 @@ Commands:
 ## Color_shift
 Summary: slowly shifts between two colors \
 Commands: `color_shift.shift(to_colorscheme,time,steps?)`
+
+## Curosr
+Summary: Create multiple cursors \
+Setup: `cursor.setup()` \
+Commands:
++ `cursor.create_cursor()` create a cursor
++ `cursor.goto_next_cursor(create_cursor)` goes to next cursor, if `create_cursor` is true, creates a cursor before jumping
++ `clear_cursor` clears the cursors in current buffer
 
 ## Debugger
 Summary: Open a debugger buffer on error

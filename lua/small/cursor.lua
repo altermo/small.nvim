@@ -1,9 +1,9 @@
 local M={ns=vim.api.nvim_create_namespace'small_cursor',data={}}
 function M.create_cursor()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
-    vim.api.nvim_buf_set_extmark(0,M.ns,row-1,col,{})
+    M.data[vim.api.nvim_buf_set_extmark(0,M.ns,row-1,col,{})]={}
 end
-function M.jump_to_next_cursor(create_cursor)
+function M.goto_next_cursor(create_cursor)
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
     local pos=vim.api.nvim_buf_get_extmarks(0,M.ns,{row-1,col+1},-1,{})[1]
     if not pos then
@@ -28,13 +28,14 @@ function M.jump_to_prev_cursor(create_cursor)
     M.del_cursor(0,pos[1])
 end
 function M.del_cursor(buf,extmark_id)
-    M.data=nil
+    M.data[extmark_id]=nil
     vim.api.nvim_buf_del_extmark(buf,M.ns,extmark_id)
 end
 function M.clear_cursor(buf)
     for _,v in ipairs(vim.api.nvim_buf_get_extmarks(buf or 0,M.ns,0,-1,{})) do
         M.del_cursor(buf or 0,v[1])
     end
+    vim.cmd.mode()
 end
 function M._update(buf)
     local tns=vim.api.nvim_create_namespace'small_cursor_ephemeral'
@@ -50,13 +51,17 @@ function M._update(buf)
         end
     end
 end
-if vim.dev then
-    vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
-    vim.keymap.set('n','<F1>',function() M.create_cursor() end)
-    vim.keymap.set('n','<F2>',function() M.jump_to_next_cursor() end)
-    vim.keymap.set('n','<F3>',function() M.jump_to_prev_cursor() end)
+function M.setup()
     vim.api.nvim_set_decoration_provider(M.ns,{on_win=function (_,_,bufnr,_)
         M._update(bufnr)
     end})
+end
+if vim.dev then
+    vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
+    vim.keymap.set('n','m',function() M.create_cursor() end)
+    vim.keymap.set('n',"'",function() M.goto_next_cursor(true) end)
+    vim.keymap.set('n',"<C-'>",function() M.goto_next_cursor() end)
+    vim.keymap.set('n','¨',function() M.clear_cursor() end)
+    M.setup()
 end
 return M
