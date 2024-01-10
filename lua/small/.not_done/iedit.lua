@@ -42,6 +42,9 @@ function M._update()
             for _,i in ipairs(M.marks) do
                 local c=vim.api.nvim_buf_get_extmark_by_id(0,M.ns,i,{details=true}) --[[@as any]]
                 vim.api.nvim_buf_set_text(0,c[1],c[2],c[3].end_row,c[3].end_col,text)
+                --TODO: maybe have a mark at the beginning and end and then draw the highlight using decorator
+                --TODO: undojoin or something similar, so that undos work fine
+                --TODO: if the complete range is deleted, then delete all the other ranges
             end
             return
         end
