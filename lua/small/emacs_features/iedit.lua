@@ -10,7 +10,7 @@ function M.find_all(text)
         local rowe=rows+#text-1
         local cole=(#text==1 and cols or 0)+#text[#text]
         table.insert(ret,{rows-1,cols,rowe-1,cole})
-        byte=buffer:find(t,byte+1,true)
+        byte=buffer:find(t,byte+#text+1,true)
     end
     return ret
 end
