@@ -1,4 +1,4 @@
-local M={ns=vim.api.nvim_create_namespace'small_iedit',marks={}}
+local M={ns=vim.api.nvim_create_namespace'small_iedit'}
 function M.find_all(text)
     local t=table.concat(text,'\n')
     local buffer=table.concat(vim.api.nvim_buf_get_lines(0,0,-1,true),'\n')
@@ -16,8 +16,17 @@ function M.find_all(text)
 end
 function M.clear()
     vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
-    M.marks={}
     M.text=nil
+end
+function M._create_extmark(rows,cols,rowe,cole,id)
+    vim.api.nvim_buf_set_extmark(0,M.ns,rows,cols,{
+        end_row=rowe,
+        end_col=cole,
+        hl_group='IncSearch',
+        id=id,
+        end_right_gravity=true,
+        right_gravity=false,
+    })
 end
 function M.select(range)
     M.clear()
@@ -25,26 +34,19 @@ function M.select(range)
     M.text=table.concat(text,'\n')
     local all=M.find_all(text)
     for _,r in ipairs(all) do
-        table.insert(M.marks,vim.api.nvim_buf_set_extmark(0,M.ns,r[1],r[2],{
-            end_row=r[3],
-            end_col=r[4],
-            hl_group='IncSearch'
-        }))
+        M._create_extmark(r[1],r[2],r[3],r[4])
     end
 end
 function M._update()
-    for _,v in ipairs(M.marks) do
-        local m=vim.api.nvim_buf_get_extmark_by_id(0,M.ns,v,{details=true}) --[[@as any]]
-        local text=vim.api.nvim_buf_get_text(0,m[1],m[2],m[3].end_row,m[3].end_col,{})
+    for _,v in ipairs(vim.api.nvim_buf_get_extmarks(0,M.ns,0,-1,{details=true})) do
+        local s,text=pcall(vim.api.nvim_buf_get_text,0,v[2],v[3],v[4].end_row,v[4].end_col,{})
+        if not s then return end
         local t=table.concat(text,'\n')
         if t~=M.text then
             M.text=t
-            for _,i in ipairs(M.marks) do
-                local c=vim.api.nvim_buf_get_extmark_by_id(0,M.ns,i,{details=true}) --[[@as any]]
-                vim.api.nvim_buf_set_text(0,c[1],c[2],c[3].end_row,c[3].end_col,text)
-                --TODO: maybe have a mark at the beginning and end and then draw the highlight using decorator
-                --TODO: undojoin or something similar, so that undos work fine
-                --TODO: if the complete range is deleted, then delete all the other ranges
+            for _,i in ipairs(vim.api.nvim_buf_get_extmarks(0,M.ns,0,-1,{details=true})) do
+                vim.api.nvim_buf_set_text(0,i[2],i[3],i[4].end_row,i[4].end_col,text)
+                M._create_extmark(i[2],i[3],i[2]+#text-1,(#text==1 and i[3] or 0)+#text[#text],i[1])
             end
             return
         end
@@ -60,12 +62,15 @@ function M.visual()
     pos2={pos2[2]-1,pos2[3]}
     M.select({pos1[1],pos1[2],pos2[1],pos2[2]})
 end
-if vim.dev then
-    M.clear()
-    vim.keymap.set('x','gi',M.visual)
+function M.setup()
     vim.api.nvim_create_autocmd(
         {'TextChanged','TextChangedI','TextChangedP'},
         {callback=M._update,group=vim.api.nvim_create_augroup('small_iedit',{})}
     )
+end
+if vim.dev then
+    M.clear()
+    vim.keymap.set('x','gi',M.visual)
+    M.setup()
 end
 return M
