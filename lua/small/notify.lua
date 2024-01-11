@@ -24,7 +24,7 @@ function M.open_history()
     vim.cmd.vsplit()
     vim.api.nvim_set_current_buf(buf)
 end
-function M.overide_notify()
+function M.override_notify()
     rawset(vim,'notify',M.notify)
 end
 M.update=function()

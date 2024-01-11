@@ -81,11 +81,11 @@ function M.error(message,level)
     end,M.ns)
     _G._ERROR(message..'\n\n#### press y to start debugger ####\n',level)
 end
-function M.overide_error()
+function M.override_error()
     rawset(_G,'error',M.error)
 end
 if vim.dev then
-    M.overide_error()
+    M.override_error()
     error(1)
 end
 return M

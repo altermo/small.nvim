@@ -85,7 +85,7 @@ Commands:
 Summary: Open a debugger buffer on error
 Commands:
 `debugger.error()`: run the debugger
-`debugger.overide_error()`: replace normal error with the debugger
+`debugger.override_error()`: replace normal error with the debugger
 
 ## Dff
 Summary: The hop/leap/flash style selector + a file explorer (not manager).\
@@ -214,7 +214,7 @@ summary: a rewrite of [fidget.nvim](https://github.com/j-hui/fidget.nvim)\
 Commands:
 + `notify.notify(msg,level,opts)` do a notify
 + `notify.open_history()` open the history in a new buffer
-+ `notify.overide_notify()` override `vim.notify`
++ `notify.override_notify()` override `vim.notify`
 + `notify.dismiss()` dismiss the current notifications
 
 Config:
@@ -226,7 +226,7 @@ Config:
 ## Nterm
 Summary: Run terminal or use neovim as a terminal.\
 Commands:
-+ `nterm.run(cmd?,smart_quit_nvim?)` creates a new termial
++ `nterm.run(cmd?,smart_quit_nvim?)` creates a new terminal
     + `cmd?`: the cmd to run, defaults to `&shell`
     + `smart_quit_nvim?`: if is the only buffer open, quits neovim
 
@@ -281,7 +281,7 @@ Commands:
 
 Config:
 + `splitbuf.conf.options` a table of commands (see source code)
-+ `splitbuf.conf.call` a function which overides the default behaviour
++ `splitbuf.conf.call` a function which oveerides the default behaviour
 
 ## Tableformat
 Summary: format markdown tables \
