@@ -29,6 +29,7 @@ function M._create_extmark(rows,cols,rowe,cole,id)
     })
 end
 function M.select(range)
+    M._setup()
     M.clear()
     local text=vim.api.nvim_buf_get_text(0,range[1],range[2],range[3],range[4],{})
     M.text=table.concat(text,'\n')
@@ -62,7 +63,9 @@ function M.visual()
     pos2={pos2[2]-1,pos2[3]}
     M.select({pos1[1],pos1[2],pos2[1],pos2[2]})
 end
-function M.setup()
+function M._setup()
+    if M._ then return end
+    M._=true
     vim.api.nvim_create_autocmd(
         {'TextChanged','TextChangedI','TextChangedP'},
         {callback=M._update,group=vim.api.nvim_create_augroup('small_iedit',{})}
@@ -71,6 +74,5 @@ end
 if vim.dev then
     M.clear()
     vim.keymap.set('x','gi',M.visual)
-    M.setup()
 end
 return M
