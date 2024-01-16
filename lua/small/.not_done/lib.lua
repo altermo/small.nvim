@@ -135,11 +135,40 @@ end
 ---@param fn fun(...:T,cb:fun(arg:P)):P
 ---@param ... T
 ---@return P
-function M.psudo_async(fn,...)
+function M.pseudo_async(fn,...)
     local co=assert(coroutine.running())
     local args={...}
     table.insert(args,function (...) coroutine.resume(co,...) end)
     fn(unpack(args))
     return coroutine.yield(co)
+end
+function M.strencodefn(f,encode)
+    local pack={
+        string.dump(f,true),
+        {},
+    }
+    local i=1
+    while debug.getupvalue(f,i) do
+        local _,val=debug.getupvalue(f,i)
+        if type(val)=='function' then
+            pack[2][i]={0,M.strencodefn(val)}
+        else
+            pack[2][i]={val}
+        end
+        i=i+1
+    end
+    return (encode or vim.mpack.encode)(pack)
+end
+function M.strdecodefn(s,decode)
+    local pack=(decode or vim.mpack.decode)(s)
+    local f=assert(loadstring(pack[1]))
+    for i,val in ipairs(pack[2]) do
+        if #val==2 then
+            debug.setupvalue(f,i,M.strdecodefn(val[2]))
+        else
+            debug.setupvalue(f,i,val[1])
+        end
+    end
+    return f
 end
 return M
