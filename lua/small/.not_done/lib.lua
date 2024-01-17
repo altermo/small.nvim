@@ -177,4 +177,31 @@ function M.strdecodefn(s,decode)
     end
     return f
 end
+---@param keymap string
+---@return {mods:string[],key:string}[]
+function M.parse_keymap(keymap)
+    if keymap=='' then return {} end
+    local function isupper(c) --TODO UTF-8 upper case match
+        return c:upper()==c and c:lower()~=c or nil
+    end
+    keymap=vim.fn.keytrans(vim.keycode(keymap))
+    local l=vim.lpeg
+    local p=(l.Ct(l.P'<'*((l.C(l.P(1))*l.P'-')^0*l.C((l.P(1)-l.P'>')^0))*l.P'>')+l.C(l.P(1)))^0
+    local match={p:match(keymap) --[[@as (string|string[])]]}
+    local ret={}
+    for _,v in ipairs(match) do
+        if type(v)=='string' then
+            table.insert(ret,{mods={S=isupper(v)},key=v})
+        else
+            local mods={}
+            local key=table.remove(v)
+            for _,mod in ipairs(v) do
+                mods[mod]=true
+            end
+            if not mods.C then mods.S=isupper(key) end
+            table.insert(ret,{mods=mods,key=key})
+        end
+    end
+    return ret
+end
 return M
