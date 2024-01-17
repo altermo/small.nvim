@@ -142,6 +142,9 @@ function M.pseudo_async(fn,...)
     fn(unpack(args))
     return coroutine.yield(co)
 end
+---@param f function
+---@param encode? fun(t:table):string
+---@return string
 function M.strencodefn(f,encode)
     local pack={
         string.dump(f,true),
@@ -151,20 +154,23 @@ function M.strencodefn(f,encode)
     while debug.getupvalue(f,i) do
         local _,val=debug.getupvalue(f,i)
         if type(val)=='function' then
-            pack[2][i]={0,M.strencodefn(val)}
+            pack[2][i]={0,M.strencodefn(val,encode)}
         else
             pack[2][i]={val}
         end
         i=i+1
     end
-    return (encode or vim.mpack.encode)(pack)
+    return (encode or vim.mpack.encode)(pack) --[[@as string]]
 end
+---@param s string
+---@param decode? fun(s:string):table
+---@return function
 function M.strdecodefn(s,decode)
-    local pack=(decode or vim.mpack.decode)(s)
+    local pack=(decode or vim.mpack.decode)(s) --[[@as table]]
     local f=assert(loadstring(pack[1]))
     for i,val in ipairs(pack[2]) do
         if #val==2 then
-            debug.setupvalue(f,i,M.strdecodefn(val[2]))
+            debug.setupvalue(f,i,M.strdecodefn(val[2],decode))
         else
             debug.setupvalue(f,i,val[1])
         end
