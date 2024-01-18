@@ -66,6 +66,7 @@ end
 function M._setup()
     if M._ then return end
     M._=true
+    --TODO: make it activate other TextChanged autocmds (without activating itself)
     vim.api.nvim_create_autocmd(
         {'TextChanged','TextChangedI','TextChangedP'},
         {callback=M._update,group=vim.api.nvim_create_augroup('small_iedit',{})}
