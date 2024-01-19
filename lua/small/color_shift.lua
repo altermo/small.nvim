@@ -1,6 +1,6 @@
 local M={}
 ---TODO: use ColorSchemePre to make switching colors while running not cause problems
----TODO: look into synIDtrans()
+---TODO: look into synIDtrans() and vim.api.nvim_get_hl({name=...,link=false})
 function M.get_colorscheme(colorname)
     local user_colorscheme=vim.g.colors_name
     vim.cmd.colorscheme(colorname)
