@@ -24,8 +24,10 @@ function M.sync_font_size()
 end
 function M.setup()
     if not M.in_kitty() then return end
-    vim.api.nvim_create_autocmd('ColorScheme',{callback=M.sync_background})
-    M.sync_background()
+    if not  M.conf.no_sync_bg then
+        vim.api.nvim_create_autocmd('ColorScheme',{callback=M.sync_background})
+        M.sync_background()
+    end
     vim.api.nvim_create_autocmd('OptionSet',{pattern='guifont',callback=M.sync_font_size})
     M.sync_font_size()
     if not M.conf.no_keymap then M.setup_keymaps() end

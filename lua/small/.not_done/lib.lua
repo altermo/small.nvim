@@ -204,4 +204,9 @@ function M.parse_keymap(keymap)
     end
     return ret
 end
+function M.auto_sync_background()
+    vim.api.nvim_create_autocmd('VimLeave',{callback=function() io.stdout:write("\027]110;;\027\\") end})
+    vim.api.nvim_create_autocmd('ColorScheme',{callback=function() io.stdout:write(("\027]10;1;#%06x\027\\"):format(vim.api.nvim_get_hl(0,{name='Normal'}).bg)) end})
+end
+
 return M
