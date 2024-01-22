@@ -19,7 +19,9 @@ end
 function M.setup()
     vim.schedule(function ()
         vim.api.nvim_create_autocmd({'TextChanged','InsertLeave','BufEnter'},{callback=function (ev)
-            if vim.bo[ev.buf].buftype~='terminal' then
+            if vim.bo[ev.buf].spelllang~='en' then
+                vim.diagnostic.set(M.ns,ev.buf,{})
+            elseif vim.bo[ev.buf].buftype~='terminal' then
                 M.update(ev.buf)
             end
         end,group=vim.api.nvim_create_augroup('small_typos',{clear=true})})

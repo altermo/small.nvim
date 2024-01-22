@@ -27,6 +27,7 @@ function M.play_rec()
     vim.cmd.normal{vim.v.count1..'@q',bang=true}
 end
 function M.edit_rec()
+    --TODO: preview macro at cursor while editing
     local reg=vim.fn.getreg('q') --[[@as string]]
     vim.ui.input({
         prompt='>',
