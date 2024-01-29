@@ -135,7 +135,7 @@ function M.MyFoldText()
             if not line:match('^%-%-%-*') then break end
             linenr=linenr+1
         end
-        if linenr~=vim.v.foldend then
+        if vim.fn.getline(linenr):find('^[local ]*function') and linenr~=vim.v.foldend then
             vim.v.foldstart=linenr
         end
     end
