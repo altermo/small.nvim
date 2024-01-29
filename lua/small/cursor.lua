@@ -3,6 +3,11 @@ local M={
     data={},
     conf={},
 }
+function M.get_colors()
+    local ret={}
+    ret.cursor=vim.api.nvim_get_hl(0,{name='cursor',link=false})
+    return ret
+end
 function M.create_cursor()
     local row,col=unpack(vim.api.nvim_win_get_cursor(0))
     local buf=vim.api.nvim_get_current_buf()

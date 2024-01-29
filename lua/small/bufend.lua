@@ -14,7 +14,7 @@ M.marked_buf={}
 function M.get_buf_list(key)
     return vim.iter(vim.api.nvim_list_bufs()):filter(vim.api.nvim_buf_is_loaded):filter(function(v)
         local file=M.buf_get_file(v)
-        return file and ((not key) or key==vim.fn.fnamemodify(file,':t'):sub(1,1))
+        return file and ((not key) or key==vim.fn.fnamemodify(file,':t'):sub(1,1)) or false
     end):rev():totable()
 end
 function M.mark_buf(key) M.marked_buf[key]=vim.api.nvim_get_current_buf() end

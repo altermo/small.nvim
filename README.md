@@ -81,6 +81,10 @@ Commands:
 + `cursor.goto_next_cursor(create_cursor)` goes to next cursor, if `create_cursor` is true, creates a cursor before jumping
 + `clear_cursor` clears the cursors in current buffer
 
+## Cursor_xray
+Summary: xray current buffer if cursor covered by floating window \
+Setup: `cursor_xray.setup()`
+
 ## Debugger
 Summary: Open a debugger buffer on error
 Commands:
