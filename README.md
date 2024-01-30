@@ -70,8 +70,8 @@ Commands:
 + `cmd2ins.map(key)` run key from command mode in insert mode
 
 ## Color_cmdline
-Summary: Color the cmdline
-Setup: `color_cmdline.setup()`
+Summary: Color the cmdline \
+Setup: `color_cmdline.setup()` \
 **NOTE: it uses some internal things (which are only there for testing) to accomplish this**
 
 ## Color_shift
@@ -171,6 +171,11 @@ Config:
 Summary: Highlight matching selected text in visual mode. \
 Setup: `highlight_selected.setup()`
 
+## Iedit
+Summary: rewrite of [emacs-iedit](https://www.emacswiki.org/emacs/Iedit) in neovim \
+Commands:
++ `iedit.visual()` run iedit on current visual selection
+
 ## Kitty
 Summary: Synchronize with kitty terminal\
 NOTE: Can't be configured yet.\
@@ -265,6 +270,11 @@ Summary: simple `ranger` wrapper \
 Commands: `ranger.run(file?)` \
 Config:
 + `ranger.conf.exit_if_single`: exit neovim when quitting ranger if it is the only buffer
+
+## Recenter_top_bottom
+Summary: Works like emacs's `(recenter-top-bottom)` \
+Commands: `recenter_top_bottom()`
+
 ## Reminder
 Summary: Searches the `reminder.conf.path` for any bullet list with `-`, and a date `(@YYYY-MM-DD HH:MM)`, and does a reminder when the time comes. \
 Setup: `reminder.setup()`\
