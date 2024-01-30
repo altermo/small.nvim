@@ -69,6 +69,11 @@ Summary: Run insert mappings (like [nvim-autopairs](https://github.com/windwp/nv
 Commands:
 + `cmd2ins.map(key)` run key from command mode in insert mode
 
+## Color_cmdline
+Summary: Color the cmdline
+Setup: `color_cmdline.setup()`
+**NOTE: it uses some internal things (which are only there for testing) to accomplish this**
+
 ## Color_shift
 Summary: slowly shifts between two colors \
 Commands: `color_shift.shift(to_colorscheme,time,steps?)`
