@@ -1,3 +1,4 @@
+--TODO: add write-good (only in comments/markdown)
 local M={
     ns_typos=vim.api.nvim_create_namespace'small_typo_typos',
     ns_codespell=vim.api.nvim_create_namespace'small_codespell_typos',
