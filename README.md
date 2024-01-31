@@ -153,6 +153,10 @@ Setup: `foldtext.setup()`
 Config:
 + `foldtext.conf.treesitter` whether to use treesitter Highlighting
 
+## Format
+Summary: format file with formatter if config exist, fallback lsp.format. \
+Commands: `format.run()`
+
 ## Help_cword
 Summary: Try to get help from current word. \
 Commands: `help_cword.run()`
