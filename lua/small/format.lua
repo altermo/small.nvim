@@ -18,7 +18,6 @@ M.formatters={
         run=function (v,conf,file)
             if M.luacheck_job then M.luacheck_job:wait() end
             M.luacheck_job=vim.system({'luacheck','--codes','--ranges','--formatter','plain','--',file},{cwd=vim.fs.dirname(conf)},vim.schedule_wrap(function (ev)
-                vim.lgclear()
                 local diagnostics={}
                 for line in vim.gsplit(ev.stdout,'\n',{trimempty=true}) do
                     local row,col,end_col,mes=line:match('^[^:]+:(%d+):(%d+)%-(%d+): %(%w*%) (.*)')

@@ -22,8 +22,6 @@ function M.run(cmdline)
             table.insert(tags[ecol],1,{e=true,n=hl})
         end
     end)
-    vim.lgclear()
-    vim.lg(tags)
     local stack={}
     local style={}
     for i=0,#cmdline do

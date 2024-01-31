@@ -23,7 +23,7 @@ end
 function M.update_codespell(buf)
     local lines=vim.api.nvim_buf_get_lines(buf,0,-1,false)
     if M.job.codespell then M.job.codespell:wait() end
-    M.job.codespell=vim.system({'codespell','-','clear,rare,usage'},{stdin=lines},vim.schedule_wrap(function (ev)
+    M.job.codespell=vim.system({'codespell','-','--builtin','clear,rare,usage,informal,names'},{stdin=lines},vim.schedule_wrap(function (ev)
         if not vim.api.nvim_buf_is_valid(buf) then return end
         local iter=vim.iter(vim.split(ev.stdout,'\n',{trimempty=true}))
         local diagnostics={}
@@ -33,7 +33,7 @@ function M.update_codespell(buf)
             has[lnum]=has[lnum] or {}
             local word,spell=iter:next():match('\t(%S+) ==> (.*)')
             local spells=vim.split(spell,', ')
-            local col=lines[lnum]:find(word,has[lnum][word])
+            local col=lines[lnum]:find(word,has[lnum][word] or 0,true)
             has[lnum][word]=col+1
             table.insert(diagnostics,{
                 col=col-1,
