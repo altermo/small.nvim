@@ -344,10 +344,10 @@ Setup: `treewarn.setup()`
 Config:
 + `treewarn.conf[lang]`: list of queries with the capture `@warn`; and to add custo messages: ` (#set! "mes" "...")`
 
-## Typos
-Required: `typos`\
-Summary: show code typos\
-Setup: `typos.setup()`
+## Typo
+Required: `typos` and or `codespell`\
+Summary: show code typos/codespells\
+Setup: `typo.setup()`
 
 ## Unimpaired
 Summary: Goto next/previous file OR quickly change options\
