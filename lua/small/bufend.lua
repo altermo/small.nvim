@@ -78,7 +78,8 @@ function M.run()
                 if #files==1 then vim.cmd.edit(files[1]) return end
                 require'small.lib.select'(vim.tbl_map(M.file_to_lfile,files),{},function (file)
                     if not file then return end
-                    vim.defer_fn(function () vim.cmd.edit(file) end,50)
+                    vim.cmd.edit(file)
+                    vim.defer_fn(function () vim.cmd.edit(file) end,300)
                 end)
             end
             if vim.fn.executable('fd')==0 then
@@ -108,7 +109,8 @@ function M.run()
                 if #files==1 then vim.cmd.edit(files[1]) return end
                 require'small.lib.select'(vim.tbl_map(M.file_to_lfile,files),{},function (file)
                     if not file then return end
-                    vim.defer_fn(function () vim.cmd.edit(file) end,50)
+                    vim.cmd.edit(file)
+                    vim.defer_fn(function () vim.cmd.edit(file) end,300)
                 end)
             end
             if vim.fn.executable('fd')==0 then
