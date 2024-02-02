@@ -178,7 +178,8 @@ Setup: `highlight_selected.setup()`
 ## Iedit
 Summary: rewrite of [emacs-iedit](https://www.emacswiki.org/emacs/Iedit) in neovim \
 Commands:
-+ `iedit.visual()` run iedit on current visual selection
++ `iedit.visual_all()` run iedit on current visual selection
++ `iedit.visual_select()` interactive select and iedit on current visual selection
 
 ## Kitty
 Summary: Synchronize with kitty terminal\
