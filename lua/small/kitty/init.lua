@@ -27,6 +27,7 @@ function M.setup()
     if not  M.conf.no_sync_bg then
         vim.api.nvim_create_autocmd('ColorScheme',{callback=M.sync_background})
         M.sync_background()
+        vim.defer_fn(M.sync_background,100)
     end
     vim.api.nvim_create_autocmd('OptionSet',{pattern='guifont',callback=M.sync_font_size})
     M.sync_font_size()
