@@ -116,6 +116,10 @@ while len(items)!=1:
 </details>
 <!-- TODO: write about config-->
 
+## Elastic_tabstop
+Summary: elastic tabstop. [info](https://nickgravgaard.com/elastic-tabstops/) \
+Setup: `elastic_tabstop.setup()`
+
 ## Exchange
 Summary: Exchange two selected regions. \
 Commands:
