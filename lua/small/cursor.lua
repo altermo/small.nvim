@@ -103,13 +103,13 @@ function M._update(buf,win)
     end
     for _,v in ipairs(cursors) do
         if v[3]>=#vim.fn.getline(v[2]+1) then
-            vim.api.nvim_buf_set_extmark(buf,tns,v[2],v[3],{
+            pcall(vim.api.nvim_buf_set_extmark,buf,tns,v[2],v[3],{
                 virt_text={{' ','Cursor'}},
                 virt_text_pos='overlay',
                 ephemeral=true,
             })
         else
-            vim.api.nvim_buf_set_extmark(buf,tns,v[2],v[3],{end_col=v[3]+1,hl_group='Cursor',ephemeral=true})
+            pcall(vim.api.nvim_buf_set_extmark,buf,tns,v[2],v[3],{end_col=v[3]+1,hl_group='Cursor',ephemeral=true})
         end
     end
 end
