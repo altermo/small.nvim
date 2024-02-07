@@ -60,9 +60,9 @@ Config:
 + `builder.conf.builders` a table of builders, (see source code)
 
 ## Chat
-Required: [`tgpt`](https://github.com/aandrew-me/tgpt)\
-Summary: Runs tgpt in buffer\
-Commands: `tgpt.run()`
+Required: `ollama`
+Summary: Runs ollama in buffer\
+Commands: `chat.run()`
 
 ## Cmd2ins
 Summary: Run insert mappings (like [nvim-autopairs](https://github.com/windwp/nvim-autopairs)) in the cmdline \
