@@ -23,7 +23,7 @@ end
 function M.update_codespell(buf)
     local lines=vim.api.nvim_buf_get_lines(buf,0,-1,false)
     if M.job.codespell then M.job.codespell:wait() end
-    M.job.codespell=vim.system({'codespell','-','--builtin','clear,rare,usage,informal,names'},{stdin=lines},vim.schedule_wrap(function (ev)
+    M.job.codespell=vim.system({'codespell','-','--builtin','clear,rare,informal,names'},{stdin=lines},vim.schedule_wrap(function (ev)
         if not vim.api.nvim_buf_is_valid(buf) then return end
         local iter=vim.iter(vim.split(ev.stdout,'\n',{trimempty=true}))
         local diagnostics={}

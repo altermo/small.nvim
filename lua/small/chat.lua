@@ -19,7 +19,7 @@ function M.open(_)
         M.buf=vim.api.nvim_create_buf(true,true)
         vim.api.nvim_buf_set_name(M.buf,'ollama chat')
         vim.o.bufhidden='wipe'
-        vim.api.nvim_create_autocmd('BufWipeout',{buffer=M.buf,callback=function ()
+        vim.api.nvim_create_autocmd('BufHidden',{buffer=M.buf,callback=function ()
             if M.proc then M.proc:kill(1) end
         end})
     end
