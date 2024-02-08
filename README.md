@@ -60,8 +60,8 @@ Config:
 + `builder.conf.builders` a table of builders, (see source code)
 
 ## Chat
-Required: `ollama`
-Summary: Runs ollama in buffer\
+Required: some chat program that has a bin `chat`
+Summary: Runs chat in buffer\
 Commands: `chat.run()`
 
 ## Cmd2ins
