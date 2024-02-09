@@ -17,8 +17,8 @@ function M.update()
         if (opt.zindex or 0)<=zindex then
             goto continue
         end
-        local winrow=opt.row[vim.val_idx]
-        local wincol=opt.col[vim.val_idx]
+        local winrow=opt.row
+        local wincol=opt.col
         if row<winrow+1 or row>winrow+opt.height or col<wincol+1 or col>wincol+opt.width then
             goto continue
         end

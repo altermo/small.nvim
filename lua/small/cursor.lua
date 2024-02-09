@@ -47,7 +47,9 @@ function M.goto_next_cursor(create_cursor)
     if curbuf~=M.data[pos[1]].buf then
         vim.api.nvim_set_current_buf(M.data[pos[1]].buf)
     end
-    vim.api.nvim_win_set_cursor(0,{pos[2]+1,pos[3]})
+    if not pcall(vim.api.nvim_win_set_cursor,0,{pos[2]+1,pos[3]}) then
+        pcall(vim.api.nvim_win_set_cursor,0,{pos[2]+1,0})
+    end
     M.del_cursor(pos[1])
 end
 function M.goto_prev_cursor(create_cursor)
