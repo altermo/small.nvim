@@ -13,6 +13,7 @@ function M.get_ft()
 end
 function M.get_comment(ft)
     if M.comments[ft] then return M.comments[ft] end
+    if ft==vim.o.filetype then return vim.o.commentstring end
     local comment=vim.filetype.get_option(ft,'commentstring')
     if comment~='' then return comment end
     return M.comments[true]
