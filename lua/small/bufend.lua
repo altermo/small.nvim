@@ -29,6 +29,10 @@ function M.run()
         local key=vim.fn.fnamemodify(file,':t'):sub(1,1)
         keys[key]=M.get_buf_list(key)
     end
+    for key,buf in pairs(M.marked_buf) do
+        keys[key]=keys[key] or {}
+        table.insert(keys[key],buf)
+    end
     local buf=vim.api.nvim_create_buf(false,true)
     vim.bo[buf].bufhidden='wipe'
     vim.api.nvim_buf_set_lines(buf,0,-1,false,{
