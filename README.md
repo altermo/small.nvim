@@ -389,6 +389,10 @@ Configs:
 + `winpick.conf.color` color of winbar (may be #rgb or color-name)
 + `winpick.conf.symbols` symbols to use
 
+## Winvis
+Summary: Only show visual selection in current window. \
+Setup: `winvis.setup()`
+
 ## Zen
 Summary: Simple zen \
 Commands: `zen.run()`
