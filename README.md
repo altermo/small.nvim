@@ -3,6 +3,8 @@ This is a collection of small plugins (cause I can't stop making them).
 
 **I don't plan on doing good maintenance, so I might change things without warning.**
 
+Some of the plugins have been rewritten in higher quality and can be found in [doune.nvim](https://github.com/altermo/doune.nvim).
+
 The documentation is not up to date.
 
 Here some plugins that I would recommend you check out: [whint](#Whint), [bufend](#Bufend), [dff](#Dff).
