@@ -1,7 +1,7 @@
 local dap=require'dap'
 local _=require'osv'
 local M={}
-function M.start()
+function M.start_nvim()
     if M.nvim then
         vim.fn.jobstop(M.nvim)
     end
@@ -15,19 +15,20 @@ function M.start()
     return vim.rpcrequest(M.nvim,'nvim_get_vvar','servername')
 
 end
-function M.open()
-    if M.buf and vim.api.nvim_buf_is_valid(M.buf) then return end
+function M.start()
+    M.prevbuf=M.buf
     M.buf=vim.api.nvim_create_buf(false,true)
     vim.bo[M.buf].bufhidden='wipe'
-    vim.api.nvim_open_win(M.buf,false,{split='right'})
-    local server_path=M.start()
+    if M.prevbuf and vim.api.nvim_buf_is_valid(M.prevbuf) then
+        for _,w in ipairs(vim.fn.win_findbuf(M.prevbuf)) do
+            vim.api.nvim_win_set_buf(w,M.buf)
+        end
+    else
+        vim.api.nvim_open_win(M.buf,false,{split='right'})
+    end
+    local server_path=M.start_nvim()
     vim.api.nvim_buf_call(M.buf,function ()
         vim.cmd.term(table.concat({'nvim','--remote-ui','--server',server_path},' '))
     end)
-    return true
-end
-function M.continue()
-    if M.open() then return end
-    dap.continue()
 end
 return M

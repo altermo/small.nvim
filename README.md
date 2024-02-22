@@ -96,8 +96,7 @@ Setup: `cursor_xray.setup()`
 Summary: Similar to `osv.run_this` but opens nvim instance in a terminal buffer
 Requires: `nvim-dap`, `one-small-step-for-vimkind `
 Commands:
-+ `dapnvim.open`: Runs osv inside a new neovim instance and opens instance in new window
-+ `dapnvim.continue`: runs `dap.continue` if window open, lse runs `dapnvim.open`
++ `dapnvim.start`: Runs osv inside a new neovim instance and opens instance in new window
 
 ## Debugger
 Summary: Open a debugger buffer on error
