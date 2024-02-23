@@ -19,8 +19,8 @@ function M.labull(inp)
         inp:match('^%s*[+%-] ') or
         (inp:match('^%s*%d+%.%a+[.)] ') and inp:gsub('^(%s*%d+%.)(%a+)([.)] ).*',function (indent,number,end_) return indent..M.incahrs(number)..end_ end)) or
         (inp:match('^%s*%d+[.)] ') and inp:gsub('^(%s*)(%d+)([.)] ).*',function (indent,number,end_) return indent..(tonumber(number)+1)..end_ end)) or
-        (inp:match('^%s*%a+[.)] ') and inp:gsub('^(%s*)(%a+)([.)] ).*',function (indent,number,end_) return indent..M.incahrs(number)..end_ end)) or
-        (vim.o.filetype=='lua' and inp:match('^---(@field )')))
+        (inp:match('^%s*%a+[.)] ') and inp:gsub('^(%s*)(%a+)([.)] ).*',function (indent,number,end_) return indent..M.incahrs(number)..end_ end)))
+        --(vim.o.filetype=='lua' and inp:match('^---(@field )')))
 end
 function M.run()
     local laline=M.labull(vim.api.nvim_get_current_line())
