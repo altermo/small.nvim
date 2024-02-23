@@ -146,6 +146,15 @@ vim.keymap.set('n','cxc',exchange.ex_cancel)
 vim.keymap.set('x','X',exchange.ex_visual)
 ```
 
+## Fastmultif
+Summary: A faster way to do multiple finds
+Commands:
++ `fastmultif.find`: run fastmultif forwards
++ `fastmultif.rfind`: run fastmultif backwards
+Config:
++ `fastmultif.conf.labels` labels to use
+
+
 ## Float
 Summary: create, move and resize floating windows, use ctrl-mouse to move/resize windows \
 Setup: `float.setup()` \
