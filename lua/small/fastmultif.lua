@@ -22,12 +22,16 @@ end
 function M.find(opts)
     opts=opts or {}
     if vim.fn.mode()~='n' then error('only in normal mode supported') end
-    if vim.fn.mode(true):find'^ni' then
-        vim.api.nvim_feedkeys(vim.keycode'<C-o>f'..vim.fn.getcharstr(),'n',true)
-        return
-    end
-    if vim.fn.reg_recording()~='' or vim.fn.reg_executing()~='' then
-        vim.api.nvim_feedkeys('f'..vim.fn.getcharstr(),'n',true)
+    if vim.fn.mode(true):find'^ni' or vim.fn.reg_recording()~='' or vim.fn.reg_executing()~='' then
+        local char=vim.fn.getcharstr()
+        local instances
+        if opts.backwards then
+            instances=M.find_prev_instances(char,1)
+        else
+            instances=M.find_next_instances(char,1)
+        end
+        if #instances<1 then return true end
+        vim.api.nvim_win_set_cursor(0,instances[1])
         return
     end
     local char=vim.fn.getcharstr()
