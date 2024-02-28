@@ -212,6 +212,11 @@ Keymap (example):
 ```lua
 vim.keymap.set('n','o',labull.run,{expr=true})
 ```
+## Large
+Summary: Makes letters large.\
+Commands:
++ `labull.start()`: makes letters large (NOTE: does not have a `stop`)
+
 ## Layout
 Summary: Save and load current tabpage layout. \
 Commands:
