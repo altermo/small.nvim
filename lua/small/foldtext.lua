@@ -106,7 +106,7 @@ function M.GetTreesitterFoldText(just,fallback)
         return fall()
     end
     local foldtext=M.vim_treesitter_foldtext()
-    if type(foldtext)=='string' then
+    if type(foldtext)=='string' or vim.tbl_isempty(foldtext) then
         return fall()
     end
     if just~=1 then
