@@ -8,7 +8,7 @@ function M.in_lua()
     local pos=vim.api.nvim_win_get_cursor(0)
     return parser:language_for_range({pos[1]-1,pos[2],pos[1]-1,pos[2]}):lang()=='lua'
 end
-function M.should_statment()
+function M.should_statement()
     local pos=vim.api.nvim_win_get_cursor(0)
     local node=vim.treesitter.get_node({pos={pos[1]-1,pos[2]-1}})
     if not node or node:type()~='identifier' then return end
@@ -32,7 +32,7 @@ function M.get_pos(name,linenr)
         if var==name then return linenr,11+#name end
     end
 end
-function M.run_statment()
+function M.run_statement()
     local linenr,col=unpack(vim.api.nvim_win_get_cursor(0))
     local off=M.has_return(linenr) and 1 or 0
     local name=M.get_name()
@@ -79,7 +79,7 @@ function M.create_return_autocmd(linenr,col)
 end
 function M.run(char)
     if not M.in_lua() then return char or ':' end
-    if M.should_statment() then vim.schedule(M.run_statment)
+    if M.should_statement() then vim.schedule(M.run_statement)
     elseif M.should_return() then vim.schedule(M.run_return)
     else return char or ':' end
 end

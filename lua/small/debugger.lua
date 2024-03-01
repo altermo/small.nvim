@@ -17,7 +17,7 @@ function M.create_traceback_buf(traceback,win,mes,default_file)
     if win then vim.api.nvim_win_set_buf(win,buf) end
     local places={}
     local function nw(text) return function () vim.notify(text) end end
-    local function file_open_wrapp(file,row)
+    local function file_open_wrap(file,row)
         return function ()
             vim.cmd.vnew(file)
             if row then vim.cmd(tostring(row)) end
@@ -42,7 +42,7 @@ function M.create_traceback_buf(traceback,win,mes,default_file)
             enter=nw("Can't enter lua internal code")
         elseif v.what=='main' then
             line='file:'..file
-            enter=file_open_wrapp(file)
+            enter=file_open_wrap(file)
         elseif vim.startswith(v.source,'@vim/') then
             line='vim:'..v.name..':'..file
             enter=function ()
@@ -50,7 +50,7 @@ function M.create_traceback_buf(traceback,win,mes,default_file)
             end
         else
             line=v.what..':'..v.currentline..':'..file
-            enter=file_open_wrapp(file,v.currentline)
+            enter=file_open_wrap(file,v.currentline)
         end
         table.insert(places,enter)
         vim.api.nvim_buf_set_lines(buf,-1,-1,false,{line})

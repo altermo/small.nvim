@@ -39,12 +39,12 @@ function M.open(src,cwd)
         vim.fn.termopen(src,{cwd=cwd})
     end)
 end
-function M.deferr() vim.notify('Builderror: filetype '..vim.o.ft..' has no builder or can not be built or swaped') end
+function M.deferr() vim.notify('Builderror: filetype '..vim.o.ft..' has no builder or can not be built or swapped') end
 function M.swap()
     local s=M.conf.builders[vim.o.filetype]
     if not s or not s.altern then M.deferr() return end
     s.normal,s.altern=s.altern,s.normal
-    vim.notify(('builder swaped from `%s` `to` `%s`'):format(s.altern,s.normal))
+    vim.notify(('builder swapped from `%s` `to` `%s`'):format(s.altern,s.normal))
 end
 function M.set()
     M.conf.builders[vim.o.filetype].normal=vim.fn.input('>')

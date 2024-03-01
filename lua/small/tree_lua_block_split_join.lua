@@ -1,5 +1,5 @@
 local M={}
-function M.wrapp_toggle_statement(times)
+function M.wrap_toggle_statement(times)
     return function(node)
         local start={}
         for i=0,times do
@@ -22,9 +22,9 @@ function M.wrapp_toggle_statement(times)
     end
 end
 M.nodes={
-    if_statement=M.wrapp_toggle_statement(2),
-    for_statement=M.wrapp_toggle_statement(2),
-    function_definition=M.wrapp_toggle_statement(1),
+    if_statement=M.wrap_toggle_statement(2),
+    for_statement=M.wrap_toggle_statement(2),
+    function_definition=M.wrap_toggle_statement(1),
 }
 function M.run()
     local node=vim.treesitter.get_node()

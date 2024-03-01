@@ -18,7 +18,7 @@ function M.toggle_rec()
 end
 function M.play_rec()
     if vim.fn.reg_recording()~='' then
-        vim.notify('Cant play macro while recoding, stoping recording',vim.log.levels.ERROR)
+        vim.notify('Cant play macro while recoding, stopping recording',vim.log.levels.ERROR)
         local prev=vim.fn.getreg('q')
         vim.cmd.normal{'q',bang=true}
         vim.fn.setreg('q',prev)

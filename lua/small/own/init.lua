@@ -68,7 +68,7 @@ function M.set_highlights(color,ns_id)
     set_hl('EndOfBuffer',{})
     ---VISUAL
     set_hl('Visual',{bg=p.visual})
-    ---CURSOR/COLUM
+    ---CURSOR/COLUMN
     set_hl('LineNr',{bg=linebg,fg=secondfg})
     set_hl('CursorLineNr',{bg=linebg,fg=p.yellow})
     set_hl('Cursor',{bg=p.mainfg})
