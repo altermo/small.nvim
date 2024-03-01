@@ -44,7 +44,13 @@ M.update=function()
             goto continue
         end
         local text=vim.split(v.msg,'\n')
-        local level=vim.tbl_add_reverse_lookup(vim.fn.copy(vim.log.levels))[v.level]
+        local level
+        for name,lvl in pairs(vim.log.levels) do
+            if v.level==lvl then
+                level=name
+                break
+            end
+        end
         local width=math.max(unpack(vim.tbl_map(vim.api.nvim_strwidth,text)))
         local winopt={
             height=#text,
