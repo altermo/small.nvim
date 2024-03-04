@@ -1,11 +1,9 @@
 # Small.nvim
-This is a collection of small plugins (cause I can't stop making them).
+This is a collection of small plugins that I created just because.
 
 **I don't plan on doing good maintenance, so I might change things without warning.**
 
 The documentation is not up to date.
-
-Here some plugins that I would recommend you check out: [whint](#Whint), [bufend](#Bufend), [dff](#Dff).
 
 Optional dependencies:
 + `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
