@@ -329,6 +329,10 @@ Config:
 + `splitbuf.conf.options` a table of commands (see source code)
 + `splitbuf.conf.call` a function which oveerides the default behaviour
 
+## Statusbuf
+Summary: Statusline in buffer (floating window)
+Setup: `statusbuf.setup`
+
 ## Tableformat
 Summary: format markdown tables \
 Commands: `tablemode.run()`

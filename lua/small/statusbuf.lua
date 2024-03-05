@@ -15,8 +15,8 @@ function M.get_statusline(opt,statusline)
     return out
 end
 function M.update()
-    local statusline=vim.o.statusline
-    if vim.o.statusline==' ' then return end
+    local statusline=vim.wo.statusline
+    if statusline==' ' then return end
     vim.o.statusline=' '
     for _,v in ipairs(vim.api.nvim_list_wins()) do
         vim.wo[v].statusline=' '
@@ -50,7 +50,12 @@ function M.setup()
     vim.api.nvim_create_autocmd('OptionSet',{
         group=M.au_group,
         pattern='statusline',
-        callback=M.update,
+        callback=vim.schedule_wrap(M.update),
     })
+    vim.schedule(M.update)
+end
+if vim.dev then
+    vim.cmd.fclose()
+    M.setup()
 end
 return M
