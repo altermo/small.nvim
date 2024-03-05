@@ -93,7 +93,7 @@ function M.notify(msg,level,opts)
             M.notifs[time].dispand=true
             M.update()
         end
-    end,M.conf.timeout)
+    end,(opts or {}).timeout or M.conf.timeout)
     M.update()
 end
 function M.dismiss()
