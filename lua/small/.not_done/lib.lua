@@ -1,7 +1,7 @@
 local M={}
 ---@param s string
 ---@param i number
----@param j number
+---@param j number?
 ---@return string
 function M.utf8_sub(s,i,j)
     local pos=vim.str_utf_pos(s) --[[@as number[]]
@@ -22,9 +22,9 @@ function M.pos_tree_lang()
     local lang=parser:language_for_range({row,col,row,col})
     return lang:lang()
 end
----@param self LanguageTree
+---@param self vim.treesitter.LanguageTree
 ---@param range Range4
----@return LanguageTree[]
+---@return vim.treesitter.LanguageTree[]
 function M.languages_for_range(self,range,_s)
     _s=_s or {}
     table.insert(_s,1,self)
@@ -204,11 +204,36 @@ function M.parse_keymap(keymap)
     end
     return ret
 end
-function M.auto_sync_background()
+function M.auto_sync_terminal_background()
     vim.api.nvim_create_autocmd('VimLeave',{callback=function () io.stdout:write("\027]111;;\027\\") end})
     vim.api.nvim_create_autocmd('ColorScheme',{callback=function ()
         io.stdout:write(("\027]11;#%06x\027\\"):format(vim.api.nvim_get_hl(0,{name='Normal',link=false}).bg))
     end})
 end
-
+---@generic T:table
+---@param tbl T
+---@param recursive boolean?
+---@return T
+function M.readonly(tbl,recursive)
+    local mt={
+        __index=tbl,
+        __newindex=function()
+            error("Tried to change a readonly table")
+        end,
+        __tostring=function ()
+            return vim.inspect(tbl)
+        end
+    }
+    if recursive then
+        mt.__index=function (_,idx)
+            if type(tbl[idx])=='table' then
+                return M.readonly(tbl[idx],true)
+            end
+            return tbl[idx]
+        end
+    end
+    local proxy=newproxy(true)
+    debug.setmetatable(proxy,mt)
+    return proxy
+end
 return M
