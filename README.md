@@ -419,6 +419,10 @@ Setup: `winvis.setup()`
 Summary: Simple zen \
 Commands: `zen.run()`
 
+## Zenall
+Summary: Zen in all the windows (not just the current one). \
+Setup: `zenall.setup()`
+
 ## Donate
 If you want to donate then you need to find the correct link (hint: chess-bird):
 * [0a]() [0b]() [0c]() [0d]() [0e]() [0f]() [0g]() [0h]()
