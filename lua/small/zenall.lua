@@ -27,6 +27,7 @@ function M.redraw(win,topline,botline)
             virt_text={{zen}},
             virt_text_pos='inline',
             scoped=true,
+            right_gravity=false,
         })
         local line_len=#vim.fn.getline(row+1)
         local vwidth=width-#zen-#zen
@@ -37,6 +38,7 @@ function M.redraw(win,topline,botline)
         if vim.opt_global.showbreak:get()~='' then
             vwidth=vwidth-vim.api.nvim_strwidth(vim.opt_global.showbreak:get())
         end
+        ---TODO: setting 'linebreak' breaks things
         for vcol=ovwidth,line_len, vwidth do
             vim.api.nvim_buf_set_extmark(buf,ns,row,vcol,{
                 virt_text_pos='inline',
@@ -47,16 +49,20 @@ function M.redraw(win,topline,botline)
     end
 end
 function M.setup()
+    local done={}
     vim.api.nvim_set_decoration_provider(M.ns,{
+        on_start=function ()
+            done={}
+        end,
         on_win=function (_,winid,bufnr,topline,botline)
-            if not vim.b[bufnr].small_zenall_first_win then
-                vim.b[bufnr].small_zenall_first_win=winid
-            end
-            vim.api.nvim_win_call(winid,function ()
-                --IMPORTANT: have this before nvim_buf_clear_namespace
-                vim.w[winid].small_zenall_view=vim.fn.winsaveview()
-            end)
-            if winid==vim.b[bufnr].small_zenall_first_win then
+            if not done[bufnr] then
+                done[bufnr]=true
+                for _,win in ipairs(vim.fn.win_findbuf(bufnr)) do
+                    vim.api.nvim_win_call(win,function ()
+                        --IMPORTANT: have this before nvim_buf_clear_namespace
+                        vim.w[win].small_zenall_view=vim.fn.winsaveview()
+                    end)
+                end
                 for i=1,(vim.b[bufnr].small_zenall_win_ns or 0) do
                     vim.api.nvim_buf_clear_namespace(bufnr,M.nss[i],0,-1)
                 end
