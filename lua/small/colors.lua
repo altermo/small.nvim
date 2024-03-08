@@ -1,7 +1,8 @@
+local plugins=require'small.lib.plugins'
 local M={}
+M.download_colors_cache={}
 function M._get_colorschemes(cb)
-    vim.system({'curl','https://neovimcraft.com/db.json'},{},function (out)
-        local json=vim.json.decode(out.stdout)
+    plugins(function (json)
         local colorschemes={}
         for _,v in pairs(json.plugins) do
             if vim.tbl_contains(v.tags,'colorscheme') then
@@ -14,7 +15,7 @@ function M._get_colorschemes(cb)
         end
         table.sort(colorschemes,function (a,b) return a.stars>b.stars end)
         M.online_colors_cache=colorschemes
-        vim.schedule(cb)
+        cb()
     end)
 end
 function M.search_colors_online()
@@ -27,8 +28,7 @@ function M.search_colors_online()
     end
     require'small.lib.select'(M.online_colors_cache,opts,function (index)
         if not index then return end
-        local path=vim.fn.tempname()..'/'
-        vim.system({'git','clone','--depth=1',index.link,path},{},vim.schedule_wrap(function ()
+        local function fn(path)
             assert(vim.fn.isdirectory(path)==1,'git clone failed')
             local colorpath=vim.fs.joinpath(path,'colors')
             assert(vim.fn.isdirectory(colorpath)==1,'has no colorschemes defined')
@@ -42,7 +42,16 @@ function M.search_colors_online()
                 return
             end
             M.search_colors(colorschemes)
-        end))
+        end
+        if not M.download_colors_cache[index.link] then
+            local path=vim.fn.tempname()..'/'
+            vim.system({'git','clone','--depth=1',index.link,path},{},function ()
+                M.download_colors_cache[index.link]=path
+                vim.schedule_wrap(fn)(path)
+            end)
+        else
+            fn(M.download_colors_cache[index.link])
+        end
     end)
 end
 function M.search_colors(colorschemes)

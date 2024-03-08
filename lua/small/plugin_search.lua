@@ -1,34 +1,40 @@
+local plugins=require'small.lib.plugins'
 local M={}
 function M.handle_plugin(path)
     vim.opt.runtimepath:append(path)
     pcall(vim.cmd.helptags,path..'/doc')
     vim.cmd.vnew(path)
 end
-function M.run()
-    if not M.cache then
-        vim.system({'curl','https://nvim.sh/s'},{},function (out)
-            M.cache=out.stdout
-            vim.schedule(M.run)
-        end) return
+function M.run(json)
+    if not json then
+        return plugins(M.run)
     end
-    local ret={}
-    for _,v in ipairs(vim.split(M.cache,'\n')) do
-        table.insert(ret,({string.gsub(v,'^(%S+%s+)%S*%s*%S*%s*%S*%s*%S+%s*(.-) *$','%1%2')})[1])
+    local items=vim.tbl_values(json.plugins)
+    table.sort(items,function (a,b)
+        return a.stars>b.stars
+    end)
+    local justlen=0
+    for _,v in ipairs(items) do
+        justlen=math.max(justlen,#v.id)
     end
-    table.remove(ret,1)
-    require'small.lib.select'(ret,{},function (index)
-        if not index then return end
-        local url=index:gsub('^(%S+).*$','%1')
+    local just=(' '):rep(justlen+1)
+    local opts={}
+    opts.format_item=function (v)
+        if v.description==vim.NIL then
+            return v.id
+        end
+        return v.id..just:sub(#v.id)..v.description
+    end
+    require'small.lib.select'(items,opts,function (plug)
+        if not plug then return end
         local tmp=vim.fn.tempname()..'/'
-        vim.fn.setreg('+',url)
-        vim.system({'git','clone','--depth=1','https://github.com/'..url,tmp},{},function ()
+        vim.fn.setreg('+',plug.id)
+        vim.system({'git','clone','--depth=1','https://github.com/'..plug.id,tmp},{},function ()
             vim.schedule_wrap(M.handle_plugin)(tmp)
         end)
     end)
 end
 if vim.dev then
-    M.cache=_G._CACHE
-    M.search_plugins()
-    _G._CACHE=M.cache
+    M.run()
 end
 return M
