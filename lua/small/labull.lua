@@ -19,8 +19,8 @@ function M.labull(inp)
         inp:match('^%s*[+%-] ') or
         (inp:match('^%s*%d+%.%a+[.)] ') and inp:gsub('^(%s*%d+%.)(%a+)([.)] ).*',function (indent,number,end_) return indent..M.incahrs(number)..end_ end)) or
         (inp:match('^%s*%d+[.)] ') and inp:gsub('^(%s*)(%d+)([.)] ).*',function (indent,number,end_) return indent..(tonumber(number)+1)..end_ end)) or
+        (vim.o.filetype=='lua' and inp:match('^%-%-%-(@field )')) or
         (inp:match('^%s*%a+[.)] ') and inp:gsub('^(%s*)(%a+)([.)] ).*',function (indent,number,end_) return indent..M.incahrs(number)..end_ end)))
-        --(vim.o.filetype=='lua' and inp:match('^---(@field )')))
 end
 function M.run()
     local laline=M.labull(vim.api.nvim_get_current_line())
@@ -33,7 +33,9 @@ function M.setup()
             return
         end
         local laline=M.labull(vim.api.nvim_get_current_line())
-        vim.schedule_wrap(vim.api.nvim_feedkeys)(vim.keycode(laline and ('<esc>I'..laline) or ''),'n',false)
+        vim.schedule(function ()
+            vim.api.nvim_put({laline or ''},'c',true,true)
+        end)
     end,vim.api.nvim_create_namespace'small_labull')
 end
 return M
