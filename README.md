@@ -6,7 +6,7 @@ This is a collection of small plugins that I created just because.
 The documentation is not up to date.
 
 Optional dependencies:
-+ `nvim-telescope/telescope-ui-select.nvim`: many plugins use `vim.ui.select`
++ `nvim-telescope/telescope.nvim`: many plugins use a selector
 + `rcarriga/nvim-notify` or something similar: many plugins use `vim.notify`
 
 ## Beacon
@@ -75,6 +75,12 @@ Setup: `color_cmdline.setup()` \
 ## Color_shift
 Summary: slowly shifts between two colors \
 Commands: `color_shift.shift(to_colorscheme,time,steps?)`
+
+## Colors
+Summary: select between colors (offline and online) \
+Commands:
++ `colors.search_colors`: search colors in runtimepath
++ `colors.search_colors_online`: search colors on neovimcraft.com
 
 ## Curosr
 Summary: Create multiple cursors \
