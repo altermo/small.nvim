@@ -203,6 +203,13 @@ Summary: Synchronize with kitty terminal\
 NOTE: Can't be configured yet.\
 Setup: `kitty.setup()`
 
+## Jumpall
+Inspired by: [longbow](https://github.com/mizlan/longbow.nvim) \
+Summary: Using 2 length de Bruijn sequence jump to anywhere without problem.\
+Commands: `jumpall.run()` \
+Config:
++ `jumpall.conf.labels` labels to use for jumping
+
 ## Labull
 Summary: Auto adds bullets for bullet-list.\
 Commands: `labull.run()` (map-expr)
