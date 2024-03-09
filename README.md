@@ -21,6 +21,8 @@ Config:
 + `beacon.conf.color` color of flash (may be #rgb or color-name)
 + `beacon.conf.minimal` minimal size of move to flash cursor
 
+Rewrite into normal plugin: https://github.com/altermo/beacon.nvim
+
 ## Bufend
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
@@ -203,6 +205,8 @@ Summary: rewrite of [emacs-iedit](https://www.emacswiki.org/emacs/Iedit) in neov
 Commands:
 + `iedit.visual_all()` run iedit on current visual selection
 + `iedit.visual_select()` interactive select and iedit on current visual selection
+
+Rewrite into normal plugin: https://github.com/altermo/iedit.nvim
 
 ## Kitty
 Summary: Synchronize with kitty terminal\
