@@ -308,6 +308,11 @@ Summary: Colorscheme
 Required: `curl` \
 Summary: Searches and download and inits plugins using [nvim.sh](https://nvim.sh/) \
 Commands: `plugin_search.run()`
+
+## Qrun
+Summary: Quick run neovim \
+Commands: `qrun.run()`
+
 ## Ranger
 Required: `ranger` \
 Summary: simple `ranger` wrapper \
