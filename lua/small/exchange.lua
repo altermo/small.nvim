@@ -22,7 +22,7 @@ function M.ex_range(start,fin,regt)
     local reg=vim.region(0,start,fin,regt or '',true)
     local edit1={range=M.I.to_lsp_range(reg),newText=M.I.get_range(M.save)}
     local edit2={range=M.I.to_lsp_range(M.save),newText=M.I.get_range(reg)}
-    vim.lsp.util.apply_text_edits({edit1,edit2},0,'urt-8')
+    vim.lsp.util.apply_text_edits({edit1,edit2},vim.api.nvim_get_current_buf(),'urt-8')
     M.ex_cancel()
 end
 function M.ex_line()
