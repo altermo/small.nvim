@@ -34,7 +34,7 @@ function M.setup()
         end
         local laline=M.labull(vim.api.nvim_get_current_line())
         vim.schedule(function ()
-            vim.api.nvim_put({laline or ''},'c',true,true)
+            vim.api.nvim_put({(laline or ''):match('^%s*(.*)')},'c',true,true)
         end)
     end,vim.api.nvim_create_namespace'small_labull')
 end
