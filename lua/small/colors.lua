@@ -24,6 +24,9 @@ function M.search_colors_online()
     end
     local opts={}
     opts.format_item=function (v)
+        if M.download_colors_cache[v.link] then
+            return v.name..' [cached]'
+        end
         return v.name
     end
     require'small.lib.select'(M.online_colors_cache,opts,function (index)
@@ -41,7 +44,7 @@ function M.search_colors_online()
                 vim.cmd.colorscheme(assert(colorschemes[1]))
                 return
             end
-            M.search_colors(colorschemes)
+            M.search_colors(colorschemes,{no_inc_origin=true})
         end
         if not M.download_colors_cache[index.link] then
             local path=vim.fn.tempname()..'/'
@@ -54,11 +57,19 @@ function M.search_colors_online()
         end
     end)
 end
-function M.search_colors(colorschemes)
+function M.search_colors(colorschemes,conf)
+    conf=conf or {}
     if not colorschemes then
         colorschemes=vim.fn.getcompletion('','color')
     end
     local original_colorscheme=vim.api.nvim_exec2('colorscheme',{output=true}).output
+    colorschemes=vim.tbl_filter(function (colorscheme)
+        return (conf.no_inc_origin or colorscheme~=original_colorscheme) and
+            colorscheme~='_color_shift'
+    end,colorschemes)
+    if not conf.no_inc_origin then
+        table.insert(colorschemes,1,original_colorscheme)
+    end
     local opts={}
     opts.preview=function(colorscheme)
         if not colorscheme then return end
