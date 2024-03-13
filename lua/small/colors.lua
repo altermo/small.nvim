@@ -33,9 +33,9 @@ function M.search_colors_online()
         if not index then return end
         local function fn(path)
             assert(vim.fn.isdirectory(path)==1,'git clone failed')
+            vim.opt.runtimepath:append(path)
             local colorpath=vim.fs.joinpath(path,'colors')
             assert(vim.fn.isdirectory(colorpath)==1,'has no colorschemes defined')
-            vim.opt.runtimepath:append(path)
             local colorschemes=vim.fn.readdir(colorpath)
             for k,v in ipairs(colorschemes) do
                 colorschemes[k]=vim.fn.fnamemodify(v,':r')

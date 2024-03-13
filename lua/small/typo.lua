@@ -57,14 +57,18 @@ function M.update(buf)
     end
 end
 function M.setup()
+    local timer
     vim.schedule(function ()
         vim.api.nvim_create_autocmd({'TextChanged','InsertLeave','BufEnter'},{callback=function (ev)
-            if vim.bo[ev.buf].spelllang~='en' then
-                vim.diagnostic.set(M.ns_typos,ev.buf,{})
-                vim.diagnostic.set(M.ns_codespell,ev.buf,{})
-            elseif vim.bo[ev.buf].buftype~='terminal' then
-                M.update(ev.buf)
-            end
+            if timer then timer:stop() end
+            timer=vim.defer_fn(function ()
+                if vim.bo[ev.buf].spelllang~='en' then
+                    vim.diagnostic.set(M.ns_typos,ev.buf,{})
+                    vim.diagnostic.set(M.ns_codespell,ev.buf,{})
+                elseif vim.bo[ev.buf].buftype~='terminal' then
+                    M.update(ev.buf)
+                end
+            end,100)
         end,group=vim.api.nvim_create_augroup('small_typos',{clear=true})})
     end)
 end
