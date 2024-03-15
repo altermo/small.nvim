@@ -13,6 +13,13 @@ function M._get_colorschemes(cb)
                 })
             end
         end
+        table.insert(colorschemes,{
+            link='https://github.com/altermo/base46-fork',
+            name='nvchad-base46',
+            stars=json.plugins['siduck76/NvChad'].stars,
+            make=true,
+        })
+        vim.lg(json.plugins)
         table.sort(colorschemes,function (a,b) return a.stars>b.stars end)
         M.online_colors_cache=colorschemes
         cb()
@@ -46,15 +53,19 @@ function M.search_colors_online()
             end
             M.search_colors(colorschemes,{no_inc_origin=true})
         end
-        if not M.download_colors_cache[index.link] then
-            local path=vim.fn.tempname()..'/'
-            vim.system({'git','clone','--depth=1',index.link,path},{},function ()
-                M.download_colors_cache[index.link]=path
+        if M.download_colors_cache[index.link] then
+            fn(M.download_colors_cache[index.link]) return
+        end
+        local path=vim.fn.tempname()..'/'
+        vim.system({'git','clone','--depth=1',index.link,path},{},function ()
+            M.download_colors_cache[index.link]=path
+            if not index.make then
+                vim.schedule_wrap(fn)(path) return
+            end
+            vim.system({'make'},{cwd=path},function ()
                 vim.schedule_wrap(fn)(path)
             end)
-        else
-            fn(M.download_colors_cache[index.link])
-        end
+        end)
     end)
 end
 function M.search_colors(colorschemes,conf)
@@ -73,6 +84,7 @@ function M.search_colors(colorschemes,conf)
     local opts={}
     opts.preview=function(colorscheme)
         if not colorscheme then return end
+        vim.cmd.colorscheme('default')
         vim.cmd.colorscheme(colorscheme)
     end
     opts.cancel=function()

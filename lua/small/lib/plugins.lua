@@ -19,7 +19,8 @@ function M.create_cache(cb)
 end
 function M.get(cb)
     if M.cache_valid() then
-        return cb(M.get_cache())
+        local s,json=pcall(M.get_cache)
+        if s then return cb(json) end
     end
     M.create_cache(cb)
 end
