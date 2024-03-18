@@ -84,6 +84,10 @@ Commands:
 + `colors.search_colors`: search colors in runtimepath
 + `colors.search_colors_online`: search colors on neovimcraft.com
 
+## Copyring
+Summary: minimal yankring
+Setup: `copyring.setup()`
+
 ## Curosr
 Summary: Create multiple cursors \
 Setup: `cursor.setup()` \
