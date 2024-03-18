@@ -2,16 +2,10 @@ local M={}
 M.completionlist={}
 function M.get_pos()
     if vim.fn.mode()=='c' then
-        return {
-            relative='editor',
-        }
+        return vim.o.lines-2,vim.fn.getcmdpos()
     end
-    return {
-        relative='win',
-        win=vim.api.nvim_get_current_win(),
-        col=vim.fn.wincol()-2,
-        row=vim.fn.winline(),
-    }
+    local info=vim.fn.getwininfo(vim.api.nvim_get_current_win())[1]
+    return info.winrow+vim.fn.winline()-1,info.wincol+vim.fn.wincol()-2
 end
 function M.is_open()
     return vim.api.nvim_win_get_config(M.win).hide==false
@@ -20,10 +14,15 @@ function M.close()
     if not M.is_open() then return end
     vim.api.nvim_win_set_config(M.win,{hide=true})
 end
-function M.open()
-    if M.is_open() then return end
+function M.update()
+    if M.is_open() then M.close() end
     vim.api.nvim_win_set_config(M.win,{hide=false})
-    vim.api.nvim_win_set_config(M.win,M.get_pos())
+    local row,col=M.get_pos()
+    vim.api.nvim_win_set_config(M.win,{
+        relative='editor',
+        row=row,
+        col=col,
+    })
 end
 function M.setup()
     M.group=vim.api.nvim_create_augroup('small_acomp',{})
@@ -35,9 +34,9 @@ function M.setup()
         style='minimal',
     })
     vim.keymap.set({'i','c'},'§',function ()
-        M.open()
+        M.update()
     end)
-    vim.api.nvim_create_autocmd('InsertLeave',{
+    vim.api.nvim_create_autocmd({'InsertLeave','CmdlineLeave'},{
         callback=M.close,
         group=M.augroup,
     })
