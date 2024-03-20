@@ -2,10 +2,21 @@ local plugins=require'small.lib.plugins'
 local M={}
 M.download_colors_cache={}
 function M._get_colorschemes(cb)
+    if not package.loaded['lush'] then
+        local idx=#package.loaders+1
+        package.loaders[idx]=function ()
+            local path=vim.fn.tempname()..'/'
+            vim.system({'git','clone','--depth=1','https://github.com/rktjmp/lush.nvim',path},{}):wait()
+            assert(vim.fn.isdirectory(path)==1,'git clone failed')
+            vim.opt.runtimepath:append(path)
+            table.remove(package.loaders,idx)
+            return require'lush'
+        end
+    end
     plugins(function (json)
         local colorschemes={}
         for _,v in pairs(json.plugins) do
-            if vim.tbl_contains(v.tags,'colorscheme') then
+            if vim.tbl_contains(v.tags,'colorscheme') and v.name~='lush.nvim' then
                 table.insert(colorschemes,{
                     link=v.link,
                     name=(v.name:find('^n?vim$') or v.name=='neovim') and v.id:match('(.-)/') or v.name,
@@ -19,7 +30,6 @@ function M._get_colorschemes(cb)
             stars=json.plugins['siduck76/NvChad'].stars,
             make=true,
         })
-        vim.lg(json.plugins)
         table.sort(colorschemes,function (a,b) return a.stars>b.stars end)
         M.online_colors_cache=colorschemes
         cb()
