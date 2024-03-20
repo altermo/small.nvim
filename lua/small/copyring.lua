@@ -68,7 +68,7 @@ function M.setup()
         end
     end,group=M.augroup})
     vim.keymap.set('n','p',function () M.put(true) end)
-    vim.keymap.set('n','P',function () M.Put(false) end)
+    vim.keymap.set('n','P',function () M.put(false) end)
     vim.keymap.set('n','<A-p>',function () M.cycle(false) end)
     vim.keymap.set('n','<A-P>',function () M.cycle(true) end)
 end
