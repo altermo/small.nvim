@@ -65,10 +65,12 @@ function M.setup()
                 vim.api.nvim_buf_set_extmark(buf,M.ns,row-1,col-1,{
                     virt_text={{text:sub(1,t),'Whitespace'}},
                     virt_text_pos='overlay',
+                    right_gravity=false,
                 })
                 vim.api.nvim_buf_set_extmark(buf,M.ns,row-1,col,{
                     virt_text={{text:sub(t+1),'Whitespace'}},
                     virt_text_pos='inline',
+                    right_gravity=false,
                 })
             end
         end

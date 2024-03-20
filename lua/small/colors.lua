@@ -85,6 +85,9 @@ function M.search_colors(colorschemes,conf)
     opts.preview=function(colorscheme)
         if not colorscheme then return end
         vim.cmd.colorscheme('default')
+        if vim.startswith(colorscheme,'46') then
+            vim.o.background='light'
+        end
         vim.cmd.colorscheme(colorscheme)
     end
     opts.cancel=function()

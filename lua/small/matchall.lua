@@ -50,12 +50,14 @@ function M.redraw()
     M.clear()
     M.highlight()
 end
+function M.toggle()
+    M.disable=not M.disable
+end
 function M.setup()
     vim.api.nvim_create_augroup('matchall',{})
     vim.api.nvim_create_autocmd({'InsertEnter','TermEnter','WinLeave','CmdlineEnter'},{group='matchall',callback=M.clear})
     vim.api.nvim_create_autocmd({'CursorMoved'},{group='matchall',callback=M.highlight})
     vim.api.nvim_create_autocmd({'TextChanged','CmdLineLeave'},{group='matchall',callback=M.redraw})
-    vim.api.nvim_create_user_command('ToggleMatchAll',function () M.disable=not M.disable end,{})
     M.highlight()
 end
 return M

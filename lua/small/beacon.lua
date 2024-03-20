@@ -35,3 +35,4 @@ end
 if vim.dev then
     M.create_autocmd()
 end
+return M
