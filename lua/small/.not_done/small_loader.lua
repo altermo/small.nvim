@@ -1,39 +1,40 @@
 local M={}
+M.conf={}
+M.loaded={}
 M.def={
     fork={special=true},
     lib={special=true},
 
-    own={setup=true},
-    color_cmdline={setup=true},
-    cursor_xray={setup=true},
-    elastic_tabstop={setup=true},
-    foldtext={setup=true,conf=true},
-    help_readme={setup=true,build='generate',conf=true},
-    highlight_selected={setup=true},
-    labull={setup=true},
-    specfile={setup=true,conf=true},
-    statusbuf={setup=true},
-    tabline={setup=true},
-    treewarn={setup=true,conf=true},
-    typo={setup=true},
-    winvis={setup=true},
-    zenall={setup=true},
-    large={setup='start'},
-    beacon={setup='create_autocmd',conf=true},
-    debugger={setup='override_error'},
+    color_cmdline={setup=true,event={'CmdlineEnter'}},
+    cursor_xray={setup=true,event={'WinNew'}},
+    elastic_tabstop={setup=true,event={'~Now'}},
+    foldtext={setup=true,conf=true,event={'~Fold'}},
+    help_readme={setup=true,build='generate',conf=true,event={'~Now'}},
+    highlight_selected={setup=true,event={'~VisualEnter'}},
+    labull={setup=true,event={'~OnKey'}},
+    specfile={setup=true,conf=true,event={'BufReadPre'}},
+    statusbuf={setup=true,event={'~Now'}},
+    tabline={setup=true,event={'TabNew'}},
+    treewarn={setup=true,conf=true,event={'~Later'}},
+    typo={setup=true,event={'~Later'}},
+    winvis={setup=true,event={'~VisualEnter'}},
+    zenall={setup=true,event={'~Now'}},
+    large={setup='start',event={'~Now'}},
+    beacon={setup='create_autocmd',conf=true,event={'~Now'}},
+    debugger={setup='override_error',event={'~Now'}},
 
-    matchall={setup=true,run='toggle'},
-    cursor={setup=true,run={'create_cursor','goto_next_cursor','clear_cursor'},conf=true},
-    kitty={setup=true,run={'set_font_size','get_font_size','set_padding','toggle_padding'},conf=true},
-    reminder={setup=true,run='sidebar',conf=true},
-    notify={setup='override_notify',run={'notify','open_history','dismiss'},conf=true},
-    splitbuf={run={'open','split','vsplit'},conf=true},
+    own={setup=true,run='load',event={'~Now'}},
+    matchall={setup=true,run='toggle',event={'~Later'}},
+    cursor={setup=true,run={'create_cursor','goto_next_cursor','clear_cursor'},conf=true,event={'BufNew'}},
+    kitty={setup=true,run={'set_font_size','get_font_size','set_padding','toggle_padding'},conf=true,event={'~Now'}},
+    reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
+    notify={setup='override_notify',run={'notify','open_history','dismiss'},conf=true,event={'~Now'}},
     copyring={setup=true,run={'put','cycle'},keys=function (m,fn)
         fn.map('n','p',function () m.put(true) end)
         fn.map('n','P',function () m.put(false) end)
         fn.map('n','<A-p>',function () m.cycle(false) end)
         fn.map('n','<A-P>',function () m.cycle(true) end)
-    end},
+    end,event={'~OnKey'}},
 
     bufend={run=true},
     chat={run=true},
@@ -52,6 +53,7 @@ M.def={
     cmd2ins={run='map'},
     color_shift={run='shift'},
     colors={run={'search_colors','search_colors_online'}},
+    splitbuf={run={'open','split','vsplit'},conf=true},
     dapnvim={run='start'},
     dff={run='file_expl',conf=true},
     layout={run={'save','load'},conf=true},
@@ -113,7 +115,7 @@ M.def={
         fn.map('i',m.run,{expr=true})
     end}
 }
-function M.load(plugin)
+function M._require(plugin)
     vim.dev=nil
     return require('small.'..plugin)
 end
@@ -123,7 +125,7 @@ end
 function M.get_functions(v)
     local funcs={}
     if v.run then vim.list_extend(funcs,M.to_table(v.run==true and 'run' or v.run)) end
-    if v.setup then vim.list_extend(funcs,M.to_table(v.setup==true and 'setup' or v.setup)) end
+    if v.setup then vim.list_extend(funcs,{v.setup==true and 'setup' or v.setup}) end
     assert(#funcs>0,'no functions defined')
     return funcs
 end
@@ -144,22 +146,111 @@ function M.check(all)
     if not all then return end
     for k,v in pairs(M.def) do
         if v.special or v.color then goto continue end
-        local p=M.load(k)
+        local p=M._require(k)
         for _,f in ipairs(M.get_functions(v)) do
             asnot(p[f],'function not defined: `%s` in `%s`',k,f)
         end
         asnot(not p.conf or v.conf,'`conf` not set for `%s`',k)
         asnot(not v.conf or p.conf,'`conf` set for `%s` but should not be set',k)
-        --asnot(v.lazy,'lazy loading not set `%s`',k) --TODO
+        asnot(not v.setup or v.event~=nil,'lazy loading not set `%s`',k)
         ::continue::
     end
 end
-function M.setup()
+function M.load(name)
+    if not M.def[name] then return end
+    if M.loaded[name] then return end
+    M.loaded[name]=true
+    local conf=M.conf[name] or {setup=false,keys=false}
+    local def=M.def[name]
+    local plugin=M._require(name)
+    if conf.setup~=false and def.setup then
+        plugin[def.setup==true and 'setup' or def.setup]()
+    end
+    if conf.keys~=false and (def.keys or conf.keys) then
+        (def.keys or conf.keys)(plugin,{map=function (mode,lhs,callback,opts)
+            opts=opts or {}
+            vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr})
+        end})
+    end
+    if conf.conf then
+        assert(def.conf)
+        plugin.conf=conf.conf
+    end
+    return plugin
+end
+function M.init_package_loader()
+    local loaders=package.loaders
+    for k,f in ipairs(loaders) do
+        if ({debug.getupvalue(f,1)})[2]=='_SMALL_LOADER_' then
+            table.remove(loaders,k)
+            break
+        end
+    end
+    local upvalue='_SMALL_LOADER_'
+    table.insert(loaders,function (name)
+        _=upvalue
+        if name:sub(1,6)=='small.' then
+            return M.load(name:sub(7))
+        end
+    end)
+    --assert(({debug.getupvalue(loaders[1],1)})[2]=='_SMALL_LOADER_')
+end
+function M.init_keys()
+    for name,conf in pairs(M.conf) do
+        local def=M.def[name]
+        if conf.keys~=false and (def.keys or conf.keys) then
+            (def.keys or conf.keys)(setmetatable({},{__index=function (_,fn)
+                return M.load(name)[fn]
+            end}),{map=function (mode,lhs,callback,opts)
+                    opts=opts or {}
+                    vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr})
+                end})
+        end
+    end
+end
+function M.create_autocmd(event,name)
+    if event:sub(1,1)=='~' then
+        return
+    end
+    local done
+    vim.api.nvim_create_autocmd(event,{callback=function ()
+        if done then return end
+        done=true
+        M.load(name)
+        for _,v in ipairs(vim.api.nvim_get_autocmds({event=event})) do
+            --TODO
+        end
+    end,once=true})
+end
+function M.init_autocmds()
+    for name,conf in pairs(M.conf) do
+        local def=M.def[name]
+        if not def.event then goto continue end
+        if conf.setup==false then goto continue end
+        for _,event in ipairs(def.event) do
+            M.create_autocmd(event,name)
+        end
+        ::continue::
+    end
+end
+function M.run(plugins)
     if _G.UA_DEV then
         vim.defer_fn(M.check,1000)
     end
+    for _,pluginconf in ipairs(vim.tbl_map(M.to_table,plugins)) do
+        local name=pluginconf[1]
+        assert(M.def[name])
+        M.conf[name]=pluginconf
+    end
+    M.init_package_loader()
+    M.init_keys()
+    M.init_autocmds()
 end
 if vim.dev then
-    M.check(true)
+    M.run({
+        'highlight_selected',
+        'copyring',
+        'color_cmdline',
+    })
 end
 return M
