@@ -336,6 +336,11 @@ Commands:
 
 Config:
 + `reminder.conf.path` (required) file to find reminders in
+
+## Small_loader
+Summary: a lazy loader for small plugins.\
+Run: `small_loade.run()`
+
 ## Specfile
 Summary: Run scripts on specific file opens.\
 Setup: `specfile.setup()`\

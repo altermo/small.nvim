@@ -4,6 +4,7 @@ M.loaded={}
 M.def={
     fork={special=true},
     lib={special=true},
+    small_loader={special=true},
 
     color_cmdline={setup=true,event={'CmdlineEnter'}},
     cursor_xray={setup=true,event={'WinNew'}},
@@ -47,7 +48,9 @@ M.def={
     tableformat={run=true},
     recenter_top_bottom={run=true},
     zen={run=true},
-    ranger={run={'run','ranger'},conf=true},
+    ranger={run={'run','ranger'},conf=true,event={'~Now'}},
+    --FIX: `conf` not set correctly when running with `$nvim -c "lua require 'small.*'"`
+    --HACK: loading the module instantly (with event=Now)
     jumpall={run=true,conf=true},
     iedit={run={'clear','visual_all','visual_select'}},
     cmd2ins={run='map'},
@@ -86,8 +89,8 @@ M.def={
         fn.map('n','<C-RightRelease>',m.deinitilize)
     end,conf=true},
     builder={run={'eval','termbuild','swap','set'},conf=true,keys=function (m,fn)
-        fn.map('i','<F5>',m.termbuild)
-        fn.map('i','<F6>',m.eval)
+        fn.map('n','<F5>',m.termbuild)
+        fn.map('n','<F6>',m.eval)
     end},
     help_cword={run=true,keys=function (m,fn)
         fn.map('n','K',m.run)
@@ -103,8 +106,8 @@ M.def={
         fn.map('n','<a',m.swap_prev)
     end,conf=true},
     onelinecomment={run=true,keys=function (m,fn)
-        fn.map('n','gc',m.comment_lines)
-        fn.map('x','gc',m.comment_lines)
+        fn.map('n','gc',m.run)
+        fn.map('x','gc',m.run)
     end},
     unimpaired={run={'edit_prev_file','edit_next_file','get_next_file','set_opt'},keys=function (m,fn)
         fn.map('n','yo',m.set_opt)
@@ -112,12 +115,11 @@ M.def={
         fn.map('n','[f',m.edit_prev_file)
     end},
     whint={run=true,keys=function (m,fn)
-        fn.map('i',m.run,{expr=true})
+        fn.map('i',':',m.run,{expr=true})
     end}
 }
-function M._require(plugin)
-    vim.dev=nil
-    return require('small.'..plugin)
+function M._require(name)
+    return require('small.'..name)
 end
 function M.to_table(t)
     if type(t)=='string' then return {t} else return t end
@@ -156,25 +158,26 @@ function M.check(all)
         ::continue::
     end
 end
-function M.load(name)
+function M.load(name,recursive)
     if not M.def[name] then return end
-    if M.loaded[name] then return end
+    if M.loaded[name] and recursive then return end
+    if M.loaded[name] then return M._require(name) end
     M.loaded[name]=true
-    local conf=M.conf[name] or {setup=false,keys=false}
-    local def=M.def[name]
     local plugin=M._require(name)
+    local def=M.def[name]
+    local conf=M.conf[name] or {setup=false,keys=false}
+    if conf.conf then
+        assert(def.conf)
+        plugin.conf=conf.conf
+    end
     if conf.setup~=false and def.setup then
         plugin[def.setup==true and 'setup' or def.setup]()
     end
     if conf.keys~=false and (def.keys or conf.keys) then
         (def.keys or conf.keys)(plugin,{map=function (mode,lhs,callback,opts)
             opts=opts or {}
-            vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr})
+            vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr,noremap=true,replace_keycodes=opts.expr})
         end})
-    end
-    if conf.conf then
-        assert(def.conf)
-        plugin.conf=conf.conf
     end
     return plugin
 end
@@ -187,40 +190,61 @@ function M.init_package_loader()
         end
     end
     local upvalue='_SMALL_LOADER_'
-    table.insert(loaders,function (name)
+    table.insert(loaders,1,function (name)
         _=upvalue
         if name:sub(1,6)=='small.' then
-            return M.load(name:sub(7))
+            local p=M.load(name:sub(7),true)
+            package.loaded[name]=p
+            return p
         end
     end)
-    --assert(({debug.getupvalue(loaders[1],1)})[2]=='_SMALL_LOADER_')
+    assert(({debug.getupvalue(loaders[1],1)})[2]=='_SMALL_LOADER_')
 end
 function M.init_keys()
     for name,conf in pairs(M.conf) do
         local def=M.def[name]
         if conf.keys~=false and (def.keys or conf.keys) then
             (def.keys or conf.keys)(setmetatable({},{__index=function (_,fn)
-                return M.load(name)[fn]
+                return function (...)
+                    return M.load(name)[fn](...)
+                end
+
             end}),{map=function (mode,lhs,callback,opts)
                     opts=opts or {}
-                    vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr})
+                    vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr,noremap=true,replace_keycodes=opts.expr})
                 end})
         end
     end
 end
 function M.create_autocmd(event,name)
-    if event:sub(1,1)=='~' then
-        return
+    local pattern
+    if event=='~VisualEnter' then
+        pattern='*:[vV\x16]'
+        event='ModeChanged'
+    elseif event=='~Now' or event=='~Fold' then
+        M.load(name) return
+    elseif event=='~Later' then
+        vim.defer_fn(function ()
+            M.load(name)
+        end,500) return
+    elseif event=='~OnKey' then
+        M.load(name) return
+    elseif event:sub(1,1)=='~' then
+        error''
     end
     local done
-    vim.api.nvim_create_autocmd(event,{callback=function ()
+    vim.api.nvim_create_autocmd(event,{callback=function (data)
         if done then return end
         done=true
         M.load(name)
-        for _,v in ipairs(vim.api.nvim_get_autocmds({event=event})) do
-            --TODO
+        if event=='ModeChanged' then
+            pattern=data.match
         end
-    end,once=true})
+        vim.api.nvim_exec_autocmds(event,{
+            data=data,
+            pattern=pattern,
+        })
+    end,once=true,pattern=pattern})
 end
 function M.init_autocmds()
     for name,conf in pairs(M.conf) do
@@ -234,23 +258,14 @@ function M.init_autocmds()
     end
 end
 function M.run(plugins)
-    if _G.UA_DEV then
-        vim.defer_fn(M.check,1000)
-    end
+    vim.defer_fn(M.check,1000)
     for _,pluginconf in ipairs(vim.tbl_map(M.to_table,plugins)) do
         local name=pluginconf[1]
         assert(M.def[name])
         M.conf[name]=pluginconf
     end
-    M.init_package_loader()
-    M.init_keys()
     M.init_autocmds()
-end
-if vim.dev then
-    M.run({
-        'highlight_selected',
-        'copyring',
-        'color_cmdline',
-    })
+    M.init_keys()
+    M.init_package_loader()
 end
 return M
