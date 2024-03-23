@@ -48,9 +48,7 @@ M.def={
     tableformat={run=true},
     recenter_top_bottom={run=true},
     zen={run=true},
-    ranger={run={'run','ranger'},conf=true,event={'~Now'}},
-    --FIX: `conf` not set correctly when running with `$nvim -c "lua require 'small.*'"`
-    --HACK: loading the module instantly (with event=Now)
+    ranger={run={'run','ranger'},conf=true},
     jumpall={run=true,conf=true},
     iedit={run={'clear','visual_all','visual_select'}},
     cmd2ins={run='map'},
