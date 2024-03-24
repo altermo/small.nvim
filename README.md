@@ -3,7 +3,9 @@ This is a collection of small plugins that I created just because.
 
 **I don't plan on doing good maintenance, so I might change things without warning.**
 
-The documentation is not up to date.
+**Some of the plugins are a complete hack while others are top quality**
+
+The documentation is **not up to date**.
 
 Optional dependencies:
 + `nvim-telescope/telescope.nvim`: many plugins use a selector
