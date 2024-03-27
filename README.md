@@ -408,6 +408,11 @@ Setup: `treewarn.setup()`
 Config:
 + `treewarn.conf[lang]`: list of queries with the capture `@warn`; and to add custo messages: ` (#set! "mes" "...")`
 
+## Ts_paren
+Required: `treesitter`\
+Summary: parenthesise all nodes (containing multiple nodes)\
+Command: `ts_paren.run()`
+
 ## Typo
 Required: `typos` and or `codespell`\
 Summary: show code typos/codespells\

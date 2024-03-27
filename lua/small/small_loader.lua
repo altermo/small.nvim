@@ -48,6 +48,7 @@ M.def={
     tableformat={run=true},
     recenter_top_bottom={run=true},
     zen={run=true},
+    ts_paren={run=true},
     ranger={run={'run','ranger'},conf=true},
     jumpall={run=true,conf=true},
     iedit={run={'clear','visual_all','visual_select'}},
