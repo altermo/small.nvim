@@ -28,7 +28,8 @@ M.def={
     matchall={setup=true,run='toggle',event={'~Later'}},
     cursor={setup=true,run={'create_cursor','goto_next_cursor','clear_cursor'},conf=true,event={'BufNew'}},
     kitty={setup=true,run={'set_font_size','get_font_size','set_padding','toggle_padding'},conf=true,event={'~Now'}},
-    reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
+    --reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
+        reminder={setup=true,run='sidebar',conf=true,event={'~Now'}},
     notify={setup='override_notify',run={'notify','open_history','dismiss'},conf=true,event={'~Now'}},
     copyring={setup=true,run={'put','cycle'},keys=function (m,fn)
         fn.map('n','p',function () m.put(true) end)
