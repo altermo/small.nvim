@@ -106,6 +106,8 @@ M.def={
         fn.map('n','<a',m.swap_prev)
     end,conf=true},
     onelinecomment={run=true,keys=function (m,fn)
+        vim.keymap.del('n','gcc')
+        vim.keymap.del({'o','x','n'},'gc')
         fn.map('n','gc',m.run)
         fn.map('x','gc',m.run)
     end},
