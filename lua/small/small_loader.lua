@@ -191,7 +191,7 @@ function M.init_package_loader()
     end
     local upvalue='_SMALL_LOADER_'
     table.insert(loaders,1,function (name)
-        _=upvalue
+        local _=upvalue
         if name:sub(1,6)=='small.' then
             local p=M.load(name:sub(7),true)
             package.loaded[name]=p
