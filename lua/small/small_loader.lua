@@ -28,8 +28,7 @@ M.def={
     matchall={setup=true,run='toggle',event={'~Later'}},
     cursor={setup=true,run={'create_cursor','goto_next_cursor','clear_cursor'},conf=true,event={'BufNew'}},
     kitty={setup=true,run={'set_font_size','get_font_size','set_padding','toggle_padding'},conf=true,event={'~Now'}},
-    --reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
-        reminder={setup=true,run='sidebar',conf=true,event={'~Now'}},
+    reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
     notify={setup='override_notify',run={'notify','open_history','dismiss'},conf=true,event={'~Now'}},
     copyring={setup=true,run={'put','cycle'},keys=function (m,fn)
         fn.map('n','p',function () m.put(true) end)
@@ -183,91 +182,92 @@ function M.load(name,recursive)
     end
     return plugin
 end
-function M.init_package_loader()
-    local loaders=package.loaders
-    for k,f in ipairs(loaders) do
-        if ({debug.getupvalue(f,1)})[2]=='_SMALL_LOADER_' then
-            table.remove(loaders,k)
-            break
-        end
-    end
-    local upvalue='_SMALL_LOADER_'
-    table.insert(loaders,1,function (name)
-        local _=upvalue
-        if name:sub(1,6)=='small.' then
-            local p=M.load(name:sub(7),true)
-            package.loaded[name]=p
-            return p
-        end
-    end)
-    assert(({debug.getupvalue(loaders[1],1)})[2]=='_SMALL_LOADER_')
-end
-function M.init_keys()
-    for name,conf in pairs(M.conf) do
-        local def=M.def[name]
-        if conf.keys~=false and (def.keys or conf.keys) then
-            (def.keys or conf.keys)(setmetatable({},{__index=function (_,fn)
-                return function (...)
-                    return M.load(name)[fn](...)
-                end
-
-            end}),{map=function (mode,lhs,callback,opts)
-                    opts=opts or {}
-                    vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr,noremap=true,replace_keycodes=opts.expr})
-                end})
-        end
-    end
-end
-function M.create_autocmd(event,name)
-    local pattern
-    if event=='~VisualEnter' then
-        pattern='*:[vV\x16]'
-        event='ModeChanged'
-    elseif event=='~Now' or event=='~Fold' then
-        M.load(name) return
-    elseif event=='~Later' then
-        vim.defer_fn(function ()
-            M.load(name)
-        end,500) return
-    elseif event=='~OnKey' then
-        M.load(name) return
-    elseif event:sub(1,1)=='~' then
-        error''
-    end
-    local done
-    vim.api.nvim_create_autocmd(event,{callback=function (data)
-        if done then return end
-        done=true
-        M.load(name)
-        if event=='ModeChanged' then
-            pattern=data.match
-        end
-        vim.api.nvim_exec_autocmds(event,{
-            data=data,
-            pattern=pattern,
-        })
-    end,once=true,pattern=pattern})
-end
-function M.init_autocmds()
-    for name,conf in pairs(M.conf) do
-        local def=M.def[name]
-        if not def.event then goto continue end
-        if conf.setup==false then goto continue end
-        for _,event in ipairs(def.event) do
-            M.create_autocmd(event,name)
-        end
-        ::continue::
-    end
-end
+--function M.init_package_loader()
+--    local loaders=package.loaders
+--    for k,f in ipairs(loaders) do
+--        if ({debug.getupvalue(f,1)})[2]=='_SMALL_LOADER_' then
+--            table.remove(loaders,k)
+--            break
+--        end
+--    end
+--    local upvalue='_SMALL_LOADER_'
+--    table.insert(loaders,1,function (name)
+--        local _=upvalue
+--        if name:sub(1,6)=='small.' then
+--            local p=M.load(name:sub(7),true)
+--            package.loaded[name]=p
+--            return p
+--        end
+--    end)
+--    assert(({debug.getupvalue(loaders[1],1)})[2]=='_SMALL_LOADER_')
+--end
+--function M.init_keys()
+--    for name,conf in pairs(M.conf) do
+--        local def=M.def[name]
+--        if conf.keys~=false and (def.keys or conf.keys) then
+--            (def.keys or conf.keys)(setmetatable({},{__index=function (_,fn)
+--                return function (...)
+--                    return M.load(name)[fn](...)
+--                end
+--
+--            end}),{map=function (mode,lhs,callback,opts)
+--                    opts=opts or {}
+--                    vim.api.nvim_set_keymap(mode,lhs,'',{callback=callback,expr=opts.expr,noremap=true,replace_keycodes=opts.expr})
+--                end})
+--        end
+--    end
+--end
+--function M.create_autocmd(event,name)
+--    local pattern
+--    if event=='~VisualEnter' then
+--        pattern='*:[vV\x16]'
+--        event='ModeChanged'
+--    elseif event=='~Now' or event=='~Fold' then
+--        M.load(name) return
+--    elseif event=='~Later' then
+--        vim.defer_fn(function ()
+--            M.load(name)
+--        end,500) return
+--    elseif event=='~OnKey' then
+--        M.load(name) return
+--    elseif event:sub(1,1)=='~' then
+--        error''
+--    end
+--    local done
+--    vim.api.nvim_create_autocmd(event,{callback=function (data)
+--        if done then return end
+--        done=true
+--        M.load(name)
+--        if event=='ModeChanged' then
+--            pattern=data.match
+--        end
+--        vim.api.nvim_exec_autocmds(event,{
+--            data=data,
+--            pattern=pattern,
+--        })
+--    end,once=true,pattern=pattern})
+--end
+--function M.init_autocmds()
+--    for name,conf in pairs(M.conf) do
+--        local def=M.def[name]
+--        if not def.event then goto continue end
+--        if conf.setup==false then goto continue end
+--        for _,event in ipairs(def.event) do
+--            M.create_autocmd(event,name)
+--        end
+--        ::continue::
+--    end
+--end
 function M.run(plugins)
     vim.defer_fn(M.check,1000)
     for _,pluginconf in ipairs(vim.tbl_map(M.to_table,plugins)) do
         local name=pluginconf[1]
         assert(M.def[name])
         M.conf[name]=pluginconf
+        M.load(name)
     end
-    M.init_autocmds()
-    M.init_keys()
-    M.init_package_loader()
+    --M.init_autocmds()
+    --M.init_keys()
+    --M.init_package_loader()
 end
 return M
