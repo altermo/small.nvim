@@ -33,6 +33,11 @@ function M.setup()
     M.sync_font_size()
     if not M.conf.no_keymap then M.setup_keymaps() end
     if M.conf.padding then M.set_padding(M.conf.padding) end
+    if M.conf.original_padding then
+        vim.api.nvim_create_autocmd('VimLeave',{callback=function ()
+            M.set_padding(M.conf.original_padding)
+        end})
+    end
 end
 function M.set_font_size(size) vim.o.guifont=vim.o.guifont:gsub(':h%d*',':h'..size) end
 function M.get_font_size() return vim.o.guifont:match(':h(%d*)') end

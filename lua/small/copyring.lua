@@ -2,7 +2,7 @@ local M={augroup=vim.api.nvim_create_augroup('small_copy',{clear=true})}
 function M.highlight(event)
     vim.highlight.on_yank{higroup='Search',timeout=500,event=event}
 end
-M.copies={{cont=vim.fn.getreg'"',type=vim.fn.getregtype'"'}}
+M.copies={{cont=vim.split(vim.fn.getreg'"','\n'),type=vim.fn.getregtype'"'}}
 function M.create_cancel(first)
     if not M.state then return end
     if not first then
@@ -55,6 +55,9 @@ function M.put(after)
     end
 end
 function M.push(regcont,regtype)
+    if table.concat(M.copies[1].cont,'\n')==table.concat(regcont,'\n') and M.copies[1].type==regtype then
+        return
+    end
     table.insert(M.copies,1,{cont=regcont,type=regtype})
     if #M.copies>10 then
         table.remove(M.copies)
