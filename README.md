@@ -408,6 +408,17 @@ Setup: `treewarn.setup()`
 Config:
 + `treewarn.conf[lang]`: list of queries with the capture `@warn`; and to add custo messages: ` (#set! "mes" "...")`
 
+## Treeselect
+Required: `treesitter`\
+Summary: Similar to Helix's treesitter selection\
+Commands:
++ `treeselect.current()`: select current node
++ `treeselect.line()`: select current node linewise
++ `treeselect.next()`: select next node
++ `treeselect.prev()`: select previous node
++ `treeselect.up()`: select parent node
++ `treeselect.down()`: select child node
+
 ## Ts_paren
 Required: `treesitter`\
 Summary: parenthesise all nodes (containing multiple nodes)\

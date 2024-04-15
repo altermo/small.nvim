@@ -117,7 +117,15 @@ M.def={
     end},
     whint={run=true,keys=function (m,fn)
         fn.map('i',':',m.run,{expr=true})
-    end}
+    end},
+    treeselect={run={'next','prev','upp','down','current','line'},keys=function (m,fn)
+        fn.map('n','vn',m.current)
+        fn.map('n','vr',m.line)
+        fn.map('x','<C-h>',m.prev)
+        fn.map('x','<C-l>',m.next)
+        fn.map('x','<C-k>',m.up)
+        fn.map('x','<C-j>',m.down)
+    end},
 }
 function M._require(name)
     return require('small.'..name)

@@ -1,6 +1,6 @@
 local M={conf={}}
 function M.in_kitty()
-    return vim.env.TERM:find('kitty')
+    return vim.env.TERM:find('kitty') and not vim.env.NVIM
 end
 function M.send_cmd(...)
     vim.system(vim.list_extend({'kitty','@'},{...}))
