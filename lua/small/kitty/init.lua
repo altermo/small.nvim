@@ -43,10 +43,6 @@ function M.set_font_size(size) vim.o.guifont=vim.o.guifont:gsub(':h%d*',':h'..si
 function M.get_font_size() return vim.o.guifont:match(':h(%d*)') end
 function M.setup_keymaps()
     local default_font=M.get_font_size()
-    vim.keymap.set({'t','n'},'<F11>',function ()
-        M.get_kitty_winid(function (kitty_winid)
-            vim.system{'wmctrl','-ir',kitty_winid,'-b','toggle,fullscreen'}
-        end) end)
     vim.keymap.set({'t','n'},'<C-0>',function () M.set_font_size(default_font) end)
     vim.keymap.set({'t','n'},'<C-+>',function () M.set_font_size(M.get_font_size()+1) end)
     vim.keymap.set({'t','n'},'<C-S-=>',function () M.set_font_size(M.get_font_size()+1) end)
