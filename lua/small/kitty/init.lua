@@ -1,5 +1,12 @@
 local M={conf={}}
 function M.in_kitty()
+    if M.conf.strict then
+        if not vim.env.TERM:find('kitty') or vim.env.NVIM then return end
+        local proc=vim.api.nvim_get_proc(vim.fn.getpid())
+        local function parent() proc=vim.api.nvim_get_proc(proc.ppid) end
+        repeat parent() until proc.name~='nvim'
+        return proc.name=='kitty'
+    end
     return vim.env.TERM:find('kitty') and not vim.env.NVIM
 end
 function M.send_cmd(...)
