@@ -8,6 +8,7 @@ function M.clear()
     M.save=nil
 end
 function M.highlight_word()
+    if vim.fn.hlID('Underline')==0 then return end
     local line=vim.api.nvim_get_current_line()
     local s,match=pcall(vim.fn.matchadd,'Underline','\\M\\<'..line:sub(M.save.beg+1,M.save.fin):gsub([[\]],[[\\]])..'\\>',-1)
     if s then M.save.matchid=match end
