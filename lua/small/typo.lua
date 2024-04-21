@@ -52,9 +52,9 @@ function M.update(buf)
     if vim.fn.executable('typos')==1 then
         M.update_typos(buf)
     end
-    if vim.fn.executable('codespell')==1 then
-        M.update_codespell(buf)
-    end
+    --if vim.fn.executable('codespell')==1 then
+    --    M.update_codespell(buf)
+    --end
 end
 function M.setup()
     local timer
