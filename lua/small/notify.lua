@@ -84,6 +84,10 @@ M.update=function()
     end
 end
 function M.notify(msg,level,opts)
+    if vim.in_fast_event() then
+        vim.schedule_wrap(M.notify)(msg,level,opts)
+        return
+    end
     M.add_to_history(msg)
     local time=vim.uv.hrtime()
     while M.notifs[time] do time=time+1 end
