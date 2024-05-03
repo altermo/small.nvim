@@ -253,6 +253,12 @@ Commands: `lbpr.run()` \
 NOTE:
 + `:write` on script buf to run script.
 + `:write` on preview buf to save changes.
+
+## Luay
+Inspired by: [luapad](https://github.com/rafcamlet/nvim-luapad) \
+Summary: a minimal version of luapad. \
+Commands: `luay.run()`
+
 ## Macro
 Summary: A simple macro plugin \
 Commands:
