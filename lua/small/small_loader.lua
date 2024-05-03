@@ -50,6 +50,7 @@ M.def={
     zen={run=true},
     ts_paren={run=true},
     luay={run=true},
+    qvim2={run={'run','open_run_buf'}},
     ranger={run={'run','ranger'},conf=true},
     jumpall={run=true,conf=true},
     iedit={run={'clear','visual_all','visual_select'}},

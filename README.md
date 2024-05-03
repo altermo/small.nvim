@@ -325,6 +325,10 @@ Commands: `plugin_search.run()`
 Summary: Quick run neovim \
 Commands: `qrun.run()`
 
+## Qvim2
+Summary: Quick run neovim (version 2) \
+Commands: `qrun.run()`
+
 ## Ranger
 Required: `ranger` \
 Summary: simple `ranger` wrapper \
