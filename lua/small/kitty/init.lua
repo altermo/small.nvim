@@ -63,7 +63,7 @@ function M.set_padding(size)
     M.send_cmd('set-spacing','padding='..size)
 end
 function M.toggle_padding(size)
-    if M.padding==size then M.set_padding(0)
+    if M.padding==size then M.set_padding(3)
     else M.set_padding(size) end
 end
 return M
