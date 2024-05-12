@@ -18,7 +18,7 @@ end
 function M.run(opts)
     opts=vim.tbl_extend('force',M.conf,opts or {})
     local s,err=pcall(function()
-        vim.api.nvim_win_add_ns(0,M.ns)
+        vim.api.nvim__win_add_ns(0,M.ns)
         local labels=M.generate_sequence(opts.labels)
         local win=vim.api.nvim_get_current_win()
         local lcol=1
@@ -69,7 +69,7 @@ function M.run(opts)
         end
     end)
     vim.api.nvim_buf_clear_namespace(0,M.ns,0,-1)
-    vim.api.nvim_win_remove_ns(0,M.ns)
+    vim.api.nvim__win_del_ns(0,M.ns)
     if not s then error(err) end
 end
 if vim.dev then

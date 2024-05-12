@@ -18,9 +18,9 @@ function M.redraw(win,topline,botline)
     vim.wo[win].wrap=true
     local buf=vim.api.nvim_win_get_buf(win)
     if vim.w[win].small_zenall_prev_ns then
-        vim.api.nvim_win_remove_ns(win,vim.w[win].small_zenall_prev_ns)
+        vim.api.nvim__win_del_ns(win,vim.w[win].small_zenall_prev_ns)
     end
-    vim.api.nvim_win_add_ns(win,ns)
+    vim.api.nvim__win_add_ns(win,ns)
     vim.w[win].small_zenall_prev_ns=ns
     for row=topline,botline do
         vim.api.nvim_buf_set_extmark(buf,ns,row,view.leftcol,{
