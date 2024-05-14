@@ -11,23 +11,43 @@ function M.create_buffer()
     M.buf=buf
     return buf
 end
-function M.get_pid_tree(pid)
-    local ret={}
+function M.get_pid_table()
     -- Dont use vim.api.nvim_get_proc_children, see https://github.com/neovim/neovim/issues/28741
-    for _,p in vim.spairs(vim.api.nvim_get_proc_children(pid)) do
-        ret[p]=M.get_pid_tree(p)
+    if vim.fn.has'unix' then
+        return M.get_pid_table_unix()
     end
-    return ret
+    error(('Not supported for `%s` operating system'):format(vim.uv.os_uname().sysname))
 end
-function M.update(buf)
-    local get_pid_tree=M.get_pid_tree(1)
-    local function f(tree,level)
-        for pid,subtree in vim.spairs(tree) do
-            vim.api.nvim_buf_set_lines(buf,-1,-1,false,{(' '):rep(level)..tostring(pid)})
-            f(subtree,level+2)
+function M.get_pid_table_unix()
+    local pid_table={[0]={}}
+    for i in vim.fs.dir('/proc') do
+        if tonumber(i) then
+            pid_table[tonumber(i)]={}
         end
     end
-    f({[1]=get_pid_tree},0)
+    for pid,_ in pairs(pid_table) do
+        if pid~=0 then
+            local f=assert(io.open('/proc/'..pid..'/stat', 'r'))
+            local stat=f:read('*l')
+            f:close()
+            local ppid=tonumber(stat:match('^%d+ %(.-%) [^ ] (%d+)'))
+            table.insert(pid_table[ppid],pid)
+        end
+    end
+    return pid_table
+end
+function M.update(buf)
+    local pid_table=M.get_pid_table()
+    for _,subpid in pairs(pid_table) do
+        table.sort(subpid)
+    end
+    local function f(table,level)
+        for _,subpid in ipairs(table) do
+            vim.api.nvim_buf_set_lines(buf,-1,-1,false,{(' '):rep(level)..tostring(subpid)})
+            f(pid_table[subpid],level+2)
+        end
+    end
+    f(pid_table[0],0)
     vim.api.nvim_buf_set_lines(buf,0,1,false,{})
 end
 function M.open()
