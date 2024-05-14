@@ -122,7 +122,7 @@ function M.run()
                     return name:sub(1,1)==key and not path:sub(#vim.fn.getcwd()):match('/%.')
                 end,{type='file',limit=1000}))
             else
-                vim.system({'fd','-tfile','-s','-a','^'..key},{},function (ev)
+                vim.system({'fd','-tfile','-s','-a','-H','^'..vim.fn.escape(key,'.')},{},function (ev)
                     vim.schedule_wrap(cb)(vim.split(ev.stdout,'\n',{trimempty=true}))
                 end)
             end
