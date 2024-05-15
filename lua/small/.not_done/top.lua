@@ -25,7 +25,7 @@ function M.get_pid_table_unix()
         if not pid then
             goto continue
         end
-        pid_table[pid]={}
+        pid_table[pid]={pid=pid}
         ::continue::
     end
     for pid,_ in pairs(pid_table) do
@@ -40,24 +40,27 @@ function M.get_pid_table_unix()
         local stat=f:read('*l')
         f:close()
         local comm,ppid_str=stat:match('^%d+ %((.-)%) [^ ] (%d+)')
-        table.insert(pid_table[tonumber(ppid_str)],pid)
+        table.insert(pid_table[tonumber(ppid_str)],pid_table[pid])
         pid_table[pid].comm=comm
         ::continue::
     end
     return pid_table
 end
 function M.update(buf)
+    local function sort(t)
+        table.sort(t,function (a,b)
+            return a.pid<b.pid
+        end)
+    end
     local function l()
         local pid_table=M.get_pid_table()
-        for _,subpid in pairs(pid_table) do
-            table.sort(subpid)
-        end
         local count=0
         local function f(table,level)
-            for _,subpid in ipairs(table) do
-                vim.api.nvim_buf_set_lines(buf,count,count+1,false,{(' '):rep(level)..tostring(subpid)..' '..tostring(pid_table[subpid].comm)})
+            sort(table)
+            for _,subpid_table in ipairs(table) do
+                vim.api.nvim_buf_set_lines(buf,count,count+1,false,{(' '):rep(level)..tostring(subpid_table.pid)..' '..tostring(subpid_table.comm)})
                 count=count+1
-                f(pid_table[subpid],level+2)
+                f(subpid_table,level+2)
             end
         end
         vim.bo[buf].modifiable=true
