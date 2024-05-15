@@ -21,34 +21,52 @@ end
 function M.get_pid_table_unix()
     local pid_table={[0]={}}
     for i in vim.fs.dir('/proc') do
-        if tonumber(i) then
-            pid_table[tonumber(i)]={}
+        local pid=tonumber(i)
+        if not pid then
+            goto continue
         end
+        pid_table[pid]={}
+        ::continue::
     end
     for pid,_ in pairs(pid_table) do
-        if pid~=0 then
-            local f=assert(io.open('/proc/'..pid..'/stat', 'r'))
-            local stat=f:read('*l')
-            f:close()
-            local ppid=tonumber(stat:match('^%d+ %(.-%) [^ ] (%d+)'))
-            table.insert(pid_table[ppid],pid)
+        if pid==0 then
+            goto continue
         end
+        local f=io.open('/proc/'..pid..'/stat', 'r')
+        if not f then
+            pid_table[pid]=nil
+            goto continue
+        end
+        local stat=f:read('*l')
+        f:close()
+        local comm,ppid_str=stat:match('^%d+ %((.-)%) [^ ] (%d+)')
+        table.insert(pid_table[tonumber(ppid_str)],pid)
+        pid_table[pid].comm=comm
+        ::continue::
     end
     return pid_table
 end
 function M.update(buf)
-    local pid_table=M.get_pid_table()
-    for _,subpid in pairs(pid_table) do
-        table.sort(subpid)
-    end
-    local function f(table,level)
-        for _,subpid in ipairs(table) do
-            vim.api.nvim_buf_set_lines(buf,-1,-1,false,{(' '):rep(level)..tostring(subpid)})
-            f(pid_table[subpid],level+2)
+    local function l()
+        local pid_table=M.get_pid_table()
+        for _,subpid in pairs(pid_table) do
+            table.sort(subpid)
         end
+        local count=0
+        local function f(table,level)
+            for _,subpid in ipairs(table) do
+                vim.api.nvim_buf_set_lines(buf,count,count+1,false,{(' '):rep(level)..tostring(subpid)..' '..tostring(pid_table[subpid].comm)})
+                count=count+1
+                f(pid_table[subpid],level+2)
+            end
+        end
+        vim.bo[buf].modifiable=true
+        f(pid_table[0],0)
+        vim.api.nvim_buf_set_lines(buf,count,-1,false,{})
+        vim.bo[buf].modifiable=false
+        vim.defer_fn(l,1000)
     end
-    f(pid_table[0],0)
-    vim.api.nvim_buf_set_lines(buf,0,1,false,{})
+    l()
 end
 function M.open()
     local buf=M.create_buffer()
