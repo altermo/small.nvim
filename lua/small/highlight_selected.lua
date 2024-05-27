@@ -1,12 +1,9 @@
 local M={}
 M.prev_match_win=nil
 function M.get_visual()
-    local reg=vim.region(0,'v','.','',true)
-    if vim.tbl_count(reg)>1 then return end
-    local linenr,pos=next(reg)
-    local start,fin=unpack(pos)
-    if not linenr then return end
-    return vim.api.nvim_buf_get_lines(0,linenr,linenr+1,false)[1]:sub(start+1,fin)
+    local text=vim.fn.getregion(vim.fn.getpos'v',vim.fn.getpos'.',{type=vim.fn.mode()})
+    if vim.fn.mode()=='\x16' and #text>1 then return end
+    return table.concat(text,'\n')
 end
 function M.clear()
     if not M.prev_match_win then return end
@@ -17,12 +14,12 @@ function M.clear()
 end
 function M.do_highlight()
     M.clear()
-    local line=M.get_visual()
-    if not line or vim.trim(line)=='' or #line<2 then return end
-    if vim.fn.type(line)==10 then return end
+    local text=M.get_visual()
+    if not text or vim.trim(text)=='' or #text<2 then return end
+    if vim.fn.type(text)==10 then return end
     M.prev_match_win={}
     for _,win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        local id=vim.fn.matchadd('Visual','\\M'..vim.fn.escape(line,'\\'),100,-1,{window=win})
+        local id=vim.fn.matchadd('Visual','\\M'..text:gsub('\\','\\\\'):gsub('\n','\\n'),100,-1,{window=win})
         M.prev_match_win[win]=id
     end
 end
@@ -32,10 +29,10 @@ function M.setup()
     vim.api.nvim_create_autocmd('ModeChanged',{group='hisel',callback=function ()
         M.do_highlight()
         id=vim.api.nvim_create_autocmd('CursorMoved',{callback=M.do_highlight})
-    end,pattern='*:[v\x16]'})
+    end,pattern='*:[vV\x16]'})
     vim.api.nvim_create_autocmd('ModeChanged',{group='hisel',callback=function ()
         if id then vim.api.nvim_del_autocmd(id) id=nil end
         M.clear()
-    end,pattern='[v\x16]:*'})
+    end,pattern='[vV\x16]:*'})
 end
 return M
