@@ -1,7 +1,7 @@
 local M={}
 M.prev_match_win=nil
 function M.get_visual()
-    if not vim.fn.mode():find'vV\x16' then
+    if not vim.fn.mode():find'[vV\x16]' then
         return
     end
     local text=vim.fn.getregion(vim.fn.getpos'v',vim.fn.getpos'.',{type=vim.fn.mode()})
