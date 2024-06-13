@@ -4,7 +4,6 @@ for i = 1, vim.api.nvim_buf_line_count(0) do
 end
 vim.api.nvim_buf_attach(0, false, {
     on_lines = function(_, _, _, first, last, newlast)
-        vim.pprint(first,last,newlast)
         if last < newlast then
             for i = first + 1, last do
                 cache[i] = false
@@ -20,8 +19,8 @@ vim.api.nvim_buf_attach(0, false, {
             for i = first + 1, newlast do
                 cache[i] = false
             end
-            for i = newlast, last - 1 do
-                table.remove(cache, i+1)
+            for _ = newlast, last - 1 do
+                table.remove(cache, newlast+1)
             end
         end
         assert(#cache == vim.api.nvim_buf_line_count(0))
@@ -33,7 +32,6 @@ vim.keymap.set('n', '§', function()
     end
 end)
 local ns = vim.api.nvim_create_namespace('test')
-vim.api.nvim_win_add_ns(0, ns)
 vim.api.nvim_set_decoration_provider(ns, {
     on_line = function(_, _, bufnr, row)
         vim.api.nvim_buf_set_extmark(bufnr, ns, row, 0, { sign_text = cache[row + 1] and '●' or '○' ,scoped=true})
