@@ -23,7 +23,14 @@ function M.refresh()
     },{__index=_G}))
     if not xpcall(f,function (msg)
         local line=debug.getinfo(2,'l').currentline-2
-        msg=msg:gsub('^.-:.-: ','')
+        if line<0 then
+            line=debug.getinfo(3,'l').currentline-2
+        end
+        if type(msg)~='string' then
+            msg=vim.inspect(msg)
+        else
+            msg=msg:gsub('^.-:.-: ','')
+        end
         vim.api.nvim_buf_set_extmark(M.buf,M.ns,line,0,{virt_text={{'Error: '..msg,'ErrorMsg'}}})
     end) then return end
     for row,v in pairs(output) do
