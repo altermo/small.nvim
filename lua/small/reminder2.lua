@@ -3,7 +3,7 @@ function M.parse_date(date)
     local reg='(%d%d%d%d)%-(%d%d)%-(%d%d)_(%d%d):(%d%d)'
     if not date:match(reg) then date=date..'_00:00' end
     local year,month,day,hour,minute=date:match(reg)
-    return {year=year,month=month,day=day,hour=hour,min=minute},{year=year,month=month,day=day}
+    return {year=year,month=month,day=day,hour=hour,min=minute}
 end
 function M.today()
     return M.normalize_date(os.date('*t'))
@@ -24,7 +24,7 @@ function M.parse_file_or_buf(file_or_buf)
         local doc=line:match('^%s*[+-]%s*(.*)$')
         if doc then
             local item={row=row,doc=doc:gsub('[^a-zA-Z0-9_-]@.*$','')}
-            local override
+            local run
             local function err(msg)
                 item.error=item.error or {}
                 table.insert(item.error,msg)
@@ -52,13 +52,23 @@ function M.parse_file_or_buf(file_or_buf)
                     if not n then
                         err('WARN: bad number: '..tag:sub(2))
                     else
-                        override=function (i)
+                        run=function (i,is)
                             if not i.date then
                                 err('WARN: can\'t override nonexsisting date')
                                 return
                             end
-                            ---@diagnostic disable-next-line: param-type-mismatch
-                            i.date=os.date('*t',os.time(i.date)-n*86400)
+                            local new_i=setmetatable({date={}},{__index=i})
+                            ---@type any
+                            local date=os.date('*t',os.time(i.date)-n*86400)
+                            if n>0 then
+                                new_i.doc='prepare for '..i.doc
+                            end
+                            for k,v in pairs(date) do
+                                if type(v)=='number' then
+                                    new_i.date[k]=string.format('%02d',v)
+                                end
+                            end
+                            table.insert(is,new_i)
                         end
                     end
                 else
@@ -66,7 +76,7 @@ function M.parse_file_or_buf(file_or_buf)
                     table.insert(item.error,'WARN: unknown tag: '..tag)
                 end
             end)
-            if override then override(item) end
+            if run then run(item,items) end
             if item.date or item.error then
                 table.insert(items,item)
             end
