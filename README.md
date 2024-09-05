@@ -349,6 +349,15 @@ Commands:
 Config:
 + `reminder.conf.path` (required) file to find reminders in
 
+## Reminder2
+Summary: Searches the `reminder2.conf.path` for any bullet list with `-`, and a date `@YYYY-MM-DD`, and does a reminder when the time comes.
+Setup: `reminder2.setup()`\
+Commands:
++ `reminder2.sidebar`: open a sidebar with all the reminders
+
+Config:
++ `reminder2.conf.path` (required) file to find reminders in
+
 ## Small_loader
 Summary: a lazy loader for small plugins.\
 Run: `small_loade.run()`

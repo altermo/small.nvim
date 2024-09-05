@@ -24,25 +24,49 @@ function M.parse_file_or_buf(file_or_buf)
         local doc=line:match('^%s*[+-]%s*(.*)$')
         if doc then
             local item={row=row,doc=doc:gsub('[^a-zA-Z0-9_-]@.*$','')}
+            local override
+            local function err(msg)
+                item.error=item.error or {}
+                table.insert(item.error,msg)
+            end
             doc:gsub('[^a-zA-Z0-9_:-]@([a-zA-Z0-9_:-]+)',function (tag)
                 if tag:match('^%d%d%d%d%-%d%d%-%d%d$') then
+                    if item.date then
+                        err('WARN: duplicate date: '..tag)
+                    end
                     item.date=M.parse_date(tag)
                 elseif tag:match('^%d%d%d%d%-%d%d%-%d%d_%d%d:%d%d$') then
+                    if item.date then
+                        err('WARN: duplicate date: '..tag)
+                    end
                     item.date=M.parse_date(tag)
                     item.time=true
                 elseif tag:match('^a%d%d:%d%d$') then
+                    --TODO
                     item.only_show_after_time=tag:match('^a(%d%d:%d%d)$')
                 elseif tag=='r' then
+                    --TODO
                     item.repeated=true
                 elseif tag:match('^p%d+$') then
-                    item.amount_days_preparation_needed=tag:match('^p(%d+)$')
-                elseif tag=='asap' then
-                    item.date=M.parse_date(os.date('%Y-%m-%d %H:%M'))
+                    local n=tonumber(tag:match('^p(%d+)$'))
+                    if not n then
+                        err('WARN: bad number: '..tag:sub(2))
+                    else
+                        override=function (i)
+                            if not i.date then
+                                err('WARN: can\'t override nonexsisting date')
+                                return
+                            end
+                            ---@diagnostic disable-next-line: param-type-mismatch
+                            i.date=os.date('*t',os.time(i.date)-n*86400)
+                        end
+                    end
                 else
                     item.error=item.error or {}
                     table.insert(item.error,'WARN: unknown tag: '..tag)
                 end
             end)
+            if override then override(item) end
             if item.date or item.error then
                 table.insert(items,item)
             end
@@ -54,16 +78,26 @@ function M.update()
     local items=M.parse_file_or_buf(M.conf.path)
     for item in vim.iter(items) do
         if item.time and os.time()>os.time(item.date) then
-            vim.notify(item.doc..' is due in NOW',vim.log.levels.ERROR)
+            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
         elseif item.time and (os.time()+60*10)>os.time(item.date) then
             local min=item.date.min-os.date('*t').min
             vim.notify(item.doc..' is due in '..min..' min',vim.log.levels.WARN)
         end
     end
-    --TODO
 end
 function M.notify_today()
-    --TODO
+    local items=M.parse_file_or_buf(M.conf.path)
+    for item in vim.iter(items) do
+        if item.time and os.time()>os.time(item.date) then
+            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
+        elseif item.time and (M.today()+86400)>os.time(item.date) then
+            vim.notify(item.doc..' '..item.date.hour..':'..item.date.min,vim.log.levels.TRACE)
+        elseif item.date and M.today()>os.time(item.date) then
+            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
+        elseif item.date and (M.today()+86400)>os.time(item.date) then
+            vim.notify(item.doc,vim.log.levels.TRACE)
+        end
+    end
 end
 function M.draw(buf)
     vim.api.nvim_buf_clear_namespace(buf,M.ns,0,-1)
@@ -112,10 +146,35 @@ function M.draw(buf)
         vim.api.nvim_buf_set_extmark(buf,M.ns,item.row-1,0,{virt_text=text})
     end
 end
+function M.sidebar()
+    local items=M.parse_file_or_buf(M.conf.path)
+    local dates=vim.defaulttable()
+    for _,v in ipairs(items) do
+        table.insert(dates[v.date.year..'-'..v.date.month..'-'..v.date.day],v)
+    end
+    local lines={}
+    for k,v in vim.spairs(dates) do
+        table.sort(v,function(a,b) return os.time(a.date)<os.time(b.date) end)
+        table.insert(lines,'')
+        table.insert(lines,'#'..k)
+        for _,i in ipairs(v) do
+            if i.time then
+                table.insert(lines,i.date.hour..':'..i.date.min..' '..i.doc)
+            else
+                table.insert(lines,i.doc)
+            end
+        end
+    end
+    table.remove(lines,1)
+    local buf=vim.api.nvim_create_buf(true,true)
+    vim.bo[buf].bufhidden='wipe'
+    vim.api.nvim_buf_set_lines(buf,0,-1,true,lines)
+    vim.cmd.vnew()
+    vim.api.nvim_set_current_buf(buf)
+end
 function M.setup()
     assert(M.conf.path,'conf: small.reminder2.conf.path is not set')
     vim.fn.timer_start(30000,vim.schedule_wrap(M.update),{['repeat']=-1})
-    M.update()
     vim.defer_fn(M.notify_today,1000)
     vim.api.nvim_create_autocmd('BufRead',{callback=function (ev)
         if ev.file==M.conf.path then

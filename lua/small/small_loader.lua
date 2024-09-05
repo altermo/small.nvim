@@ -29,6 +29,7 @@ M.def={
     cursor={setup=true,run={'create_cursor','goto_next_cursor','clear_cursor'},conf=true,event={'BufNew'}},
     kitty={setup=true,run={'set_font_size','get_font_size','set_padding','toggle_padding'},conf=true,event={'~Now'}},
     reminder={setup=true,run='sidebar',conf=true,event={'~Later'}},
+    reminder2={setup=true,run='sidebar',conf=true,event={'~Later'}},
     notify={setup='override_notify',run={'notify','open_history','dismiss'},conf=true,event={'~Now'}},
     copyring={setup=true,run={'put','cycle'},keys=function (m,fn)
         fn.map('n','p',function () m.put(true) end)
