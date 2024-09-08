@@ -84,16 +84,20 @@ function M.parse_file_or_buf(file_or_buf)
     end
     return items
 end
-function M.update()
-    local items=M.parse_file_or_buf(M.conf.path)
+local function _update(items)
     for item in vim.iter(items) do
         if item.time and os.time()>os.time(item.date) then
             vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
         elseif item.time and (os.time()+60*10)>os.time(item.date) then
             local min=item.date.min-os.date('*t').min
+            if min<0 then min=min+60 end
             vim.notify(item.doc..' is due in '..min..' min',vim.log.levels.WARN)
         end
     end
+end
+function M.update()
+    local items=M.parse_file_or_buf(M.conf.path)
+    _update(items)
 end
 function M.notify_today()
     local items=M.parse_file_or_buf(M.conf.path)
@@ -184,7 +188,13 @@ function M.sidebar()
 end
 function M.setup()
     assert(M.conf.path,'conf: small.reminder2.conf.path is not set')
-    vim.fn.timer_start(30000,vim.schedule_wrap(M.update),{['repeat']=-1})
+    local items=M.parse_file_or_buf(M.conf.path)
+    vim.fn.timer_start(5000,vim.schedule_wrap(function ()
+        _update(items)
+    end),{['repeat']=-1})
+    vim.fn.timer_start(30000,vim.schedule_wrap(function ()
+        items=M.parse_file_or_buf(M.conf.path)
+    end),{['repeat']=-1})
     vim.defer_fn(M.notify_today,1000)
     vim.api.nvim_create_autocmd('BufRead',{callback=function (ev)
         if ev.file==M.conf.path then
