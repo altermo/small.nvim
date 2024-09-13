@@ -23,6 +23,7 @@ M.def={
     large={setup='start',event={'~Now'}},
     beacon={setup='create_autocmd',conf=true,event={'~Now'}},
     debugger={setup='override_error',event={'~Now'}},
+    node_eval={setup=true,conf=true,event={'~Now'}},
 
     own={setup=true,run='load',event={'~Now'}},
     matchall={setup=true,run='toggle',event={'~Later'}},

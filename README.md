@@ -268,6 +268,18 @@ Commands:
 ## Matchall
 Summary: Match current word + vim.lsp.buf.document_highlight\
 Setup: `matchall.setup()`
+
+## Node_eval
+Required: `treesitter`\
+Summary: Evaluate node with bin \
+Setup: `node_eval.setup()`
+
+Config:
++ `node_eval.conf.node` the node type to evaluate
++ `node_eval.conf.bin` the bin to evaluate with
++ `node_eval.conf.handle` the function to handle the output
++ `node_eval.conf.pre_handle` the function to do stuff before running the bin (not required)
+
 ## Nodeswap
 Required: `treesitter`\
 Summary: Smarter node swap \
