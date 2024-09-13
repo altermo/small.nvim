@@ -62,6 +62,7 @@ function M.setup()
         vim.api.nvim_create_autocmd({'TextChanged','InsertLeave','BufEnter'},{callback=function (ev)
             if timer then timer:stop() end
             timer=vim.defer_fn(function ()
+                if not vim.api.nvim_buf_is_valid(ev.buf) then return end
                 if vim.bo[ev.buf].spelllang~='en' then
                     vim.diagnostic.set(M.ns_typos,ev.buf,{})
                     vim.diagnostic.set(M.ns_codespell,ev.buf,{})
