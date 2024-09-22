@@ -3,7 +3,7 @@ function M.setup()
     vim.g.Nvim_color_cmdline=M.run
 end
 function M.run(cmdline)
-    local parser=vim.treesitter.get_string_parser(cmdline,'vim')
+    local parser=vim.treesitter.get_string_parser(cmdline--[[..'\n']],'vim')
     local tags={}
     for i=0,#cmdline do
         tags[i]={}
