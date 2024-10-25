@@ -20,10 +20,10 @@ function M.run(cmd,smart_quit_nvim,smart_quit_term)
         if vim.fs.basename(vim.o.shell)~=vim.api.nvim_get_proc(pid).name then return end
         local children=vim.api.nvim_get_proc_children(pid)
         if #children==1 and vim.api.nvim_get_proc(children[1]).name==vim.fs.basename(vim.o.shell) then
-            pid=children[1]
-            children=vim.api.nvim_get_proc_children(pid)
+            children=vim.api.nvim_get_proc_children(children[1])
         end
         if not vim.tbl_isempty(children) then return end
+        vim.schedule_wrap(print)('Terminal '..vim.fs.basename(vim.fn.bufname(buf))..' closed')
         vim.schedule_wrap(vim.cmd.bwipeout){buf,bang=true}
     end})
 end
