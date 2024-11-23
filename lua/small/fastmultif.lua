@@ -1,4 +1,4 @@
-local M={conf={labels='23456789'}}
+local M={conf={labels='23456789',flabels='asdfghjklzxcvbnmqwertyuiop'}}
 M.ns=vim.api.nvim_create_namespace'small_fastmultif'
 function M.create_hl()
     M.labels={}
@@ -8,6 +8,13 @@ function M.create_hl()
             table.insert(M.labels,labels:sub(i,i+vim.str_utf_end(labels,i)))
         end
     end
+    M.flabels={}
+    local flabels=M.conf.flabels
+    for i=1,#flabels do
+        if vim.str_utf_start(flabels,i)==0 then
+            table.insert(M.flabels,flabels:sub(i,i+vim.str_utf_end(flabels,i)))
+        end
+    end
     for _,v in ipairs({'FlashLabel','Substitute'}) do
         if vim.api.nvim_get_hl(0,{create=false,name=v}) then
             vim.api.nvim_set_hl(0,'SmallFastmultif',{link=v})
@@ -15,6 +22,40 @@ function M.create_hl()
         end
     end
     error''
+end
+function M.ffind(opts)
+    opts=opts or {}
+    local char=vim.fn.getcharstr()
+    if #char~=1 then return end
+    M.buf=vim.api.nvim_get_current_buf()
+    M.win=vim.api.nvim_get_current_win()
+    M.create_hl()
+    if char=='\n' then char='\0' end
+    local instances
+    if opts.backwards then
+        instances=M.find_prev_instances(char,#M.flabels)
+    else
+        instances=M.find_next_instances(char,#M.flabels)
+    end
+    for k,v in ipairs(instances) do
+        vim.api.nvim_buf_set_extmark(0,M.ns,v[1]-1,v[2],{
+            virt_text={{M.flabels[k],'SmallFastmultif'}},
+            virt_text_pos='overlay',
+        })
+    end
+    vim.cmd.redraw()
+    local l=vim.fn.getcharstr()
+    for k,v in ipairs(instances) do
+        if l==M.flabels[k] then
+            M.clear_highlight()
+            vim.api.nvim_win_set_cursor(0,v)
+            return
+        end
+    end
+    M.clear_highlight()
+end
+function M.rffind()
+    M.ffind{backwards=true}
 end
 function M.rfind()
     M.find{backwards=true}
