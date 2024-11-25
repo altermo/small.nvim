@@ -466,6 +466,11 @@ Commands:
 + `unimpaired.edit_next_file()`: edit next file
 + `unimpaired.edit_prev_file()`: edit prev file
 + `set_opt`: set option (and opens a preview window)
+
+## Verttab
+Summary: Vertical tabline
+Setup: `verttab.setup()`
+
 ## Whint
 Summary: Basically:
 ```lua
