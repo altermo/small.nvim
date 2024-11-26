@@ -374,6 +374,10 @@ Config:
 Summary: Remote control nvim from another neovim.\
 Run: `remote.run()`
 
+## Ruler
+Summary: A simple ruler. \
+Setup: `tabline.setup()`
+
 ## Small_loader
 Summary: a lazy loader for small plugins.\
 Run: `small_loade.run()`
