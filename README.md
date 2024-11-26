@@ -370,6 +370,10 @@ Commands:
 Config:
 + `reminder2.conf.path` (required) file to find reminders in
 
+## Remote
+Summary: Remote control nvim from another neovim.\
+Run: `remote.run()`
+
 ## Small_loader
 Summary: a lazy loader for small plugins.\
 Run: `small_loade.run()`
