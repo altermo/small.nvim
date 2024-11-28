@@ -1,4 +1,4 @@
-local M={conf={labels='23456789',flabels='asdfghjklzxcvbnmqwertyuiop'}}
+local M={conf={labels='23456789',flabels='asdfghjklzxcvbnmqwertyuiopASDFGHJKLZXCVBNMQWERTYUIOP1234567890'}}
 M.ns=vim.api.nvim_create_namespace'small_fastmultif'
 function M.create_hl()
     M.labels={}
