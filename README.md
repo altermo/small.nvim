@@ -80,6 +80,10 @@ Setup: `color_cmdline.setup()` \
 Summary: slowly shifts between two colors \
 Commands: `color_shift.shift(to_colorscheme,time,steps?)`
 
+## Colorfn
+Summary: shift r, g or b by amount \
+Commands: `colorfn.run()`
+
 ## Colors
 Summary: select between colors (offline and online) \
 Commands:
