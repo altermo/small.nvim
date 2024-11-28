@@ -50,10 +50,10 @@ function M.update(buf)
     buf=buf or 0
     if vim.api.nvim_buf_line_count(buf)>100000 then return end
     if vim.fn.executable('typos')==1 then
-        M.update_typos(buf)
+        pcall(M.update_typos,buf)
     end
     if vim.fn.executable('codespell')==1 then
-        M.update_codespell(buf)
+        pcall(M.update_codespell,buf)
     end
 end
 function M.setup()
