@@ -41,11 +41,11 @@ function M.setup()
     vim.ui_attach(M.ns,{ext_tabline=true},function (event,curtab)
         pcall(function ()
             if event~='tabline_update' then return end
-            if #vim.fn.gettabinfo()==1 and M.opened then
-                M.opened=false
-                refresh()
-                if timeout then timeout:close() timeout=nil end
-            elseif curtab~=last_tab then
+            --if #vim.fn.gettabinfo()==1 and M.opened then
+            --    M.opened=false
+            --    refresh()
+            --    if timeout then timeout:close() timeout=nil end
+            if curtab~=last_tab then
                 last_tab=curtab
                 M.opened=true
                 refresh()
