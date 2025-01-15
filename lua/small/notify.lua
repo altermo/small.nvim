@@ -14,17 +14,6 @@ local M={conf={
 }}
 M.history={}
 M.notifs={}
-local basewin=vim.api.nvim_open_win(vim.api.nvim_create_buf(false,true),false,{
-    relative='editor',
-    width=1,
-    height=1,
-    row=1,
-    col=0x7fffffff,
-    noautocmd=true,
-    style='minimal',
-    zindex=1,
-})
-vim.wo[basewin].winblend=100
 function M.add_to_history(info)
     table.insert(M.history,info)
     if #M.history>M.conf.historysize then table.remove(M.history,1) end
@@ -66,10 +55,9 @@ M.update=function()
         local winopt={
             height=#text,
             width=width,
-            relative='win',
-            win=basewin,
-            col=0,
-            row=i-1,
+            relative='editor',
+            col=vim.o.columns-width,
+            row=i,
         }
         i=i+#text
         if not v.hasbuf then
