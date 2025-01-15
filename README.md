@@ -25,6 +25,10 @@ Config:
 
 Rewrite into normal plugin: https://github.com/altermo/beacon.nvim
 
+## Bottombar
+Summary: Bottombar shows information in the bottom right corner.\
+Setup: `bottombar.setup()`
+
 ## Bufend
 Summary: Bufend makes it easy to quickly goto a specific file in your file system. \
 Commands: `bufend.run()`
