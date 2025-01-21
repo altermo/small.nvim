@@ -1,6 +1,10 @@
 local M={ns=vim.api.nvim_create_namespace('small-bottombar')}
+local enable=true
 function M.render()
     pcall(vim.api.nvim_buf_delete,M.buf,{force=true})
+    if enable==false then
+        return
+    end
     if vim.o.buftype~='' then
         return
     end
@@ -38,6 +42,10 @@ function M.render()
         vim.wo[win].winblend=100
         vim.api.nvim_win_set_cursor(win,{-k+#lines+1,0})
     end
+end
+function M.toggle()
+    enable=not enable
+    M.render()
 end
 function M.setup()
     vim.api.nvim_create_autocmd({'CursorMoved','CursorMovedI','DiagnosticChanged'},{
