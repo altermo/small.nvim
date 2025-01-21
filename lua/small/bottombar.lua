@@ -46,6 +46,13 @@ function M.setup()
         end,
         group=vim.api.nvim_create_augroup('small-bottombar',{}),
     })
+    vim.api.nvim_create_autocmd({'OptionSet'},{
+        callback=function()
+            pcall(M.render)
+        end,
+        pattern='buftype',
+        group=vim.api.nvim_create_augroup('small-bottombar',{clear=false}),
+    })
     M.render()
 end
 return M
