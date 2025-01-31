@@ -55,7 +55,9 @@ function M.telescope(items,opts,on_choice)
 end
 
 function M.fn(...)
-    if pcall(require,'telescope') then
+    if pcall(require,'fzf-lua') then
+        require'fzf-lua.providers.ui_select'.ui_select(...)
+    elseif pcall(require,'telescope') then
         M.telescope(...)
     else
         vim.ui.select(...)
