@@ -1,4 +1,3 @@
-local dap=require'dap'
 local M={}
 local function get_rtp_by(file)
     local path=vim.api.nvim_get_runtime_file(file,false)[1]
@@ -44,6 +43,7 @@ function M.start_nvim()
     }})
     ]],{get_rtp_by('lua/osv')})
     vim.wait(100)
+    local dap=require'dap'
     dap.run({type='nlua',request='attach'})
     dap.listeners.after['setBreakpoints']['dapnvim']=function ()
         run(nvim)
