@@ -1,15 +1,22 @@
 local M={ns=vim.api.nvim_create_namespace('small-bottombar')}
 local enable=true
 function M.render()
-    pcall(vim.api.nvim_buf_delete,M.buf,{force=true})
+    if not M.buf then
+        M.buf=vim.api.nvim_create_buf(false,true)
+    end
+    if M.wins then
+        while #M.wins>0 do
+            local v=table.remove(M.wins)
+            pcall(vim.api.nvim_win_close,v,true)
+        end
+    end
+    vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
     if enable==false then
         return
     end
     if vim.o.buftype~='' then
         return
     end
-    M.buf=vim.api.nvim_create_buf(false,true)
-    vim.bo[M.buf].bufhidden='wipe'
     local status='%l,%c%V %t'
     local lines={
         ---@diagnostic disable-next-line: undefined-field
@@ -41,6 +48,7 @@ function M.render()
         vim.wo[win].winhighlight='Normal:Normal'
         vim.wo[win].winblend=100
         vim.api.nvim_win_set_cursor(win,{-k+#lines+1,0})
+        table.insert(M.wins,win)
     end
 end
 function M.toggle()
