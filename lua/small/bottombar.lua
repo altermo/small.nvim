@@ -4,11 +4,10 @@ function M.render()
     if not M.buf then
         M.buf=vim.api.nvim_create_buf(false,true)
     end
-    if M.wins then
-        while #M.wins>0 do
-            local v=table.remove(M.wins)
-            pcall(vim.api.nvim_win_close,v,true)
-        end
+    M.wins=M.wins or {}
+    while #M.wins>0 do
+        local v=table.remove(M.wins)
+        pcall(vim.api.nvim_win_close,v,true)
     end
     vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
     if enable==false then
