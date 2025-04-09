@@ -6,7 +6,7 @@ local M={conf={
         INFO='Normal',
         WARN='WarningMsg',
         ERROR='ErrorMsg',
-        OFF={hl='Error',winblend=0},
+        OFF={hl='Error'},
     },
     fallback_notify=vim.notify,
     historysize=100,
@@ -75,7 +75,6 @@ M.update=function()
                 vim.defer_fn(M.update,10) return
             end
             v.win=win
-            vim.wo[v.win].winblend=style.winblend or 100
             vim.wo[v.win].winhl='Normal:'..style.hl
         else
             vim.api.nvim_win_set_config(v.win,winopt)
