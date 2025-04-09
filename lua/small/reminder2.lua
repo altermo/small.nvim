@@ -47,6 +47,10 @@ function M.parse_file_or_buf(file_or_buf)
                 elseif tag=='r' then
                     --TODO
                     item.repeated=true
+                elseif tag=='q' then
+                    item.quick=true
+                elseif tag=='i' then
+                    item.important=true
                 elseif tag:match('^p%d+$') then
                     local n=tonumber(tag:match('^p(%d+)$'))
                     if not n then
@@ -102,15 +106,38 @@ end
 function M.notify_today()
     local items=M.parse_file_or_buf(M.conf.path)
     for item in vim.iter(items) do
+        local is_overdue=false
+        local message
         if item.time and os.time()>os.time(item.date) then
-            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
+            is_overdue=true
+            message=item.doc
         elseif item.time and (M.today()+86400)>os.time(item.date) then
-            vim.notify(item.doc..' '..item.date.hour..':'..item.date.min,vim.log.levels.TRACE)
+            message=item.doc..' '..item.date.hour..':'..item.date.min
         elseif item.date and M.today()>os.time(item.date) then
-            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
+            is_overdue=true
+            message=item.doc
         elseif item.date and (M.today()+86400)>os.time(item.date) then
-            vim.notify(item.doc,vim.log.levels.TRACE)
+            message=item.doc
+        else
+            goto continue
         end
+        if item.important then
+            message='IMPORTANT: '..message
+        end
+        if is_overdue then
+            message=message..' is OVERDUE'
+        end
+        if item.quick then
+            message='QUICK: '..message
+        end
+        if is_overdue or item.important then
+            vim.notify(message,vim.log.levels.ERROR)
+        elseif item.quick then
+            vim.notify(message,vim.log.levels.WARN)
+        else
+            vim.notify(message,vim.log.levels.TRACE)
+        end
+        ::continue::
     end
 end
 function M.draw(buf)
@@ -157,6 +184,12 @@ function M.draw(buf)
         else
             text={{'ERROR: can\'t draw date','ErrorMsg'}}
         end
+        if item.important then
+            table.insert(text,{' IMPORTANT','ErrorMsg'})
+        end
+        if item.quick then
+            table.insert(text,{' QUICK','ErrorMsg'})
+        end
         vim.api.nvim_buf_set_extmark(buf,M.ns,item.row-1,0,{virt_text=text})
     end
 end
@@ -176,6 +209,12 @@ function M.sidebar()
                 table.insert(lines,i.date.hour..':'..i.date.min..' '..i.doc)
             else
                 table.insert(lines,i.doc)
+            end
+            if i.important then
+                lines[#lines]=lines[#lines]..' (IMPORTANT)'
+            end
+            if i.quick then
+                lines[#lines]=lines[#lines]..' (QUICK)'
             end
         end
     end
