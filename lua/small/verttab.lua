@@ -7,10 +7,27 @@ local function refresh()
         end
         return
     end
+    local maxwidth=1
+    vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
+    for _,tabid in ipairs(vim.api.nvim_list_tabpages()) do
+        local win=vim.api.nvim_tabpage_get_win(tabid)
+        local buf=vim.api.nvim_win_get_buf(win)
+        local tabnr=vim.api.nvim_tabpage_get_number(tabid)
+        local bufname=vim.api.nvim_buf_get_name(buf)
+        local str=('%s %s'):format(vim.fn.fnamemodify(bufname,':t'),tabnr)
+        if #str>maxwidth then maxwidth=#str end
+        vim.api.nvim_buf_set_lines(M.buf,tabnr-1,tabnr,false,{str})
+        if tabnr==vim.fn.tabpagenr() then
+            vim.api.nvim_buf_set_extmark(M.buf,M.ns,tabnr-1,0,{
+                hl_group='ErrorMsg',
+                end_col=#str,
+            })
+        end
+    end
     local old_win=M.win
     M.win=vim.api.nvim_open_win(M.buf,false,{
         relative='editor',
-        width=1,
+        width=maxwidth,
         height=vim.o.lines,
         row=0,
         col=vim.o.columns-1,
@@ -22,21 +39,11 @@ local function refresh()
         vim.api.nvim_win_close(old_win,true)
     end
     vim.wo[M.win].winhighlight='Normal:Normal'
-    vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
-    for _,info in ipairs(vim.fn.gettabinfo()) do
-        vim.api.nvim_buf_set_lines(M.buf,info.tabnr-1,info.tabnr,false,{tostring(info.tabnr)})
-        if info.tabnr==vim.fn.tabpagenr() then
-            vim.api.nvim_buf_set_extmark(M.buf,M.ns,info.tabnr-1,0,{
-                hl_group='ErrorMsg',
-                end_col=1,
-            })
-        end
-    end
 end
+local timeout
 function M.setup()
     M.buf=vim.api.nvim_create_buf(false,true)
     local last_tab=vim.fn.tabpagenr()
-    local timeout
     ---@diagnostic disable-next-line: redundant-parameter
     vim.ui_attach(M.ns,{ext_tabline=true},function (event,curtab)
         pcall(function ()
@@ -47,18 +54,21 @@ function M.setup()
             --    if timeout then timeout:close() timeout=nil end
             if curtab~=last_tab then
                 last_tab=curtab
-                M.opened=true
-                refresh()
-                if timeout then timeout:close() timeout=nil end
-                timeout=vim.defer_fn(function ()
-                    timeout=nil
-                    M.opened=false
-                    refresh()
-                end,1000)
+                M.show()
             else
                 refresh()
             end
         end)
     end)
+end
+function M.show()
+    M.opened=true
+    refresh()
+    if timeout then timeout:close() timeout=nil end
+    timeout=vim.defer_fn(function ()
+        timeout=nil
+        M.opened=false
+        refresh()
+    end,1000)
 end
 return M
