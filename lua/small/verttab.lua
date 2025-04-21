@@ -9,12 +9,19 @@ local function refresh()
     end
     local maxwidth=1
     vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
+    local padding=1
+    for _,tabid in ipairs(vim.api.nvim_list_tabpages()) do
+        local win=vim.api.nvim_tabpage_get_win(tabid)
+        local buf=vim.api.nvim_win_get_buf(win)
+        local bufname=vim.api.nvim_buf_get_name(buf)
+        padding=math.max(padding,#vim.fn.fnamemodify(bufname,':t'))
+    end
     for _,tabid in ipairs(vim.api.nvim_list_tabpages()) do
         local win=vim.api.nvim_tabpage_get_win(tabid)
         local buf=vim.api.nvim_win_get_buf(win)
         local tabnr=vim.api.nvim_tabpage_get_number(tabid)
-        local bufname=vim.api.nvim_buf_get_name(buf)
-        local str=('%s %s'):format(vim.fn.fnamemodify(bufname,':t'),tabnr)
+        local bufname=vim.fn.fnamemodify(vim.api.nvim_buf_get_name(buf),':t')
+        local str=('%s %s%s'):format(bufname,(' '):rep(padding-#bufname),tabnr)
         if #str>maxwidth then maxwidth=#str end
         vim.api.nvim_buf_set_lines(M.buf,tabnr-1,tabnr,false,{str})
         if tabnr==vim.fn.tabpagenr() then
