@@ -11,6 +11,6 @@ function M.run()
         word:match('vim%.opt%.') and "'%s'" or
         word):format(vim.fn.expand('<cword>'))) then return end
   end
-  vim.lsp.buf_request(0,vim.lsp.protocol.Methods.textDocument_hover,vim.lsp.util.make_position_params())
+  vim.lsp.buf.hover()
 end
 return M
