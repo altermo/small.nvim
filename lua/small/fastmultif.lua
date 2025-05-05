@@ -16,7 +16,7 @@ function M.create_hl()
         end
     end
     for _,v in ipairs({'FlashLabel','Substitute'}) do
-        if vim.api.nvim_get_hl(0,{create=false,name=v}) then
+        if not vim.tbl_isempty(vim.api.nvim_get_hl(0,{create=false,name=v})) then
             vim.api.nvim_set_hl(0,'SmallFastmultif',{link=v})
             return
         end
