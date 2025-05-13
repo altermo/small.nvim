@@ -234,7 +234,7 @@ function M.setup()
     vim.fn.timer_start(30000,vim.schedule_wrap(function ()
         items=M.parse_file_or_buf(M.conf.path)
     end),{['repeat']=-1})
-    vim.defer_fn(M.notify_today,1000)
+    vim.defer_fn(M.notify_today,100)
     vim.api.nvim_create_autocmd('BufRead',{callback=function (ev)
         if ev.file==M.conf.path then
             M.draw(ev.buf)
