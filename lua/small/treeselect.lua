@@ -1,6 +1,139 @@
 --- similar to helix's treesitter mappings (except ignore unnamed nodes)
 local M={}
 M.stack={}
+local function traverse(node,injections,view)
+    local data={}
+    view[node:id()]=data
+
+    data.children={}
+
+    local injection=injections[node:id()]
+    if injection then
+        table.insert(data.children,injection)
+        traverse(injection,injections,view).parent=node
+    end
+
+    for _,child in ipairs(node:named_children()) do
+        table.insert(data.children,child)
+        traverse(child,injections,view).parent=node
+    end
+
+    return data
+end
+local _treeview_cache={bufnr=-1,changedtick=-1,treeview=nil}
+---@return table
+local function create_treeview()
+    if vim.api.nvim_get_current_buf()==_treeview_cache.bufnr
+        and vim.b.changedtick==_treeview_cache.changedtick then
+        return _treeview_cache.treeview
+    end
+    local parser=assert(vim.treesitter.get_parser())
+    local root=parser:parse(true)[1]:root()
+    local injections={}
+    parser:for_each_tree(function(parent_tree,parent_ltree)
+        local parent=parent_tree:root()
+        for _,child in pairs(parent_ltree:children()) do
+            for _,child_tree in pairs(child:trees()) do
+                local child_root=child_tree:root()
+                if vim.treesitter.node_contains(parent,{child_root:range()}) then
+                    local node=assert(parent:named_descendant_for_range(child_root:range()))
+                    local id=node:id()
+                    if not injections[id] or child_root:byte_length()>injections[id].root:byte_length() then
+                        injections[id]=child_root
+                    end
+                end
+            end
+        end
+    end)
+    local view={}
+    traverse(root,injections,view)
+    _treeview_cache.bufnr=vim.api.nvim_get_current_buf()
+    _treeview_cache.changedtick=vim.b.changedtick
+    _treeview_cache.treeview=view
+    return view
+end
+---@return TSNode
+function M.get_node()
+    local pos1=vim.fn.getpos('v')
+    local pos2=vim.fn.getpos('.')
+    if pos1[2]>pos2[2] or (pos1[2]==pos2[2] and pos1[3]>pos2[3]) then
+        pos1,pos2=pos2,pos1
+    end
+    local range={pos1[2]-1,pos1[3]-1,pos2[2]-1,pos2[3]}
+    local parser=assert(vim.treesitter.get_parser())
+    parser:parse(true)
+    local ltree=parser:language_for_range(range)
+    local node=assert(ltree:named_node_for_range(range))
+    return node
+end
+---@param a TSNode
+---@param b TSNode
+---@return boolean
+local function same_range(a,b)
+    local arows,acols,arowe,acole=a:range()
+    local brows,bcols,browe,bcole=b:range()
+    return arows==brows and acols==bcols and arowe==browe and acole==bcole
+end
+---@param node TSNode
+---@return TSNode
+function M.get_parent_node(node)
+    local view=create_treeview()
+    local data=view[node:id()]
+    if not data.parent then
+        return node
+    end
+    if same_range(node,data.parent) then
+        return M.get_parent_node(data.parent)
+    end
+    return data.parent
+end
+---@param node TSNode
+---@return TSNode
+function M.get_child_node(node)
+    local view=create_treeview()
+    local data=view[node:id()]
+    for _,child in ipairs(data.children) do
+        if same_range(node,child) or child:byte_length()==0 then
+            local new_child=M.get_child_node(child)
+            if not new_child:equal(child) then
+                return new_child
+            end
+        else
+            return child
+        end
+    end
+    return node
+end
+---@param node TSNode
+---@param prev boolean
+---@return TSNode
+function M.get_sibling_node(node,prev)
+    local view=create_treeview()
+    local data=view[node:id()]
+    local parent=data.parent
+    if not parent then
+        return node
+    end
+    local parent_data=view[parent:id()]
+    local idx
+    for i,child in ipairs(parent_data.children) do
+        if child:equal(node) then
+            idx=i+(prev and -1 or 1)
+        end
+    end
+    while parent_data.children[idx] and
+        (same_range(parent_data.children[idx],node)
+        or parent_data.children[idx]:byte_length()==0) do
+        idx=idx+(prev and -1 or 1)
+    end
+    if parent_data.children[idx] then
+        return parent_data.children[idx]
+    end
+    if same_range(node,parent) then
+        return M.get_sibling_node(parent,prev)
+    end
+    return node
+end
 function M.select(node)
     local rows,cols,rowe,cole=node:range()
     vim.api.nvim_win_set_cursor(0,{rows+1,cols})
@@ -9,67 +142,35 @@ function M.select(node)
         vim.api.nvim_win_set_cursor(0,{rowe,#vim.fn.getline(rowe)})
     end
 end
-local function same_range(r1,r2)
-    return r1[1]==r2[1] and r1[2]==r2[2] and r1[3]==r2[3] and r1[4]==r2[4]
-end
-function M.get_node()
-    local node=vim.treesitter.get_node()
-    local pos1=vim.fn.getpos('v')
-    local pos2=vim.fn.getpos('.')
-    if pos1[2]>pos2[2] or (pos1[2]==pos2[2] and pos1[3]>pos2[3]) then
-        pos1,pos2=pos2,pos1
-    end
-    local r={pos1[2]-1,pos1[3]-1,pos2[2]-1,pos2[3]}
-    while node do
-        local nr={node:range()}
-        if (r[1]>nr[1] or (r[1]==nr[1] and r[2]>=nr[2])) and
-            (r[3]<nr[3] or (r[3]==nr[3] and r[4]<=nr[4])) then
-            local parent=node:parent()
-            while parent do
-                local pr={parent:range()}
-                if not same_range(nr,pr) then
-                    return node
-                end
-                node=parent
-                parent=node:parent()
-            end
-            return node
-        end
-        node=node:parent()
-    end
-    return vim.treesitter.get_parser():trees()[1]:root()
-end
-function M.next()
-    local node=M.get_node()
-    if node:next_named_sibling() then
-        M.select(node:next_named_sibling())
-    end
-end
-function M.prev()
-    local node=M.get_node()
-    if node:prev_named_sibling() then
-        M.select(node:prev_named_sibling())
-    end
-end
 function M.up()
     local node=M.get_node()
-    if not node:parent() then return end
-    table.insert(M.stack,{{node:parent():range()},node})
-    M.select(node:parent())
+    local parent=M.get_parent_node(node)
+    if parent:equal(node) then return end
+    table.insert(M.stack,{parent,node})
+    M.select(parent)
 end
 function M.down()
     local node=M.get_node()
-    if #M.stack>0 and same_range({node:range()},M.stack[#M.stack][1]) then
+    if #M.stack>0 and same_range(node,M.stack[#M.stack][1]) then
         M.select(table.remove(M.stack)[2])
         return
     end
     M.stack={}
-    local child=node:named_child(0)
-    while child and same_range({child:range()},{node:range()}) do
-        child=child:named_child(0)
-    end
-    if not child then return end
+    local child=M.get_child_node(node)
+    if child:equal(node) then return end
     M.select(child)
+end
+function M.next()
+    local node=M.get_node()
+    local sibling=M.get_sibling_node(node,false)
+    if sibling:equal(node) then return end
+    M.select(sibling)
+end
+function M.prev()
+    local node=M.get_node()
+    local sibling=M.get_sibling_node(node,true)
+    if sibling:equal(node) then return end
+    M.select(sibling)
 end
 function M.current()
     M.select(M.get_node())
