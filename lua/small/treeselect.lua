@@ -1,35 +1,22 @@
 --- similar to helix's treesitter mappings (except ignore unnamed nodes)
 local M={}
 M.stack={}
-local function traverse(node,injections,view)
-    local data={}
-    view[node:id()]=data
-
-    data.children={}
-
-    local injection=injections[node:id()]
-    if injection then
-        table.insert(data.children,injection)
-        traverse(injection,injections,view).parent=node
-    end
-
-    for _,child in ipairs(node:named_children()) do
-        table.insert(data.children,child)
-        traverse(child,injections,view).parent=node
-    end
-
-    return data
-end
-local _treeview_cache={bufnr=-1,changedtick=-1,treeview=nil}
----@return table
+local _treeview_cache={
+    bufnr=-1,
+    changedtick=-1,
+    treeview=nil,
+    injections=nil,
+    rinjections=nil
+}
+---@return table,table,table
 local function create_treeview()
     if vim.api.nvim_get_current_buf()==_treeview_cache.bufnr
         and vim.b.changedtick==_treeview_cache.changedtick then
-        return _treeview_cache.treeview
+        return _treeview_cache.treeview,_treeview_cache.injections,_treeview_cache.rinjections
     end
     local parser=assert(vim.treesitter.get_parser())
-    local root=parser:parse(true)[1]:root()
     local injections={}
+    local rinjections={}
     parser:for_each_tree(function(parent_tree,parent_ltree)
         local parent=parent_tree:root()
         for _,child in pairs(parent_ltree:children()) do
@@ -40,17 +27,19 @@ local function create_treeview()
                     local id=node:id()
                     if not injections[id] or child_root:byte_length()>injections[id].root:byte_length() then
                         injections[id]=child_root
+                        rinjections[child_root:id()]=node
                     end
                 end
             end
         end
     end)
     local view={}
-    traverse(root,injections,view)
     _treeview_cache.bufnr=vim.api.nvim_get_current_buf()
     _treeview_cache.changedtick=vim.b.changedtick
     _treeview_cache.treeview=view
-    return view
+    _treeview_cache.injections=injections
+    _treeview_cache.rinjections=rinjections
+    return view,injections,rinjections
 end
 ---@return TSNode
 function M.get_node()
@@ -74,11 +63,34 @@ local function same_range(a,b)
     local brows,bcols,browe,bcole=b:range()
     return arows==brows and acols==bcols and arowe==browe and acole==bcole
 end
+---@return table
+local function get_data(node)
+    local view,injections,rinjections=create_treeview()
+    if view[node:id()] then
+        return view[node:id()]
+    end
+    local data={}
+    view[node:id()]=data
+
+    data.children={}
+
+    local injection=injections[node:id()]
+    if injection then
+        table.insert(data.children,injection)
+    end
+
+    for _,child in ipairs(node:named_children()) do
+        table.insert(data.children,child)
+    end
+
+    data.parent=rinjections[node:id()] or node:parent() or nil
+
+    return data
+end
 ---@param node TSNode
 ---@return TSNode
 function M.get_parent_node(node)
-    local view=create_treeview()
-    local data=view[node:id()]
+    local data=get_data(node)
     if not data.parent then
         return node
     end
@@ -90,8 +102,7 @@ end
 ---@param node TSNode
 ---@return TSNode
 function M.get_child_node(node)
-    local view=create_treeview()
-    local data=view[node:id()]
+    local data=get_data(node)
     for _,child in ipairs(data.children) do
         if same_range(node,child) or child:byte_length()==0 then
             local new_child=M.get_child_node(child)
@@ -108,13 +119,12 @@ end
 ---@param prev boolean
 ---@return TSNode
 function M.get_sibling_node(node,prev)
-    local view=create_treeview()
-    local data=view[node:id()]
+    local data=get_data(node)
     local parent=data.parent
     if not parent then
         return node
     end
-    local parent_data=view[parent:id()]
+    local parent_data=get_data(parent)
     local idx
     for i,child in ipairs(parent_data.children) do
         if child:equal(node) then
