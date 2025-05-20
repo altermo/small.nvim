@@ -81,6 +81,8 @@ local function get_data(node,_rec)
         return view[node:id()]
     end
 
+    assert(node:byte_length()~=0)
+
     local parent=rinjections[node:id()] or node:parent() or nil
     if parent and same_range(node,parent) and not _rec then
         return get_data(parent)
@@ -181,7 +183,7 @@ function M.up()
     cache_check()
     local node=M.get_node()
     local parent=M.get_parent_node(node)
-    if parent:equal(node) then return end
+    if get_data(parent)==get_data(node) then return end
     table.insert(M.stack,{parent,node})
     M.select(parent)
 end
@@ -194,21 +196,21 @@ function M.down()
     end
     M.stack={}
     local child=M.get_child_node(node)
-    if child:equal(node) then return end
+    if get_data(child)==get_data(node) then return end
     M.select(child)
 end
 function M.next()
     cache_check()
     local node=M.get_node()
     local sibling=M.get_sibling_node(node,false)
-    if sibling:equal(node) then return end
+    if get_data(sibling)==get_data(node) then return end
     M.select(sibling)
 end
 function M.prev()
     cache_check()
     local node=M.get_node()
     local sibling=M.get_sibling_node(node,true)
-    if sibling:equal(node) then return end
+    if get_data(sibling)==get_data(node) then return end
     M.select(sibling)
 end
 function M.current()
