@@ -39,6 +39,7 @@ local function create_treeview()
     _treeview_cache.treeview=view
     _treeview_cache.injections=injections
     _treeview_cache.rinjections=rinjections
+    M.stack={}
     return view,injections,rinjections
 end
 ---@return TSNode
@@ -62,27 +63,49 @@ local function same_range(a,b)
     local brows,bcols,browe,bcole=b:range()
     return arows==brows and acols==bcols and arowe==browe and acole==bcole
 end
+---@param node TSNode
+---@param _rec any?
 ---@return table
-local function get_data(node)
+local function get_data(node,_rec)
     local view,injections,rinjections=create_treeview()
     if view[node:id()] then
         return view[node:id()]
     end
-    local data={}
+
+    local parent=rinjections[node:id()] or node:parent() or nil
+    if parent and same_range(node,parent) and not _rec then
+        return get_data(parent)
+    end
+
+    local data=_rec or {}
     view[node:id()]=data
 
     data.children={}
 
     local injection=injections[node:id()]
     if injection then
-        table.insert(data.children,injection)
+        if injection:byte_length()~=0 then
+            if same_range(injection,node) then
+                get_data(injection,data)
+            else
+                table.insert(data.children,injection)
+            end
+        end
     end
 
     for _,child in ipairs(node:named_children()) do
-        table.insert(data.children,child)
+        if child:byte_length()~=0 then
+            if same_range(child,node) then
+                get_data(child,data)
+            else
+                table.insert(data.children,child)
+            end
+        end
     end
 
-    data.parent=rinjections[node:id()] or node:parent() or nil
+    if not _rec then
+        data.parent=parent
+    end
 
     return data
 end
@@ -93,9 +116,7 @@ function M.get_parent_node(node)
     if not data.parent then
         return node
     end
-    if same_range(node,data.parent) then
-        return M.get_parent_node(data.parent)
-    end
+    assert(not same_range(node,data.parent))
     return data.parent
 end
 ---@param node TSNode
@@ -103,14 +124,8 @@ end
 function M.get_child_node(node)
     local data=get_data(node)
     for _,child in ipairs(data.children) do
-        if same_range(node,child) or child:byte_length()==0 then
-            local new_child=M.get_child_node(child)
-            if not new_child:equal(child) then
-                return new_child
-            end
-        else
-            return child
-        end
+        assert(not same_range(node,data.parent) and child:byte_length()~=0)
+        return child
     end
     return node
 end
@@ -124,23 +139,19 @@ function M.get_sibling_node(node,prev)
         return node
     end
     local parent_data=get_data(parent)
-    local idx
+    local idx=-1
     for i,child in ipairs(parent_data.children) do
-        if child:equal(node) then
+        if get_data(child)==get_data(node) then
             idx=i+(prev and -1 or 1)
+            break
         end
     end
-    while parent_data.children[idx] and
-        (same_range(parent_data.children[idx],node)
-        or parent_data.children[idx]:byte_length()==0) do
-        idx=idx+(prev and -1 or 1)
-    end
     if parent_data.children[idx] then
+        assert(not same_range(node,parent_data.children[idx]))
+        assert(parent_data.children[idx]:byte_length()~=0)
         return parent_data.children[idx]
     end
-    if same_range(node,parent) then
-        return M.get_sibling_node(parent,prev)
-    end
+    assert(not same_range(node,parent))
     return node
 end
 function M.select(node)
