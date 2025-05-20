@@ -25,7 +25,7 @@ local function create_treeview()
                 if vim.treesitter.node_contains(parent,{child_root:range()}) then
                     local node=assert(parent:named_descendant_for_range(child_root:range()))
                     local id=node:id()
-                    if not injections[id] or child_root:byte_length()>injections[id].root:byte_length() then
+                    if not injections[id] or child_root:byte_length()>injections[id]:byte_length() then
                         injections[id]=child_root
                         rinjections[child_root:id()]=node
                     end
@@ -51,8 +51,7 @@ function M.get_node()
     local range={pos1[2]-1,pos1[3]-1,pos2[2]-1,pos2[3]}
     local parser=assert(vim.treesitter.get_parser())
     parser:parse(true)
-    local ltree=parser:language_for_range(range)
-    local node=assert(ltree:named_node_for_range(range))
+    local node=assert(parser:named_node_for_range(range,{ignore_injections=false}))
     return node
 end
 ---@param a TSNode
