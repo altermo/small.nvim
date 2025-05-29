@@ -22,7 +22,7 @@ local modelib=require'small.lib.mode'
 ---@field display 'list'|'block'
 ---@field skip_one boolean
 ---@field dir_shash false|'before'|'after'|'included'
-local default_conf={ending='\r',display='block',skip_one=true,dir_shash='included'}
+local default_conf={ending='\r',display='block',skip_one=true,dir_shash='before'}
 
 ---@class small.dff.config
 ---@field ending string?
@@ -281,7 +281,7 @@ function M.file_expl(path,conf_)
         end
         if conf.dir_shash=='included' then
             for k,v in ipairs(files) do
-                files[k]=v..mark[k]
+                files[k]=v..(mark[k]=='/' and '/' or '')
             end
         end
         return make_obj{
