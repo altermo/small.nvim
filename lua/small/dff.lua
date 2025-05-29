@@ -8,12 +8,12 @@ local modelib=require'small.lib.mode'
 ---@class small.dff.search_obj
 ---@field slist string[]
 ---@field _slist_draw string[]
----@field premark string[]?
+---@field draw fun(pre:string,char:string,post:string,idx:number):string,string,string
 ---@field range_start number
 ---@field range_end number
 ---@field col number
 ---@field conf small.dff.base_config
----@field altchar string|'error'
+---@field altchar string
 ---@field history {k:string,rs:number,re:number,col:number}[]
 ---@field ignore_back boolean?
 
@@ -21,12 +21,14 @@ local modelib=require'small.lib.mode'
 ---@field ending string
 ---@field display 'list'|'block'
 ---@field skip_one boolean
-local default_conf={ending='\n',display='block',skip_one=true}
+---@field dir_shash false|'before'|'after'|'included'
+local default_conf={ending='\r',display='block',skip_one=true,dir_shash='included'}
 
 ---@class small.dff.config
 ---@field ending string?
 ---@field display 'list'|'block'?
 ---@field skip_one boolean?
+---@field dir_shash false|'before'|'after'|'included'?
 
 ---@param list string[]
 ---@return nil
@@ -82,18 +84,14 @@ local function draw(obj,data)
     local offset=obj.range_start
     for i=obj.range_start,obj.range_end do
         local text=obj._slist_draw[i]
-        local pretext,char,postext
-        if obj.premark then
-            pretext=text:sub(1,obj.col)
-            char=text:sub(obj.col+1,obj.col+1)
-            postext=text:sub(obj.col+2)
-        else
-            pretext=text:sub(1,obj.col-1)
-            char=text:sub(obj.col,obj.col)
-            postext=text:sub(obj.col+1)
+        local pretext=text:sub(1,obj.col-1)
+        local char=text:sub(obj.col,obj.col)
+        local postext=text:sub(obj.col+1)
+        if obj.draw then
+            pretext,char,postext=obj.draw(pretext,char,postext,i)
         end
         if #text>max_len then max_len=#text end
-        if #text==obj.col-(obj.premark and 0 or 1) then char='^M' end
+        if #text==obj.col-1 then char='^M' end
         table.insert(blocks[#blocks],('\x1b[90m%s\x1b[95m%s\x1b[m%s'):format(pretext,char,postext))
         if (i-offset+3)>data.height then
             blocks[#blocks].width=max_len+1
@@ -193,7 +191,6 @@ local function start_search(create_obj,callback,handle)
     modelib.open(function (data)
         local key=data.data
         if key then
-            key=({['\r']='\n',['\n']='\r'})[key] or key
             if key==modelib.escape then
                 stat='esc'
                 local ret=callback(stat,'')
@@ -234,7 +231,7 @@ end
 ---@class small.dff.search_obj_conf
 ---@field slist string[]
 ---@field altchar string
----@field premark string[]?
+---@field draw (fun(pre:string,char:string,post:string,idx:number):string,string,string)?
 ---@field conf small.dff.base_config
 ---@field ignore_back boolean?
 
@@ -242,15 +239,12 @@ end
 ---@return small.dff.search_obj
 local function make_obj(o)
     local slist_draw={}
-    for k,v in ipairs(o.slist) do
-        if o.altchar=='error' then
+    for _,v in ipairs(o.slist) do
+        if o.altchar==nil then
             assert(not v:find(o.conf.ending,1,true))
         else
             assert(not v:find(o.altchar,1,true))
             v=v:gsub(vim.pesc(o.conf.ending),vim.pesc(o.altchar))
-        end
-        if o.premark then
-            v=assert(o.premark[k])..v
         end
         table.insert(slist_draw,v)
     end
@@ -260,7 +254,7 @@ local function make_obj(o)
         history={},
         slist=o.slist,
         altchar=o.altchar,
-        premark=o.premark,
+        draw=o.draw,
         range_start=1,
         range_end=#o.slist,
         col=1,
@@ -279,13 +273,25 @@ function M.file_expl(path,conf_)
     start_search(function ()
         local files=vim.fn.readdir(path)
         make_it_slist(files)
-        local mark=vim.tbl_map(function (i)
-            return vim.fn.isdirectory(vim.fs.joinpath(path,i))==1 and '/' or ' '
-        end,files)
+        local mark
+        if conf.dir_shash then
+            mark=vim.tbl_map(function (i)
+                return vim.fn.isdirectory(vim.fs.joinpath(path,i))==1 and '/' or ' '
+            end,files)
+        end
+        if conf.dir_shash=='included' then
+            for k,v in ipairs(files) do
+                files[k]=v..mark[k]
+            end
+        end
         return make_obj{
             slist=files,
-            altchar='/',
-            premark=mark,
+            altchar=conf.dir_shash~='included' and '/' or '\0',
+            draw=conf.dir_shash=='before' and function (pre,char,post,idx)
+                return mark[idx]..pre,char,post
+            end or conf.dir_shash=='after' and function (pre,char,post,idx)
+                return pre,char,post..mark[idx]
+            end or nil,
             conf=conf,
         }
     end,function (stat,msg)
@@ -358,8 +364,8 @@ function M.markdown_headings(path,conf_)
     make_it_slist(names)
     start_search(make_obj{
         slist=names,
-        altchar='error',
         conf=conf,
+        altchar='\n',
         ignore_back=true,
     },function (stat,msg)
             if stat=='done' then
