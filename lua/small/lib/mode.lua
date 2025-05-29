@@ -43,11 +43,13 @@ function M.draw(chan,lines,pos,extra)
     for row,line in ipairs(lines or {}) do
         if row>height then break end
         vim.api.nvim_chan_send(chan,'\x1b['..row..';1H')
-        vim.api.nvim_chan_send(chan,line:sub(1,width))
+        local true_width=#line-#(line:gsub('\x1b%[[^a-zA-Z]*[a-zA-Z]',''))+width
+        vim.api.nvim_chan_send(chan,line:sub(1,true_width))
     end
     if pos then
         vim.api.nvim_chan_send(chan,'\x1b['..pos[1]..';'..pos[2]..'H')
     else
+        vim.api.nvim_chan_send(chan,'\x1b[1;1H')
         vim.api.nvim_chan_send(chan,'\x1b[?25l')
     end
     if extra then vim.api.nvim_chan_send(chan,extra) end
