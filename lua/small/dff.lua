@@ -15,7 +15,7 @@ local modelib=require'small.lib.mode'
 ---@field conf small.dff.base_config
 ---@field altchar string|'error'
 ---@field history {k:string,rs:number,re:number,col:number}[]
----@field stat 'back'|'done'?
+---@field ignore_back boolean?
 
 ---@class small.dff.base_config
 ---@field ending string
@@ -82,14 +82,19 @@ local function draw(obj,data)
     local offset=obj.range_start
     for i=obj.range_start,obj.range_end do
         local text=obj._slist_draw[i]
-        local pretext=text:sub(1,obj.col)
-        local char=text:sub(obj.col+1,obj.col+1)
-        local postext=text:sub(obj.col+2)
-        local len=#pretext+#char+#postext
-        if len>max_len then max_len=len end
-        if #text==obj.col then char='^M' end
+        local pretext,char,postext
+        if obj.premark then
+            pretext=text:sub(1,obj.col)
+            char=text:sub(obj.col+1,obj.col+1)
+            postext=text:sub(obj.col+2)
+        else
+            pretext=text:sub(1,obj.col-1)
+            char=text:sub(obj.col,obj.col)
+            postext=text:sub(obj.col+1)
+        end
+        if #text>max_len then max_len=#text end
+        if #text==obj.col-(obj.premark and 0 or 1) then char='^M' end
         table.insert(blocks[#blocks],('\x1b[90m%s\x1b[95m%s\x1b[m%s'):format(pretext,char,postext))
-        -- table.insert(blocks[#blocks],('%s%s%s'):format(pretext,char,postext))
         if (i-offset+3)>data.height then
             blocks[#blocks].width=max_len+1
             total_width=total_width+max_len+2
@@ -105,7 +110,6 @@ local function draw(obj,data)
         local line={}
         for _,block in ipairs(blocks) do
             if block[i] then
-                -- table.insert(line,block[i]..(' '):rep(block.width-(#block[i])))
                 table.insert(line,block[i]..(' '):rep(block.width-(#block[i]-#('\x1b[90m\x1b[95m\x1b[m'))))
             end
         end
@@ -170,10 +174,9 @@ end
 local function start_search(create_obj,callback,handle)
     local call=type(create_obj)=='function'
 
-    local obj=create_obj('first')
+    local obj=(not call) and create_obj --[[@as small.dff.search_obj]] or create_obj('first')
 
-    local stat
-    stat=obj.stat or 'done'
+    local stat='done'
 
     while #obj.slist==1 and obj.conf.skip_one do
         local ret=callback(stat,obj.slist[1])
@@ -196,7 +199,7 @@ local function start_search(create_obj,callback,handle)
                 local ret=callback(stat,'')
                 return handle_(ret)
             elseif key==modelib.backspace then
-                if back(obj) then
+                if back(obj) and (not obj.ignore_back) then
                     stat='back'
                     local ret=callback(stat,'')
                     if (not call) or ret then return handle_(ret) end
@@ -233,6 +236,7 @@ end
 ---@field altchar string
 ---@field premark string[]?
 ---@field conf small.dff.base_config
+---@field ignore_back boolean?
 
 ---@param o small.dff.search_obj_conf
 ---@return small.dff.search_obj
@@ -261,6 +265,7 @@ local function make_obj(o)
         range_end=#o.slist,
         col=1,
         conf=o.conf,
+        ignore_back=o.ignore_back,
     }
 end
 
@@ -298,8 +303,87 @@ function M.file_expl(path,conf_)
             return
         end
     end,function (ret)
-        if path then vim.cmd.edit(ret) end
+        if ret then vim.cmd.edit(ret) end
     end)
+end
+
+---@param path string?
+---@param conf_ small.dff.config?
+function M.markdown_headings(path,conf_)
+    local conf=conf_ and vim.tbl_deep_extend('force',default_conf,conf_) or default_conf
+    path=path or vim.api.nvim_buf_get_name(0)
+    assert(vim.fn.filereadable(path)==1)
+    local source=vim.fn.readblob(path)
+    local parser=vim.treesitter.get_string_parser(source,'markdown')
+    local root=parser:parse(true)[1]:root()
+    local query=vim.treesitter.query.parse('markdown',[[
+    (setext_heading
+      heading_content: (_) @h
+      (setext_h1_underline))
+    (setext_heading
+      heading_content: (_) @h
+      (setext_h2_underline))
+    (atx_heading
+      (atx_h1_marker)
+      heading_content: (_) @h)
+    (atx_heading
+      (atx_h2_marker)
+      heading_content: (_) @h)
+    (atx_heading
+      (atx_h3_marker)
+      heading_content: (_) @h)
+    (atx_heading
+      (atx_h4_marker)
+      heading_content: (_) @h)
+    (atx_heading
+      (atx_h5_marker)
+      heading_content: (_) @h)
+    (atx_heading
+      (atx_h6_marker)
+      heading_content: (_) @h)
+    ]])
+    local positions={}
+    local names={}
+    for _,node in query:iter_captures(root,source,0,-1) do
+        local heading=vim.treesitter.get_node_text(node,source)
+        local name=heading:match('<!%-%-%s*(%w+)%s*-->')
+        if name then
+            if positions[name] then
+                error('Duplicate heading: '..name)
+            end
+            positions[name]=(node:range())+1
+            table.insert(names,name)
+        end
+    end
+    make_it_slist(names)
+    start_search(make_obj{
+        slist=names,
+        altchar='error',
+        conf=conf,
+        ignore_back=true,
+    },function (stat,msg)
+            if stat=='done' then
+                return positions[msg]
+            end
+        end,function (ret)
+            vim.cmd.edit(path)
+            if ret then vim.fn.setcursorcharpos(ret,0) end
+        end)
+end
+
+---@param path string
+---@param conf_ small.dff.config?
+function M.auto_open(path,conf_)
+    if vim.fn.isdirectory(path)==1 then
+        M.file_expl(path,conf_)
+    elseif vim.fn.fnamemodify(path,':e')=='md' then
+        M.markdown_headings(path,conf_)
+    else
+        if vim.api.nvim_buf_get_name(0)==vim.fn.resolve(path) then
+        else
+            vim.cmd.edit(path)
+        end
+    end
 end
 
 return M
