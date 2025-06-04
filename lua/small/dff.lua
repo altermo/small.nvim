@@ -373,7 +373,49 @@ function M.markdown_headings(path,conf_)
             end
         end,function (ret)
             vim.cmd.edit(path)
-            if ret then vim.fn.setcursorcharpos(ret,0) end
+            if ret then
+                vim.fn.setcursorcharpos(ret,0)
+                vim.cmd.normal{'zt',bang=true}
+            end
+        end)
+end
+
+---@param path string?
+---@param conf_ small.dff.config?
+function M.lua_tags(path,conf_)
+    local conf=conf_ and vim.tbl_deep_extend('force',default_conf,conf_) or default_conf
+    path=path or vim.api.nvim_buf_get_name(0)
+    assert(vim.fn.filereadable(path)==1)
+    local positions={}
+    local names={}
+    local row=0
+    for line in io.lines(path) do
+        row=row+1
+        local tag=line:match('%*(%w+)%*')
+        if tag then
+            if positions[tag] then
+                error('Duplicate tag: '..tag)
+            end
+            positions[tag]=row
+            table.insert(names,tag)
+        end
+    end
+    make_it_slist(names)
+    start_search(make_obj{
+        slist=names,
+        conf=conf,
+        altchar='\n',
+        ignore_back=true,
+    },function (stat,msg)
+            if stat=='done' then
+                return positions[msg]
+            end
+        end,function (ret)
+            vim.cmd.edit(path)
+            if ret then
+                vim.fn.setcursorcharpos(ret,0)
+                vim.cmd.normal{'zt',bang=true}
+            end
         end)
 end
 
@@ -384,6 +426,8 @@ function M.auto_open(path,conf_)
         M.file_expl(path,conf_)
     elseif vim.fn.fnamemodify(path,':e')=='md' then
         M.markdown_headings(path,conf_)
+    elseif vim.fn.fnamemodify(path,':e')=='lua' then
+        M.lua_tags(path,conf_)
     else
         if vim.api.nvim_buf_get_name(0)==vim.fn.resolve(path) then
         else

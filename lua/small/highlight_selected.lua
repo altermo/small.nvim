@@ -22,7 +22,7 @@ function M.do_highlight()
     if vim.fn.type(text)==10 then return end
     M.prev_match_win={}
     for _,win in ipairs(vim.api.nvim_tabpage_list_wins(0)) do
-        vim._with({emsg_silent=true},function ()
+        vim._with({emsg_silent=true,silent=true},function ()
             local id=vim.fn.matchadd('Visual','\\M'..text:gsub('\\','\\\\'):gsub('\n','\\n'),100,-1,{window=win})
             M.prev_match_win[win]=id
         end)
