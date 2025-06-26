@@ -8,6 +8,7 @@ local function refresh()
         return
     end
     local maxwidth=1
+    vim.api.nvim_buf_clear_namespace(M.buf,M.ns,0,-1)
     vim.api.nvim_buf_set_lines(M.buf,0,-1,false,{})
     local padding=1
     for _,tabid in ipairs(vim.api.nvim_list_tabpages()) do
