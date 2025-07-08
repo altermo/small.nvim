@@ -27,7 +27,7 @@ local function refresh()
         vim.api.nvim_buf_set_lines(M.buf,tabnr-1,tabnr,false,{str})
         if tabnr==vim.fn.tabpagenr() then
             vim.api.nvim_buf_set_extmark(M.buf,M.ns,tabnr-1,0,{
-                hl_group='ErrorMsg',
+                hl_group='Title',
                 end_col=#str,
             })
         end
