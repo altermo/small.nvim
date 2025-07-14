@@ -65,6 +65,12 @@ function M.jump_color()
     return M.goto_node(M.nodes.last)
 end
 if vim.dev then
+    vim.api.nvim_set_hl(0,'rainbow1',{fg='red'})
+    vim.api.nvim_set_hl(0,'rainbow2',{fg='orange'})
+    vim.api.nvim_set_hl(0,'rainbow3',{fg='yellow'})
+    vim.api.nvim_set_hl(0,'rainbow4',{fg='green'})
+    vim.api.nvim_set_hl(0,'rainbow5',{fg='blue'})
+    vim.api.nvim_set_hl(0,'rainbow6',{fg='purple'})
     vim.keymap.set('n','vr',function () return M.goto_node(1) end,{expr=true})
     vim.keymap.set('n','vo',function () return M.goto_node(2) end,{expr=true})
     vim.keymap.set('n','vy',function () return M.goto_node(3) end,{expr=true})

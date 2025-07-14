@@ -236,4 +236,19 @@ function M.readonly(tbl,recursive)
     debug.setmetatable(proxy,mt)
     return proxy
 end
+---@param path string
+---@return boolean
+function M.is_binary(path)
+    local file=assert(io.open(path,'rb'),('File %s is not valid'):format(path))
+    local text=file:read(1024)
+    if text:find('\0') then
+        return true
+    end
+    for _,v in ipairs({'%PDF','\x89PNG'}) do
+        if text:sub(1,#v)==v then
+            return true
+        end
+    end
+    return false
+end
 return M

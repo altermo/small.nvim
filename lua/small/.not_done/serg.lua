@@ -28,7 +28,7 @@ function M.run()
     vim.cmd.vsplit()
     vim.api.nvim_set_current_buf(buf)
 end
-if vim.dev then
+-- if vim.dev then
     M.run()
-end
+-- end
 return M

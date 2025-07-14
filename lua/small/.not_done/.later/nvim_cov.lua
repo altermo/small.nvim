@@ -1,2 +1,0 @@
---- neovim coverage analysis
---- use debug.sethook
