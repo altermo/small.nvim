@@ -222,4 +222,12 @@ function M.line()
     vim.fn.cursor(vim.fn.line'.',1)
     M.select(M.get_node())
 end
+function M.base()
+    cache_check()
+    local node=M.get_node()
+    while node:parent() and node:parent():parent() do
+        node=assert(node:parent())
+    end
+    M.select(node)
+end
 return M

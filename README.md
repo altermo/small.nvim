@@ -470,6 +470,7 @@ Summary: Similar to Helix's treesitter selection\
 Commands:
 + `treeselect.current()`: select current node
 + `treeselect.line()`: select current node linewise
++ `treeselect.base()`: select one below root node
 + `treeselect.next()`: select next node
 + `treeselect.prev()`: select previous node
 + `treeselect.up()`: select parent node
