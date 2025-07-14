@@ -172,6 +172,9 @@ Commands:
 Config:
 + `fastmultif.conf.labels` labels to use
 
+## Fendy
+Summary: luay but for [fend](https://github.com/printfn/fend). \
+Commands: `fendy.run()`
 
 ## Float
 Summary: create, move and resize floating windows, use ctrl-mouse to move/resize windows \
