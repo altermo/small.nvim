@@ -225,6 +225,12 @@ Commands:
 
 Rewrite into normal plugin: https://github.com/altermo/iedit.nvim
 
+## Incdec
+Summary: ctrl-a/x but also dates.
+Commands:
++ `incdec.inc()` increment value
++ `incdec.dec()` decrement value
+
 ## Kitty
 Summary: Synchronize with kitty terminal\
 NOTE: Can't be configured yet.\
