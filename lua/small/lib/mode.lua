@@ -77,9 +77,8 @@ function M.open(on_input,bufname,startinsert)
     end
     au=vim.api.nvim_create_autocmd('WinResized',{callback=redraw})
     vim.api.nvim_set_current_buf(buf)
-    if startinsert then vim.schedule(function()
-        vim.cmd.startinsert()
-    end)
+    if startinsert then
+        vim.defer_fn(vim.cmd.startinsert,100)
     end
     redraw()
     return function (lines,pos,extra) M.draw(chan,lines,pos,extra) end
