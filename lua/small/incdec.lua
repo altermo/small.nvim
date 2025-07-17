@@ -13,10 +13,11 @@ local short_to_long={
 }
 local ctrl_a=vim.keycode'<C-a>'
 local ctrl_x=vim.keycode'<C-x>'
-local function builtin(inc)
-    vim.api.nvim_feedkeys(inc and ctrl_a or ctrl_x,'n',false)
+local function builtin(inc,count)
+    vim.api.nvim_feedkeys(count..(inc and ctrl_a or ctrl_x),'n',false)
 end
-local function increment(inc)
+local function increment(inc,count)
+    count=count and count~=0 and count or 1
     local line=vim.api.nvim_get_current_line()
     local row=vim.api.nvim_win_get_cursor(0)[1]
     local col=vim.api.nvim_win_get_cursor(0)[2]+1
@@ -27,7 +28,7 @@ local function increment(inc)
     if not find then return end
     local before=find~=1
     col=find+col-1
-    if line:sub(col):match('0x[0-9a-fA-F]') then return builtin(inc) end
+    if line:sub(col):match('0x[0-9a-fA-F]') then return builtin(inc,count) end
     for _,v in ipairs(dates) do
         local len=#(v[1]:gsub('%%',''))
         local area=line:sub(math.max(col-len+1,1),col+len-1)
@@ -44,7 +45,7 @@ local function increment(inc)
             local bcol=col+find-1
             col=bcol-(v[tk] or 0)
             local date=os.date('*t',vim.fn.strptime(v[2],ti))
-            date[short_to_long[tk]]=date[short_to_long[tk]]+(inc and 1 or -1)
+            date[short_to_long[tk]]=date[short_to_long[tk]]+(inc and count or -count)
             ---@diagnostic disable-next-line: param-type-mismatch
             local newdate=os.date(v[2],os.time(date)) --[[@as string]]
             vim.api.nvim_win_set_cursor(0,{row,col-1})
@@ -52,12 +53,12 @@ local function increment(inc)
             return
         end
     end
-    return builtin(inc)
+    return builtin(inc,count)
 end
-function M.inc()
-    increment(true)
+function M.inc(count)
+    increment(true,count)
 end
-function M.dec()
-    increment(false)
+function M.dec(count)
+    increment(false,count)
 end
 return M
