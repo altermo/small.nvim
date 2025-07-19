@@ -358,6 +358,11 @@ Commands: `qrun.run()`
 Summary: Quick run neovim (version 2) \
 Commands: `qrun.run()`
 
+## Rainbow_pair
+Required: `treesitter`\
+Summary: rainbow pairs \
+Setup: `rainbow_pair.setup()`\
+
 ## Ranger
 Required: `ranger` \
 Summary: simple `ranger` wrapper \
