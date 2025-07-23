@@ -173,10 +173,21 @@ end
 function M.select(node)
     cache_check()
     local rows,cols,rowe,cole=node:range()
+    local other=false
+    if vim.fn.mode()=='v'  then
+        local vcol,vline=vim.fn.col'v',vim.fn.line'v'
+        local dcol,dline=vim.fn.col'.',vim.fn.line'.'
+        if vline>dline or (vline==dline and vcol>dcol) then
+            other=true
+        end
+    end
     vim.api.nvim_win_set_cursor(0,{rows+1,cols})
     vim.api.nvim_feedkeys(vim.keycode'<C-\\><C-n>v','nx',true)
     if not pcall(vim.api.nvim_win_set_cursor,0,{rowe+1,cole-1}) then
         vim.api.nvim_win_set_cursor(0,{rowe,#vim.fn.getline(rowe)})
+    end
+    if other then
+        vim.api.nvim_feedkeys('o','nx',true)
     end
 end
 function M.up()
