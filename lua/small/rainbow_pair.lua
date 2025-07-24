@@ -15,10 +15,12 @@ local M={conf={pairs={
 
 local function highlight_range(bufnr,range,level)
     local rows,cols,_,rowe,cole=unpack(range)
-    vim.api.nvim_buf_set_extmark(bufnr,M.ns,rows,cols,{
-        end_line=rowe,end_col=cole,
-        hl_group=('rainbow'..((level)%(#M.conf.hl)+1)),
-    })
+    pcall(function ()
+        vim.api.nvim_buf_set_extmark(bufnr,M.ns,rows,cols,{
+            end_line=rowe,end_col=cole,
+            hl_group=('rainbow'..((level)%(#M.conf.hl)+1)),
+        })
+    end)
 end
 local _cache={}
 local function update_highlighting(bufnr)
