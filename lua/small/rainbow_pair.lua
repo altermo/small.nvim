@@ -37,37 +37,42 @@ local function update_highlighting(bufnr)
         end
         _cache[lang]=table.concat(queries,'\n')
     end
-    local query=vim.treesitter.query.parse(lang,_cache[lang])
-    assert(#query.captures==3)
-    local reveser_matches={}
-    for _,match in query:iter_matches(parser:parse()[1]:root(),bufnr) do
-        assert(query.captures[1]=='s' and #match[1]==1)
-        assert(query.captures[2]=='e' and #match[2]==1)
-        assert(query.captures[3]=='a' and #match[3]==1)
-        table.insert(reveser_matches,1,match)
-    end
-    local level=0
-    vim.api.nvim_buf_clear_namespace(bufnr,M.ns,0,-1)
-    local stack={math.huge}
-    for _,match in ipairs(reveser_matches) do
-        local node_a=match[3][1]
-        local byte=vim.treesitter.get_range(node_a,bufnr)[3]
-        if byte>=stack[#stack] then
-            level=level+1
-            table.insert(stack,byte)
-        else
-            while #stack>0 and byte<stack[#stack] do
-                table.remove(stack)
-                level=level-1
+    parser:parse(nil,function (err,trees)
+        if err or not trees then return end
+        local query=vim.treesitter.query.parse(lang,_cache[lang])
+        assert(#query.captures==3)
+        local reveser_matches={}
+        for _,tree in ipairs(trees) do
+            for _,match in query:iter_matches(tree:root(),bufnr) do
+                assert(query.captures[1]=='s' and #match[1]==1)
+                assert(query.captures[2]=='e' and #match[2]==1)
+                assert(query.captures[3]=='a' and #match[3]==1)
+                table.insert(reveser_matches,1,match)
             end
-            level=level+1
-            table.insert(stack,byte)
         end
-        local node_s=match[1][1]
-        highlight_range(bufnr,vim.treesitter.get_range(node_s,bufnr),level)
-        local node_e=match[2][1]
-        highlight_range(bufnr,vim.treesitter.get_range(node_e,bufnr),level)
-    end
+        local level=0
+        vim.api.nvim_buf_clear_namespace(bufnr,M.ns,0,-1)
+        local stack={math.huge}
+        for _,match in ipairs(reveser_matches) do
+            local node_a=match[3][1]
+            local byte=vim.treesitter.get_range(node_a,bufnr)[3]
+            if byte>=stack[#stack] then
+                level=level+1
+                table.insert(stack,byte)
+            else
+                while #stack>0 and byte<stack[#stack] do
+                    table.remove(stack)
+                    level=level-1
+                end
+                level=level+1
+                table.insert(stack,byte)
+            end
+            local node_s=match[1][1]
+            highlight_range(bufnr,vim.treesitter.get_range(node_s,bufnr),level)
+            local node_e=match[2][1]
+            highlight_range(bufnr,vim.treesitter.get_range(node_e,bufnr),level)
+        end
+    end)
 end
 function M.setup()
     for k,v in ipairs(M.conf.hl) do
