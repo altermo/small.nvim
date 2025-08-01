@@ -35,8 +35,9 @@ local function update_highlighting(bufnr)
                 table.insert(queries,v)
             end
         end
-        _cache[lang]=table.concat(queries,'\n')
+        _cache[lang]=#queries>1 and table.concat(queries,'\n') or true
     end
+    if _cache[lang]==true then return end
     parser:parse(nil,function (err,trees)
         if err or not trees then return end
         local query=vim.treesitter.query.parse(lang,_cache[lang])
