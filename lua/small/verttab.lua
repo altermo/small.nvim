@@ -36,7 +36,7 @@ local function refresh()
     M.win=vim.api.nvim_open_win(M.buf,false,{
         relative='editor',
         width=maxwidth,
-        height=vim.o.lines,
+        height=#vim.api.nvim_list_tabpages(),
         row=0,
         col=vim.o.columns-1,
         style='minimal',
