@@ -290,27 +290,27 @@ function M.file_expl(path,conf_)
             draw=conf.dir_shash=='before' and function (pre,char,post,idx)
                 return mark[idx]..pre,char,post
             end or conf.dir_shash=='after' and function (pre,char,post,idx)
-                return pre,char,post..mark[idx]
-            end or nil,
+                    return pre,char,post..mark[idx]
+                end or nil,
             conf=conf,
         }
     end,function (stat,msg)
-        if stat=='back' then
-            if path=='/' and conf.skip_one then
+            if stat=='back' then
+                if path=='/' and conf.skip_one then
+                    return path
+                end
+                path=vim.fs.dirname(path)
+                return
+            elseif stat=='esc' then
                 return path
+            elseif stat=='done' then
+                path=vim.fs.joinpath(path,msg)
+                if vim.fn.isdirectory(path)==0 then return path end
+                return
             end
-            path=vim.fs.dirname(path)
-            return
-        elseif stat=='esc' then
-            return path
-        elseif stat=='done' then
-            path=vim.fs.joinpath(path,msg)
-            if vim.fn.isdirectory(path)==0 then return path end
-            return
-        end
-    end,function (ret)
-        if ret then vim.cmd.edit(ret) end
-    end)
+        end,function (ret)
+            if ret then vim.cmd.edit(vim.uv.fs_realpath(ret) or ret) end
+        end)
 end
 
 ---@param path string?
@@ -324,29 +324,29 @@ function M.markdown_headings(path,conf_)
     local root=parser:parse(true)[1]:root()
     local query=vim.treesitter.query.parse('markdown',[[
     (setext_heading
-      heading_content: (_) @h
-      (setext_h1_underline))
+        heading_content: (_) @h
+        (setext_h1_underline))
     (setext_heading
-      heading_content: (_) @h
-      (setext_h2_underline))
+        heading_content: (_) @h
+        (setext_h2_underline))
     (atx_heading
-      (atx_h1_marker)
-      heading_content: (_) @h)
+        (atx_h1_marker)
+        heading_content: (_) @h)
     (atx_heading
-      (atx_h2_marker)
-      heading_content: (_) @h)
+        (atx_h2_marker)
+        heading_content: (_) @h)
     (atx_heading
-      (atx_h3_marker)
-      heading_content: (_) @h)
+        (atx_h3_marker)
+        heading_content: (_) @h)
     (atx_heading
-      (atx_h4_marker)
-      heading_content: (_) @h)
+        (atx_h4_marker)
+        heading_content: (_) @h)
     (atx_heading
-      (atx_h5_marker)
-      heading_content: (_) @h)
+        (atx_h5_marker)
+        heading_content: (_) @h)
     (atx_heading
-      (atx_h6_marker)
-      heading_content: (_) @h)
+        (atx_h6_marker)
+        heading_content: (_) @h)
     ]])
     local positions={}
     local names={}
