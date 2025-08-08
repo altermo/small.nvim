@@ -1,4 +1,9 @@
 local M={conf={warn_soon_todo_before=60*10},ns=vim.api.nvim_create_namespace('small.reminder2')}
+local function notify(msg, level)
+    local chunks={{msg,level==vim.log.levels.WARN and 'WarningMsg' or
+        level==vim.log.levels.ERROR and 'ErrorMsg' or nil}}
+    vim.api.nvim_echo(chunks,true,{})
+end
 function M.parse_date(date)
     local reg='(%d%d%d%d)%-(%d%d)%-(%d%d)_(%d%d):(%d%d)'
     if not date:match(reg) then date=date..'_00:00' end
@@ -91,11 +96,11 @@ end
 local function _update(items)
     for item in vim.iter(items) do
         if item.time and os.time()>os.time(item.date) then
-            vim.notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
+            notify(item.doc..' is OVERDUE',vim.log.levels.ERROR)
         elseif item.time and (os.time()+60*10)>os.time(item.date) then
             local min=item.date.min-os.date('*t').min
             if min<0 then min=min+60 end
-            vim.notify(item.doc..' is due in '..min..' min',vim.log.levels.WARN)
+            notify(item.doc..' is due in '..min..' min',vim.log.levels.WARN)
         end
     end
 end
@@ -131,11 +136,11 @@ function M.notify_today()
             message='QUICK: '..message
         end
         if is_overdue or item.important then
-            vim.notify(message,vim.log.levels.ERROR)
+            notify(message,vim.log.levels.ERROR)
         elseif item.quick then
-            vim.notify(message,vim.log.levels.WARN)
+            notify(message,vim.log.levels.WARN)
         else
-            vim.notify(message,vim.log.levels.TRACE)
+            notify(message,vim.log.levels.TRACE)
         end
         ::continue::
     end
