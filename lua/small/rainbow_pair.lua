@@ -28,27 +28,28 @@ local function update_highlighting(bufnr)
     if not lang then return end
     local parser=vim.treesitter.get_parser(bufnr,lang,{error=false})
     if not parser then return end
-    if not _cache[lang] then
-        local queries={}
-        for _,v in ipairs(M.conf.pairs) do
-            if pcall(vim.treesitter.query.parse,lang,v) then
-                table.insert(queries,v)
-            end
-        end
-        _cache[lang]=#queries>1 and table.concat(queries,'\n') or true
-    end
     if _cache[lang]==true then return end
     parser:parse(nil,function (err,trees)
         if err or not trees then return end
-        local query=vim.treesitter.query.parse(lang,_cache[lang])
-        assert(#query.captures==3)
+        if not _cache[lang] then
+            local queries={}
+            for _,v in ipairs(M.conf.pairs) do
+                pcall(function ()
+                    table.insert(queries,vim.treesitter.query.parse(lang,v))
+                end)
+            end
+            _cache[lang]=#queries>1 and queries or true
+            if _cache[lang]==true then return end
+        end
         local reveser_matches={}
         for _,tree in ipairs(trees) do
-            for _,match in query:iter_matches(tree:root(),bufnr) do
-                assert(query.captures[1]=='s' and #match[1]==1)
-                assert(query.captures[2]=='e' and #match[2]==1)
-                assert(query.captures[3]=='a' and #match[3]==1)
-                table.insert(reveser_matches,1,match)
+            for _,query in ipairs(_cache[lang]) do
+                for _,match in query:iter_matches(tree:root(),bufnr) do
+                    assert(query.captures[1]=='s' and #match[1]==1)
+                    assert(query.captures[2]=='e' and #match[2]==1)
+                    assert(query.captures[3]=='a' and #match[3]==1)
+                    table.insert(reveser_matches,1,match)
+                end
             end
         end
         local level=0
