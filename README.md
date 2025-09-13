@@ -176,6 +176,12 @@ Config:
 Summary: luay but for [fend](https://github.com/printfn/fend). \
 Commands: `fendy.run()`
 
+## Filetree
+Required: `netrw` \
+Summary: Filetree using netrw \
+Setup `filetree.setup()` (only changes netrw options) \
+Commands: `filetree.toggle()`
+
 ## Float
 Summary: create, move and resize floating windows, use ctrl-mouse to move/resize windows \
 Setup: `float.setup()` \
