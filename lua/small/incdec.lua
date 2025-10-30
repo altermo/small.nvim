@@ -44,7 +44,7 @@ local function increment(inc,count)
             end
             local bcol=col+find-1
             col=bcol-(v[tk] or 0)
-            local date=os.date('*t',vim.fn.strptime(v[2],ti))
+            local date=os.date('*t',vim.fn.strptime(v[2],ti)) --[[@as osdateparam]]
             date[short_to_long[tk]]=date[short_to_long[tk]]+(inc and count or -count)
             ---@diagnostic disable-next-line: param-type-mismatch
             local newdate=os.date(v[2],os.time(date)) --[[@as string]]
