@@ -1,10 +1,10 @@
 local M={ns=vim.api.nvim_create_namespace('SmallVertTab')}
 local function refresh()
+    if M.win then
+        pcall(vim.api.nvim_win_close,M.win,true)
+        M.win=nil
+    end
     if not M.opened then
-        if M.win then
-            pcall(vim.api.nvim_win_close,M.win,true)
-            M.win=nil
-        end
         return
     end
     local maxwidth=1
@@ -32,7 +32,6 @@ local function refresh()
             })
         end
     end
-    local old_win=M.win
     M.win=vim.api.nvim_open_win(M.buf,false,{
         relative='editor',
         width=maxwidth,
@@ -43,31 +42,22 @@ local function refresh()
         focusable=false,
         noautocmd=true,
     })
-    if old_win then
-        vim.api.nvim_win_close(old_win,true)
-    end
     vim.wo[M.win].winhighlight='Normal:Normal'
 end
 local timeout
 function M.setup()
+    vim.o.showtabline=0
     M.buf=vim.api.nvim_create_buf(false,true)
     local last_tab=vim.fn.tabpagenr()
-    ---@diagnostic disable-next-line: redundant-parameter
-    vim.ui_attach(M.ns,{ext_tabline=true},function (event,curtab)
-        pcall(function ()
-            if event~='tabline_update' then return end
-            --if #vim.fn.gettabinfo()==1 and M.opened then
-            --    M.opened=false
-            --    refresh()
-            --    if timeout then timeout:close() timeout=nil end
-            if curtab~=last_tab then
-                last_tab=curtab
-                M.show()
-            else
-                refresh()
-            end
-        end)
-    end)
+    vim.api.nvim_create_autocmd({'TabEnter'},{callback=function ()
+        local curtab=vim.fn.tabpagenr()
+        if curtab~=last_tab then
+            last_tab=curtab
+            M.show()
+        else
+            refresh()
+        end
+    end})
 end
 function M.show()
     M.opened=true
