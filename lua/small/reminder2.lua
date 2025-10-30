@@ -248,5 +248,6 @@ function M.setup()
             end})
         end
     end})
+    vim.cmd.doau'BufRead'
 end
 return M
