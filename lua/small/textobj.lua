@@ -30,4 +30,18 @@ function M.wordrow()
     return '<esc>'..col1..'|<C-v>o'..col2..'|'
 end
 function M.charrow() return M.wordrow()..vim.v.operator end
+
+function M.samecolumn()
+    if vim.fn.mode()=='n' then
+        return M.charcolumn()
+    end
+    return M.wordcolumn()
+end
+function M.samerow()
+    if vim.fn.mode()=='n' then
+        return M.charrow()
+    end
+    return M.wordrow()
+end
+
 return M
