@@ -288,6 +288,13 @@ Commands:
 + `macro.toggle_rec()`: toggle the recoding of macro
 + `macro.play_rec()`: play the macro
 + `macro.edit_rec()`: edit the macro
+
+## Macro2
+Summary: Improves the builtin macro system \
+Setup: `macro2.setup()` \
+Commands:
++ `macro2.edit()`: edit the macro
+
 ## Matchall
 Summary: Match current word + vim.lsp.buf.document_highlight\
 Setup: `matchall.setup()`
